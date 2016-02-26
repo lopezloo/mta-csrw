@@ -1,0 +1,60 @@
+<def name="Counter Strike RenderWare">
+    <element name="spawntt" friendlyname="Terrorist spawnpoint" icon="edf/spawntt.png">
+        <data name="position" type="coord3d" default="0,0,0" />
+        <data name="rotation" type="coord3d" default="0,0,0" />
+        <data name="interior" type="integer" default="0" />
+        <data name="dimension" type="integer" default="0" />
+
+        <ped model="100" rotation="!rotation!" interior="!interior!" dimension="!dimension!" />
+        <blip color="#FF0000" />
+    </element>
+
+    <element name="spawnct" friendlyname="Counter Terrorist spawnpoint" icon="edf/spawnct.png">
+        <data name="position" type="coord3d" default="0,0,0" />
+        <data name="rotation" type="coord3d" default="0,0,0" />
+        <data name="interior" type="integer" default="0" />
+        <data name="dimension" type="integer" default="0" />
+
+        <ped model="105" rotation="!rotation!" interior="!interior!" dimension="!dimension!" />
+        <blip color="#1240AB" />
+    </element>
+
+    <element name="hostage" friendlyname="Hostage spawnpoint" icon="edf/hostage.png">
+        <data name="position" type="coord3d" default="0,0,0" />
+        <data name="rotation" type="coord3d" default="0,0,0" />
+        <data name="skin" type="skinID" default="50" />
+        <data name="interior" type="integer" default="0" />
+        <data name="dimension" type="integer" default="0" />
+
+        <ped model="!skin!" rotation="!rotation!" interior="!interior!" dimension="!dimension!" />
+        <blip color="#00B52A" />
+    </element>
+
+     <element name="bombsite" friendlyname="Bombsite" icon="edf/bombsite.png">
+        <data name="position" type="coord3d" default="0,0,0" />
+        <data name="interior" type="integer" default="0" />
+        <data name="dimension" type="integer" default="0" />
+        <data name="size" type="number" required="true" default="3" />
+
+        <marker color="#FF0000" interior="!interior!" dimension="!dimension!" size="!size!" />
+    </element>
+
+     <element name="hostagesite" friendlyname="Hostagesite">
+        <data name="position" type="coord3d" default="0,0,0" />
+        <data name="interior" type="integer" default="0" />
+        <data name="dimension" type="integer" default="0" />
+        <data name="size" type="number" required="true" default="3" />
+
+        <marker color="#FF0000" interior="!interior!" dimension="!dimension!" size="!size!" />
+    </element>
+
+    <element name="camera" friendlyname="Camera (don't touch)" icon="edf/camera.png">
+        <data name="position" type="coord3d" default="0,0,0" />
+        <data name="targetX" type="string" default="0" />
+        <data name="targetY" type="string" default="0" />
+        <data name="targetZ" type="string" default="0" />
+        <data name="roll" type="string" default="0" />
+        <data name="fov" type="string" default="70" />
+        <data name="interior" type="integer" default="0" />
+    </element>
+</def>

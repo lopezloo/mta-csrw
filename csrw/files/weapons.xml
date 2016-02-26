@@ -1,0 +1,109 @@
+<weapons>
+	<!--
+		Weapon shop categories, weapon cost etc. are in client/settings/shop.xml
+
+		weaponID special flags:
+			-1 = kevlar
+			-2 = kevlar + helmet
+			-3 = nightvision goggles
+			-4 = thermalvision goggles
+			-5 = defusing kit
+			-6 = C4
+
+		objectID special flags:
+			-2 = flash grenade (+ weaponID="17" !)
+			-3 = decoy grenade (+ weaponID="17" !)
+			Smoke grenade it's just normal tear gas without any proper flag.
+
+		damage special flags:
+			-1 or nil = no damage (nil = no parameter)
+			-2 = original GTA weapon damage (by weaponID)
+			-3 = instant dead (not implemented)
+
+		General notes:
+			* Grenades damage are hardcoded and always uses -2 flag (original GTA damage) due to some restrictions.
+			* Shot sounds are loaded from csrw-sounds resource (sounds/weapons/...)
+			* instantDamage = get HP and no matters on distance (default used for knife)
+			* All physical (for ex. kevlar is not physical) weapons are default droppable (droppable="true")
+				* Weapon aren't droppable too if objectID is < 0 or nil (but use droppable parameter if you want to make them not droppable!)
+			* Sprinting with melee weapons is hardcoded
+
+		Weapon flags ("flags" parameter):
+			* bomb, knife
+			* NODM - weapon restricted on DeathMatch mode
+			* weapon can use many flags, example: flags="NODM,ASD"
+			* flag name is no case sensetive
+	-->
+	
+	<slot id="1">
+		<!-- shotguns -->
+		<weapon name="LEONE 12 GAUGER SUPER" weaponID="25" objectID="349" clip="8" ammo="32" skill="medium" headDamage="174" headDamageArmor="129" torsoDamage="105" torsoDamageArmor="90" stomachDamage="108" stomachDamageArmor="104" legsDamage="112" legsDamageArmor="112" shotSound="m3/m3-1.wav" image="shotguns/leone_12_gauge_super.png" /> <!-- 6 -->
+		<weapon name="LEONE YG1265 AUTO SHOTGUN" weaponID="27" objectID="351" clip="7" ammo="32" skill="medium" headDamage="158" headDamageArmor="117" torsoDamage="114" torsoDamageArmor="54" stomachDamage="120" stomachDamageArmor="72" legsDamage="84" legsDamageArmor="84" shotSound="xm1014/xm1014-1.wav" image="shotguns/leone_YG1265_auto.png" /> <!-- 7 -->
+		
+		<!-- maszynowe -->
+		<weapon name="INGRAM MAC 10" weaponID="32" objectID="372" clip="30" ammo="100" skill="low" headDamage="113" headDamageArmor="54" torsoDamage="28" torsoDamageArmor="13" stomachDamage="35" stomachDamageArmor="17" legsDamage="21" legsDamageArmor="21" shotSound="mac10/mac10-1.wav" image="submachine-guns/ingram_mac-10.png" /> <!-- 8 -->
+		<weapon name="KM SUB MACHINE GUN" weaponID="29" objectID="353" clip="30" ammo="120" skill="medium" headDamage="102" headDamageArmor="51" torsoDamage="25" torsoDamageArmor="12" stomachDamage="32" stomachDamageArmor="16" legsDamage="19" legsDamageArmor="19" shotSound="mp5navy/mp5-1.wav" image="submachine-guns/KM_sub-machine_gun.png"  /> <!-- 9 -->
+		<weapon name="KM UMP45" weaponID="29" objectID="353" clip="25" ammo="100" skill="medium" headDamage="118" headDamageArmor="58" torsoDamage="29" torsoDamageArmor="14" stomachDamage="37" stomachDamageArmor="18" legsDamage="21" legsDamageArmor="21" shotSound="ump45/ump45-1.wav" image="submachine-guns/KM_UMP45.png" /> <!-- 10 -->
+		<weapon name="P90" weaponID="29" objectID="353" clip="50" ammo="100" skill="pro" headDamage="102" headDamageArmor="76" torsoDamage="25" torsoDamageArmor="19" stomachDamage="32" stomachDamageArmor="24" legsDamage="19" legsDamageArmor="19" shotSound="p90/p90-1.wav" image="submachine-guns/ES_C90.png" /> <!-- 11; oldName: ES C90 -->
+
+		<weapon name="SCHMIDT MACHINE PISTOL" weaponID="29" objectID="347" clip="30" ammo="120" skill="medium" headDamage="102" headDamageArmor="51" torsoDamage="25" torsoDamageArmor="12" stomachDamage="32" stomachDamageArmor="16" legsDamage="19" legsDamageArmor="19" shotSound="tmp/tmp-1.wav" image="submachine-guns/schmidt_machine_pistol.png" /> <!-- only ct machine gun -->					
+		
+		<!-- assault -->
+		<weapon name="IDF DEFENDER" weaponID="30" objectID="355" clip="35" ammo="90" skill="medium" headDamage="119" headDamageArmor="92" torsoDamage="29" torsoDamageArmor="23" stomachDamage="37" stomachDamageArmor="29" legsDamage="22" legsDamageArmor="22" shotSound="galil/galil-1.wav" image="rifles/IDF_defender.png" /> <!-- 12 -->
+		<weapon name="AK 47" weaponID="30" objectID="355" clip="30" ammo="90" skill="pro" headDamage="143" headDamageArmor="111" torsoDamage="35" torsoDamageArmor="27" stomachDamage="44" stomachDamageArmor="34" legsDamage="26" legsDamageArmor="26" shotSound="ak47/ak47-1.wav" image="rifles/CV-47.png" /> <!-- 13 -->
+		<weapon name="SCHMIDT SCOUT" weaponID="34" objectID="357" clip="1" ammo="90" skill="medium" headDamage="299" headDamageArmor="254" torsoDamage="74" torsoDamageArmor="63" stomachDamage="93" stomachDamageArmor="79" legsDamage="56" legsDamageArmor="56" shotSound="scout/scout_fire-1.wav" image="rifles/shmidt_scout.png" /> <!-- 14 -->
+		<weapon name="KRIEG 552" weaponID="33" objectID="357" clip="30" ammo="90" skill="low" headDamage="279" headDamageArmor="202" torsoDamage="69" torsoDamageArmor="50" stomachDamage="87" stomachDamageArmor="63" legsDamage="52" legsDamageArmor="52" shotSound="sg552/sg552-1.wav" image="rifles/krieg552.png" /> <!-- 15 -->
+		<weapon name="MAGNUM SNIPER RIFLE" weaponID="34" objectID="358" clip="1" ammo="30" skill="pro" headDamage="459" headDamageArmor="448" torsoDamage="114" torsoDamageArmor="111" stomachDamage="143" stomachDamageArmor="140" legsDamage="86" legsDamageArmor="86" shotSound="awp/awp1.wav" image="rifles/magnum_sniper_rifle.png" /> <!-- 16 -->
+		<weapon name="D3/AU 1" weaponID="34" objectID="357" clip="20" ammo="90" skill="low" headDamage="319" headDamageArmor="263" torsoDamage="79" torsoDamageArmor="65" stomachDamage="99" stomachDamageArmor="82" legsDamage="59" legsDamageArmor="59" shotSound="g3sg1/g3sg1-1.wav" image="rifles/D3AU-1.png" /> <!-- 17 -->
+	
+		<!-- assault - only ct -->
+		<weapon name="CLARION 5 56" weaponID="31" objectID="356" clip="25" ammo="90" skill="low" headDamage="199" headDamageArmor="83" torsoDamage="29" torsoDamageArmor="20" stomachDamage="37" stomachDamageArmor="26" legsDamage="22" legsDamageArmor="22" shotSound="famas/famas-1.wav" image="rifles/clarion.png" /> <!-- 14! -->
+		<weapon name="MAVERICK M4A1 CARABINE" weaponID="31" objectID="356" clip="30" ammo="90" skill="pro" headDamage="131" headDamageArmor="92" torsoDamage="32" torsoDamageArmor="23" stomachDamage="41" stomachDamageArmor="28" legsDamage="24" legsDamageArmor="24" shotSound="m4a1/m4a1_unsil-1.wav" image="rifles/M4A1.png" /> <!-- 30 -->
+		<weapon name="BULLPUP" weaponID="31" objectID="356" clip="30" ammo="90" skill="medium" headDamage="400" headDamageArmor="89" torsoDamage="31" torsoDamageArmor="22" stomachDamage="39" stomachDamageArmor="27" legsDamage="23" legsDamageArmor="23" shotSound="aug/aug-1.wav" image="rifles/bullpup.png" /> <!-- 31 -->
+		<weapon name="KRIEG 550 COMMANDO" weaponID="34" objectID="357" clip="10" ammo="90" skill="low" headDamage="131" headDamageArmor="91" torsoDamage="32" torsoDamageArmor="22" stomachDamage="41" stomachDamageArmor="28" legsDamage="24" legsDamageArmor="24" shotSound="sg550/sg550-1.wav" image="rifles/krieg_550commando.png" /> <!-- 32 -->		
+	</slot>
+
+	<slot id="2"> <!-- guns -->
+		<weapon name="9X19MM SIDEARM" weaponID="22" objectID="346" clip="20" ammo="120" skill="low" headDamage="98" headDamageArmor="61" torsoDamage="24" torsoDamageArmor="12" stomachDamage="30" stomachDamageArmor="16" legsDamage="18" legsDamageArmor="18" shotSound="glock/glock18-1.wav" image="pistols/9x19mm_sidearm.png" flags="STARTPISTOL" /> <!-- 1 -->
+		<weapon name="KM .45 TACTICAL" weaponID="22" objectID="346" clip="12" ammo="100" skill="medium" headDamage="132" headDamageArmor="66" torsoDamage="32" torsoDamageArmor="16" stomachDamage="41" stomachDamageArmor="21" legsDamage="24" legsDamageArmor="24" shotSound="usp/usp_unsil-1.wav" image="pistols/45_tactical.png" /> <!-- 2 -->
+		<weapon name="228 COMPACT" weaponID="22" objectID="346" clip="13" ammo="52" skill="pro" headDamage="157" headDamageArmor="98" torsoDamage="39" torsoDamageArmor="24" stomachDamage="48" stomachDamageArmor="30" legsDamage="29" legsDamageArmor="29" shotSound="p228/p228-1.wav" image="pistols/228compact.png" /> <!-- 3 -->
+		<weapon name="NIGHT HAWK .50C" weaponID="24" objectID="348" clip="7" ammo="35" skill="pro" headDamage="212" headDamageArmor="159" torsoDamage="52" torsoDamageArmor="39" stomachDamage="66" stomachDamageArmor="50" legsDamage="39" legsDamageArmor="39" shotSound="deagle/deagle-1.wav" image="pistols/night_hawk.png" /> <!-- 4 -->
+		<weapon name=".40 DUEL ELITES" weaponID="22" objectID="346" clip="30" ammo="120" skill="ultra" headDamage="177" headDamageArmor="93" torsoDamage="44" torsoDamageArmor="23" stomachDamage="55" stomachDamageArmor="29" legsDamage="32" legsDamageArmor="32" shotSound="elite/elite-1.wav" image="pistols/40dual_elites.png" /> <!-- 5 -->
+
+		<weapon name="ES FIVE SEVEN" weaponID="22" objectID="346" clip="20" ammo="100" skill="medium" headDamage="99" headDamageArmor="74" torsoDamage="24" torsoDamageArmor="18" stomachDamage="31" stomachDamageArmor="23" legsDamage="18" legsDamageArmor="18" shotSound="elite/elite-1.wav" image="pistols/five_seven.png" /> <!-- 6 - only ct pistol -->	
+	</slot>	
+
+	<slot id="3">
+		<weapon name="KNIFE" weaponID="4" clip="1" instantDamage="10" flags="KNIFE" />
+	</slot>
+
+	<slot id="S1"> <!-- equipment (not physicall weapons), the most attributes don't have any effect (ex. objectID) -->
+		<weapon name="KEVLAR" weaponID="-1" image="equipment/kevlar.png" /> <!-- 18 -->
+		<weapon name="KEVLAR + HELMET" weaponID="-2" image="equipment/kevlar_helmet.png" /> <!-- 19 -->
+		<weapon name="NIGHTVISION" weaponID="-3" objectID="368" clip="1" ammo="1" image="equipment/goggles.png" /> <!-- 24 -->
+		<weapon name="THERMALVISION" weaponID="-4" objectID="368" clip="1" ammo="1" image="equipment/goggles.png" /> <!-- 25 -->
+
+		<weapon name="DEFUSE KIT" weaponID="-5" image="equipment/defuse.png" /> <!-- only ct -->		
+	</slot>
+
+	<slot id="4">
+		<weapon name="GRENADE" weaponID="16" clip="1" ammo="1" headDamage="-2" headDamageArmor="-2" torsoDamage="-2" torsoDamageArmor="-2" stomachDamage="-2" stomachDamageArmor="-2" legsDamage="-2" legsDamageArmor="-2" shotSound="fireinhole.wav" image="equipment/hegrenade.png" flags="NODM" />
+	</slot>
+
+	<slot id="5">
+		<weapon name="FLASHBANG" weaponID="17" objectID="-2" clip="1" ammo="1" shotSound="fireinhole.wav" image="equipment/flashgrenade.png" flags="NODM" />
+	</slot>
+
+	<slot id="6">
+		<weapon name="SMOKE GRENADE" weaponID="17" clip="1" ammo="1" shotSound="fireinhole.wav" image="equipment/smokegrenade.png" flags="NODM" />
+	</slot>
+
+	<slot id="7">
+		<weapon name="MOLOTOV" weaponID="18" clip="1" ammo="1" shotSound="fireinhole.wav" image="equipment/molotov.png" flags="NODM" />
+		<weapon name="DECOY GRENADE" weaponID="17" objectID="-3" clip="1" ammo="1" headDamage="-2" headDamageArmor="-2" torsoDamage="-2" torsoDamageArmor="-2" stomachDamage="-2" stomachDamageArmor="-2" legsDamage="-2" legsDamageArmor="-2" shotSound="fireinhole.wav" image="equipment/decoy.png" flags="NODM" />		
+	</slot>
+
+	<slot id="8">
+		<weapon name="C4" weaponID="-6" objectID="1654" flags="BOMB" />
+	</slot>
+</weapons>

@@ -1,0 +1,13 @@
+<config>
+    <matchrounds>30</matchrounds>
+    <startmoney>800</startmoney>
+    <maxmoney>10000</maxmoney>
+    <friendlyfire>false</friendlyfire>
+    <friendlycollisions>true</friendlycollisions>
+    <freedefusingkit>false</freedefusingkit>
+    <freekevlar>false</freekevlar>
+    <nobomb>false</nobomb>
+    <nohostage>false</nohostage>
+    <autobalance>true</autobalance>
+    <gore>false</gore>
+</config>

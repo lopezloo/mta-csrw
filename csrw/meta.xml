@@ -1,0 +1,86 @@
+<meta>
+	<info type="gamemode" name="Counter Strike: RenderWare" author="lopezloo" version="0.9.2" edf:definition="edf/csrw.xml" />
+	<file src="files/config.xml" />
+	<file src="files/lang.xml" />
+	<file src="files/shop.xml" />
+	<file src="files/weapons.xml" />
+
+	<script type="shared" src="shared/utils/advert.lua" />
+	<script type="shared" src="shared/utils/utils.lua" />
+
+	<script type="shared" src="shared/config.lua" />
+	<script type="shared" src="shared/language.lua" />
+	<script type="shared" src="shared/weapon_core.lua" />
+
+	<!--<script type="server" src="server/update.lua" />-->
+	<script type="server" src="server/match.lua" />
+	<script type="server" src="server/main.lua" />
+	<script type="server" src="server/bomb.lua" />
+	<script type="server" src="server/drop.lua" />
+	<script type="server" src="server/hostage.lua" />
+	<script type="server" src="server/mapchange.lua" />
+	<script type="server" src="server/nominate.lua" />
+	<script type="server" src="server/round.lua" />
+	<script type="server" src="server/security.lua" />
+	<script type="server" src="server/voice.lua" />
+	<script type="server" src="server/weapon.lua" />
+	<script type="server" src="server/news.lua" />
+
+	<script type="client" src="client/main.lua" />
+	<script type="client" src="client/mapchange.lua" />
+	<script type="client" src="client/bomb.lua" />
+	<script type="client" src="client/class.lua" />
+	<script type="client" src="client/motd.lua" />
+	<script type="client" src="client/damage.lua" />
+	<script type="client" src="client/drop.lua" />
+	<script type="client" src="client/grenade.lua" />
+	<script type="client" src="client/nominate.lua" />
+	<script type="client" src="client/wallshader.lua" />
+	<script type="client" src="client/reload.lua" />
+	<script type="client" src="client/shop.lua" />
+	<script type="client" src="client/spectate.lua" />
+	<script type="client" src="client/walkanim.lua" />
+	<script type="client" src="client/weapon.lua" />
+	<script type="client" src="client/hostage.lua" />
+	<script type="client" src="client/fps.lua" />
+
+	<script type="client" src="client/render/box.lua" />
+	<script type="client" src="client/render/hud.lua" />
+	<script type="client" src="client/render/nametags.lua" />
+	<script type="client" src="client/render/radar.lua" />
+	<script type="client" src="client/render/scoreboard.lua" />
+	<script type="client" src="client/render/progressbar.lua" />
+	<!--<script type="client" src="client/render/debug.lua" />-->
+
+	<file src="motd.txt" /> <!-- Message of The Day, feel free to edit this -->
+	<file src="news" />
+
+	<!-- CSRW resources -->
+	<include resource="csrw-media" /> <!-- contains all images, shaders etc. -->
+	<include resource="csrw-models" /> <!-- contains weapons, skins and some objects -->
+	<include resource="csrw-sounds" /> <!-- contains all weapon sounds and some other (GUI etc.) -->
+
+	<!-- standard (community) resources -->
+	<include resource="bone_attach" />
+	<include resource="topbarchat" />
+	<include resource="object_light_fix" />
+
+	<!-- EDF -->
+	<file src="edf/bombsite.png" />
+	<file src="edf/hostage.png" />
+	<file src="edf/spawnct.png" />
+	<file src="edf/spawntt.png" />
+	<file src="edf/camera.png" />
+	<!--<file src="edf/weapon.png" />-->
+
+	<!-- ACL requests -->
+	<aclrequest>
+		<right name="function.stopResource" access="true" /> <!-- managing external resources -->
+		<right name="function.startResource" access="true" />
+		<right name="function.fetchRemote" access="true" /> <!-- master server list, global news -->
+		<right name="function.callRemote" access="true" /> <!-- new version notification -->
+		<right name="general.ModifyOtherObjects" access="true" />
+	</aclrequest>
+	<min_mta_version server="1.4" client="1.4" />
+	<oop>true</oop> <!-- Object Oriented Porn -->
+</meta>
