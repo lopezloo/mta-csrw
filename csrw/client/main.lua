@@ -96,6 +96,7 @@ addEventHandler("onClientPlayerSpawn", localPlayer,
 	function()
 		showRadar(true)
 		showHUD(true)
+		setWindowFlashing(true, 3)
 
 		local i = math.random(1, 3)
 		if i == 1 then s = "letsgo"
