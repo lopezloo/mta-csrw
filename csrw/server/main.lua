@@ -90,7 +90,7 @@ addEventHandler("onResourceStart", root,
 				{"function.stopResource", "stopping useless resources"},
 				{"function.startResource", "starting required resources"},
 				--{"function.restartResource", "restarting yourself in auto update"},
-				{"function.fetchRemote", "global news, master server list"},
+				--{"function.fetchRemote", "global news, master server list"},
 				{"function.callRemote", "new version notification"},
 			}
 
@@ -160,10 +160,6 @@ addEventHandler("onResourceStart", root,
 			else
 				outputServerLog("Counter Strike: RenderWare started properly!")
 			end
-
-			if hasObjectPermissionTo(getThisResource(), "function.fetchRemote") then
-				fetchRemote("http://redknife.tk/csrw/servers/addserver.php?port=" .. getServerPort() .. "&ver=" .. DEFINE_VERSION, onMasterServerResult)
-			end
 		else
 			-- inne zasoby
 			for k, v in pairs(g_resources.toStop) do
@@ -205,20 +201,8 @@ addEventHandler("onResourceStop", resourceRoot,
 				end
 			end
 		end
-
-		if hasObjectPermissionTo(getThisResource(), "function.fetchRemote") then
-			fetchRemote("http://redknife.tk/csrw/servers/removeserver.php?port=" .. getServerPort(), onMasterServerResult)
-		end
 	end
 )
-
-function onMasterServerResult(responseData, errno)
-	if errno ~= 0 then
-		outputServerLog("ERROR: Can't contact with CSRW master server (code " .. errno .. ").")
-	elseif responseData ~= "" then
-		outputServerLog("CSRW master server response: " .. responseData)
-	end
-end
 
 g_team = {
 	[1] = createTeam("tt", 255, 0, 0),

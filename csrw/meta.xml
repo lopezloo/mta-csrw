@@ -77,7 +77,7 @@
 	<aclrequest>
 		<right name="function.stopResource" access="true" /> <!-- managing external resources -->
 		<right name="function.startResource" access="true" />
-		<right name="function.fetchRemote" access="true" /> <!-- master server list, global news -->
+		<!--<right name="function.fetchRemote" access="true" />--> <!-- master server list, global news -->
 		<right name="function.callRemote" access="true" /> <!-- new version notification -->
 		<right name="general.ModifyOtherObjects" access="true" />
 	</aclrequest>
