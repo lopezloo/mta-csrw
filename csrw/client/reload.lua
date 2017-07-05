@@ -122,28 +122,10 @@ addEvent("onClientPlayerReloadingEnd")
 addEventHandler("onClientPlayerReloadingEnd", localPlayer, onClientPlayerReloadingEnd)
 
 function setDucked(state)
-	if state == true and (not isPedDucked(localPlayer)) then
-	    setControlState("crouch", true)
-	    setTimer(setControlState, 100, 0, false)
-	    return true
-	elseif state == false and isPedDucked(localPlayer) then 
-	    setControlState("crouch", true)
-	    setTimer(setControlState, 100, 0, false) 
-	    return true
+	if state ~= isPedDucked(localPlayer) then
+		setControlState("crouch", true)
+		setTimer(setControlState, 100, 0, "crouch", false)
+		return true
 	end
 	return false
 end
-
---[[function setDucked(bool) -- by kakaksk (https://bugs.multitheftauto.com/view.php?id=7753#c20260)
-    if isPedDucked(localPlayer) == bool then return end
-    duckState = bool
-    setControlState("crouch", true)
-    addEventHandler("onClientRender", root, checkDucking)
-end
-
-function checkDucking()
-    if isPedDucked(localPlayer) == duckState then
-        setControlState("crouch", false)
-        removeEventHandler("onClientRender", root, checkDucking)
-    end
-end]]--
