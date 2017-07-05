@@ -55,7 +55,7 @@ end
 
 local newsMainNode = xmlLoadFile("news")
 if not newsMainNode or #xmlNodeGetChildren(newsMainNode) == 0 then
-    outputChatBox("Warning: I can't load latest news.")
+    outputConsole("Warning: I can't load latest news.")
     return
 end
 

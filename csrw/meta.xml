@@ -24,7 +24,7 @@
 	<script type="server" src="server/security.lua" />
 	<script type="server" src="server/voice.lua" />
 	<script type="server" src="server/weapon.lua" />
-	<script type="server" src="server/news.lua" />
+	<!--<script type="server" src="server/news.lua" />-->
 
 	<script type="client" src="client/main.lua" />
 	<script type="client" src="client/mapchange.lua" />
@@ -53,7 +53,7 @@
 	<!--<script type="client" src="client/render/debug.lua" />-->
 
 	<file src="motd.txt" /> <!-- Message of The Day, feel free to edit this -->
-	<file src="news" />
+	<!--<file src="news" />-->
 
 	<!-- CSRW resources -->
 	<include resource="csrw-media" /> <!-- contains all images, shaders etc. -->

@@ -1,3 +1,6 @@
+if true then
+	return
+end
 if hasObjectPermissionTo(getThisResource(), "function.fetchRemote") then
 	function onNewsDownloaded(data, errno)
 		if errno == 0 then
