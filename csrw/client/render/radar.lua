@@ -8,13 +8,13 @@ local radar = {
 	x = sY * 0.028,
 	y = sY * 0.75,
 	height = sY * 0.200,
-
-	centerleft = radar.x + radar.height / 2,
-	centerTop = radar.y + radar.height / 2,
-	blipSize = radar.height / 16,
-	lpsize = radar.height / 8,
 	range = 100
 }
+
+radar.centerleft = radar.x + radar.height / 2
+radar.centerTop = radar.y + radar.height / 2
+radar.blipSize = radar.height / 16
+radar.lpsize = radar.height / 8
 
 function showRadar(show)
 	if not show then show = not radar.showing end
