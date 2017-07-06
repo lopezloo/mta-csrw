@@ -1,5 +1,5 @@
 <meta>
-	<info type="gamemode" name="Counter Strike: RenderWare" author="lopezloo" version="0.9.2" edf:definition="edf/csrw.xml" />
+	<info type="gamemode" name="Counter Strike: RenderWare" author="lopezloo" version="0.9.3" edf:definition="edf/csrw.xml" />
 	<file src="files/config.xml" />
 	<file src="files/lang.xml" />
 	<file src="files/shop.xml" />
