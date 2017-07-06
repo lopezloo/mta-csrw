@@ -53,21 +53,33 @@ end
 addEventHandler("onElementDataChange", root,
 	function(data, oldValue)
 		if data == "carryBy" and getElementType(source) == "ped" then
-			g_player[getElementData(source, "carryBy")].carryingHost = source
-			playAnimationWithWalking("GYMNASIUM", "gym_bike_fast", source)
-			--setElementPosition(source, getElementPosition(getElementData(source, "carryBy"))) -- fix oświetlenia elementu
-			setTimer(
-				function(ped)
-					exports.bone_attach:attachElementToBone(ped, getElementData(ped, "carryBy"), 3, -0.52, -0.5, -0.2, 0, 0, 0)
-				end, 250, 1, source)
+			local player = getElementData(source, "carryBy")
+			if player then
+				-- safety check
+				if ((client and player ~= client) or getPlayerTeam(player) ~= g_team[2] or
+					not isElementInRangeOfPoint(player, source.position.x, source.position.y, source.position.z, 5)) then
+					setElementData(source, data, oldValue)
+					return
+				end
+
+				g_player[player].carryingHost = source
+				playAnimationWithWalking("GYMNASIUM", "gym_bike_fast", source)
+				--setElementPosition(source, getElementPosition(player)) -- fix oświetlenia elementu
+				setTimer(
+					function(ped)
+						exports.bone_attach:attachElementToBone(ped, getElementData(ped, "carryBy"), 3, -0.52, -0.5, -0.2, 0, 0, 0)
+					end, 250, 1, source)
+			end
 		end
 	end
 )
 
 function detachCarriedHostage(player) -- upadanie zakładnika na ziemie przy śmierci noszącego; dołączone do onPlayerQuit w main.lua
 	if g_player[player].carryingHost then
-		detachElements(player, g_player[player].carryingHost)
+		exports.bone_attach:detachElementFromBone(g_player[player].carryingHost)
 		setElementPosition(g_player[player].carryingHost, getElementPosition(player))
+		setElementRotation(g_player[player].carryingHost, getElementRotation(player))
+		playAnimationWithWalking("CRACK", "crckidle3", g_player[player].carryingHost)
 
 		setElementData(g_player[player].carryingHost, "carryBy", false)
 		setElementData(g_player[player].carryingHost, "picking", false)

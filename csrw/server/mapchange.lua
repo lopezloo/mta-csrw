@@ -7,7 +7,7 @@ function onPlayerChat(message, messageType)
 		-- RTV
 		if message == "rtv" or message == "rockthevote" or message == "rock the vote" then
 			if g_match.nextMap then
-				outputChatBox("New map was already voted.", source)
+				outputChatBox("New map was already choosen.", source)
 			elseif g_player[source].rtv then
 				outputChatBox("You have already voted to change map.", source)
 			else
@@ -84,7 +84,6 @@ function onMapStop(stoppedMap)
 	g_roundData.state = "ended"
 	g_match.bombsites = false
 	g_match.hostages = false
-	clearNominations()
 	
 	for k, v in pairs(getElementsByType("player")) do
 		--if getElementData(v, "alive") and isTimer(zombieIdleTimers[v]) then killTimer(zombieIdleTimers[v]) end

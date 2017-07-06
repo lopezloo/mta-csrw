@@ -3,14 +3,7 @@ g_resources = {
 	toStart = { "csrw-media", "csrw-models", "csrw-sounds", "bone_attach", "topbarchat", "object_light_fix", "mapmanager", "votemanager" }
 }
 
-g_player = {
-	localization = false,
-	skin = 0,
-	surviveLastRound = false,
-	sneaking = false,
-	rtv = false,
-	carryingHost = nil
-}
+g_player = {}
 
 g_core = {} -- todo: nieużywane?
 local DEFINE_VERSION = "0.9.2"
@@ -233,7 +226,14 @@ addEventHandler("onPlayerQuit", root,
 )
 
 function onPlayerJoinFunc(player)
-	g_player[player] = {}
+	g_player[player] = {
+		localization = false,
+		skin = 0,
+		surviveLastRound = false,
+		sneaking = false,
+		rtv = false,
+		carryingHost = nil
+	}
 	setPlayerMoneyEx(player, g_config["startmoney"])
 	setElementData(player, "alive", false)
 	setElementData(player, "armor", 0)

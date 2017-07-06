@@ -48,8 +48,10 @@ else
 			value = tonumber(value)
 			if xmlNodeGetName(v) == "matchrounds" and value < 5 then
 				value = 5
+				outputServerLog("WARNING: matchrounds config option was too low and was automatically changed to " .. value)
 			elseif xmlNodeGetName(v) == "maxmoney" and value < 5000 then
 				value = 5000
+				outputServerLog("WARNING: maxmoney config option was too low and was automatically changed to " .. value)
 			end
 		end
 

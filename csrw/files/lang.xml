@@ -312,11 +312,6 @@
 		<en>Vote for next map starting..</en>
 	</msg_voteStarting>
 	
-	<msg_mapExtended>
-		<pl>Głosowanie dobiegło końca, obecna mapa zostaje przedłużona.</pl>
-		<en>Vote ended, current map has been extended.</en>
-	</msg_mapExtended>
-	
 	<msg_ArleadyVoting>
 		<pl>Nie możesz już nominować mapy, ponieważ głosowanie zostało już zainicjowane bądź mapa jest właśnie zmieniana!</pl>
 		<en>You can't nominate map, because voting has already started or map is currently changing!</en>

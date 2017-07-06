@@ -6,8 +6,8 @@ local currentVoteOptions = {} -- mapy w obecnym głosowaniu
 
 -- TODO: języki
 
-function nominateMap(mapName) -- nazwa mapy
-	if #currentVoteOptions > 0 then -- jeśli właśnie jest głosowanie to return
+function nominateMap(mapName)
+	if #currentVoteOptions > 0 then
 		outputText("msg_ArleadyVoting", 255, 102, 102, client)
 		return
 	end
@@ -81,10 +81,18 @@ end
 function clearNominations()
 	playerNominations = {}
 	nominations = {}
+
+	for k, v in pairs(g_player) do
+		g_player[k].rtv = false
+	end
 end
 
--- głosowanie
 function voteMaps()
+	if #currentVoteOptions > 0 or g_match.nextMap then
+		-- map vote already started or map was selected and gonna change soon
+		return
+	end
+
 	if getResourceState(getResourceFromName("votemanager")) ~= "running" then
 		if hasObjectPermissionTo(getThisResource(), "function.startResource") then
 			outputServerLog("Turning votemanger on due to maps vote.")
@@ -111,44 +119,45 @@ function voteMaps()
 		table.insert(currentVoteOptions, v)
 	end
 
-	if #nominations < nominateLimit then -- są jeszcze miejsca na mapy
-		local maps = exports["mapmanager"]:getMapsCompatibleWithGamemode(getThisResource())
-		for k, v in pairs(maps) do
-			if getCurrentMap() == v or getResourceName(v) == "editor_test" or getResourceName(v) == "editor_dump" then
-				table.remove(maps, k)
-				break
-			end
-
-			for k2, v2 in pairs(nominations) do
-				if getResourceName(v) == v2 then
-					--outputChatBox("Usuwanie mapy " .. v2 .. " ze wzgledu na powtarzanie sie.")
-					table.remove(maps, k2)
-					break
+	-- if there is still place for maps
+	if #nominations < nominateLimit then
+		local maps = {}
+		for k, v in pairs(exports["mapmanager"]:getMapsCompatibleWithGamemode(getThisResource())) do
+			local name = getResourceName(v)
+			if getCurrentMap() ~= v and name ~= "editor_test" and name ~= "editor_dump" then
+				local nominated = false
+				for _, v2 in pairs(nominations) do
+					if name == v2 then
+						nominated = true
+						break
+					end
+				end
+				if not nominated then
+					table.insert(maps, v)
 				end
 			end
 		end
 
 		for i=1, nominateLimit - #nominations do
+			if #maps == 0 then
+				break
+			end
 			local r = math.random(1, #maps)
 			table.insert(pollTable, { getResourceName(maps[r]) })
 			table.insert(currentVoteOptions, getResourceName(maps[r]))
 			table.remove(maps, r)
 		end
 	end
-	table.insert(pollTable, {"Extend"})
+	-- Add current map as rematch option
+	table.insert(pollTable, {"Rematch"})
+	table.insert(currentVoteOptions, getResourceName(exports["mapmanager"]:getRunningGamemodeMap()))
+
 	exports["votemanager"]:startPoll(pollTable)
 end
 
 addEventHandler("onPollEnd", root,
 	function(result)
 		if result and #currentVoteOptions > 0 then
-
-			if result > #currentVoteOptions then
-				outputText("msg_mapExtended", 255, 255, 255, root)
-				currentVoteOptions = {}
-				return
-			end
-
 			local resource = getResourceFromName( currentVoteOptions[result] )
 			if resource then
 				if g_roundData.state == "ended" then

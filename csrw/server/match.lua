@@ -9,11 +9,14 @@ g_match = {
 	wantsRTV = 0
 }
 
-function restartMatch() -- wykonywane m.in przy starcie mapy (onMapStart - mapchange.lua)
+function restartMatch()
 	outputServerLog("Match was restarted.")
 	setTeamScore(g_team[1], 0)
 	setTeamScore(g_team[2], 0)
 	g_match.rounds = 0
+	g_match.nextMap = nil
+	g_match.wantsRTV = 0
+	clearNominations()
 
 	for k, v in pairs(getElementsByType("player")) do
 		setPlayerMoneyEx(v, g_config["startmoney"])

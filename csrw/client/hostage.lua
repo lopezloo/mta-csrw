@@ -70,9 +70,14 @@ addEventHandler("onClientElementDataChange", root,
 						addEventHandler("onClientPreRender", root, renderHostages)
 					end
 				else
-					table.remove(hostage.renderedHostages, source)
-					if #hostage.renderedHostages == 0 then
-						removeEventHandler("onClientPreRender", root, renderHostages)
+					for k, v in pairs(hostage.renderedHostages) do
+						if v == source then
+							table.remove(hostage.renderedHostages, k)
+							if #hostage.renderedHostages == 0 then
+								removeEventHandler("onClientPreRender", root, renderHostages)
+							end
+							break
+						end
 					end
 				end
 			elseif data == "health" and getElementData(source, data) ~= 100 then

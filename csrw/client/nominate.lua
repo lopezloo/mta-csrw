@@ -11,6 +11,7 @@ guiSetVisible(nominateWindow, false)
 addEvent("updateMapList", true)
 addEventHandler("updateMapList", root,
 	function(data)
+		guiGridListClear(nominateGrid)
 		for k, v in pairs(data) do
 			local row = guiGridListAddRow(nominateGrid)
 			guiGridListSetItemText(nominateGrid, row, 1, string.gsub(v[1], "csrw_", ""), false, false) -- nazwa mapy
