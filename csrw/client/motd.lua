@@ -2,6 +2,7 @@ local motdFile = fileOpen("motd.txt")
 local motd = "Message Of The Day cannot be loadded."
 if motdFile then
     motd = fileRead(motdFile, fileGetSize(motdFile))
+    fileClose(motdFile)
 end
 
 function onMOTDClosed(window)
