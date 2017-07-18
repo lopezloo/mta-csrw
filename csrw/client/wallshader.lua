@@ -14,7 +14,7 @@ function CWallShader:enable(element, r, g, b, a)
 		wallShader[element].color = {r, g, b, a or 1}
 		updateElementShader(element)
 
-		if not updateTimer then
+		if not isTimer(updateTimer) then
 			updateTimer = setTimer(updateElements, 100, 0)
 		end
 	end
@@ -26,7 +26,7 @@ function CWallShader:disable(element)
 		destroyWallEffect(element)
 		wallShader[element] = {}
 
-		if #wallShader == 0 and updateTimer then
+		if #wallShader == 0 and isTimer(updateTimer) then
 			killTimer(updateTimer)
 		end
 	end
@@ -40,7 +40,7 @@ function CWallShader:setColor(element, r, g, b, a)
 end
 
 function CWallShader:resetAll()
-	if #wallShader > 0 and updateTimer then
+	if #wallShader > 0 and isTimer(updateTimer) then
 		killTimer(updateTimer)
 	end
 

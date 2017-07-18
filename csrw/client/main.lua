@@ -94,6 +94,7 @@ end
 
 addEventHandler("onClientPlayerSpawn", localPlayer,
 	function()
+		spectator.exit()
 		showRadar(true)
 		showHUD(true)
 		setWindowFlashing(true, 3)
@@ -215,15 +216,6 @@ bindKey(getKeyBoundToCommand("screenshot"), "down",
 	end
 )
 
---[[addCommandHandler("config",
-	function()
-		for k, v in pairs(g_config) do
-			outputConsole(k .. ": " .. tostring(v))
-		end
-	end
-)]]--
-
--- mini utils
 function table.find(table, find)
 	if not table or not find then return false end
 	for k, v in pairs(table) do

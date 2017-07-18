@@ -58,7 +58,7 @@ addEventHandler("onElementDataChange", root,
 			
 			detachWeaponFromBody(source, newSlot) -- odczepianie nowej broni z ciała
 
-			local newWeapon = g_weapon[newSlot][ g_playerWeaponData[source][newSlot].weapon ]["weaponID"]
+			local newWeapon = tonumber(g_weapon[newSlot][ g_playerWeaponData[source][newSlot].weapon ]["weaponID"])
 			if g_player[source].sneaking and newWeapon > 0 and getSlotFromWeapon(newWeapon) == 1 then
 				-- broń biała
 				toggleControl(source, "sprint", false)

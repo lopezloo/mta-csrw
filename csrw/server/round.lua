@@ -152,7 +152,6 @@ function onPlayerWasted(ammo, killer, weapon, bodypart) -- gdy gracz zginie
 		--if getElementData(resourceRoot, "currentMode") == "cs" then
 		if team == g_team[1] then g_roundData.aliveTT = g_roundData.aliveTT - 1
 		elseif team == g_team[2] then g_roundData.aliveCT = g_roundData.aliveCT - 1 end
-		--outputChatBox("onPlayerWasted(" .. getPlayerName(source) .. ", ...) g_roundData.aliveTT = " .. g_roundData.aliveTT .. "; g_roundData.aliveCT = " .. g_roundData.aliveCT)
 		
 		if g_roundData.aliveTT < 0 or g_roundData.aliveCT < 0 then
 			outputChatBox("SERWER: Wystąpił błąd krytyczny, ilość graczy TT lub CT wynosi liczbę ujemną.", root, 204, 0, 0)
@@ -186,17 +185,23 @@ function onPlayerWasted(ammo, killer, weapon, bodypart) -- gdy gracz zginie
 		stopAnimationWithWalking(source)
 		csResetWeapons(source)
 		setElementData(source, "armor", 0)
-		-- tutaj powinno być wypadanie broni
+		-- todo: wypadanie broni
 		
-		if getElementData(source, "hePlantedBomb") then -- bonus (zapomoga po śmierci) za podłożenie bomby (niezależnie czy wygrano tą runde czy nie)
+		-- bonus (zapomoga po śmierci) za podłożenie bomby (niezależnie czy wygrano tą runde czy nie)
+		if getElementData(source, "hePlantedBomb") then
 			-- todo: zamienić na zmienną ^
 			setElementData(source, "hePlantedBomb", false)
 			givePlayerMoneyEx(source, 800)
 			advert.ok(getText("msg_moneyAward", source) .. 800, source, true)
 		end
 
-		checkPlayers() -- sprawdza ile jest żywych graczy, w razie potrzeby kończy rundę
-		setElementCollisionsEnabled(source, false) -- brak kolizji ciał, todo: powinno być poza warunkiem isRoundStart() ?
+		-- brak kolizji ciał, todo: powinno być poza warunkiem isRoundStart() ?
+		setElementCollisionsEnabled(source, false)
+
+		-- sprawdza ile jest żywych graczy, w razie potrzeby kończy rundę
+		if checkPlayers() then
+			joinSpectatorsTemporary(source)
+		end
 		-- todo: czy gracz może (i powinien) ginąć gdy nie jest w żadnym teamie?
 
 		--[[elseif g_match.mode == "zombie" then
@@ -255,29 +260,36 @@ function onRoundEnd(winTeam, reason)
 		outputServerLog("Round ended. Team " .. getTeamName( g_team[ winTeam ] ) .. " win (reason: " .. reason .. " - " .. roundEndReasons[reason] .. ").")
 		g_roundData.state = "ended"
 		
-		if reason == 1 then -- kasa za wygranie rundy poprzez zabicie wszystkich członków pozostałej drużyny (jednakowa dla obu drużyn)
+		-- kasa za wygranie rundy poprzez zabicie wszystkich członków pozostałej drużyny (jednakowa dla obu drużyn)
+		if reason == 1 then
 			for i, player in pairs( getPlayersInTeam(g_team[winTeam]) ) do
 				givePlayerMoneyEx(player, 3250)
 				advert.ok(getText("msg_moneyAward", player) .. 3250, player, true)
 			end
-		elseif reason == 2 then -- kasa dla TT za wybuch bomby
+
+		-- kasa dla TT za wybuch bomby
+		elseif reason == 2 then
 			for i, player in pairs( getPlayersInTeam(g_team[1]) ) do
 				local money = 3500
-				if g_roundData.aliveCT >= 1 then -- dodatkowy bonus pieniężny gdy jest conajmniej 1 CT żywy
+				-- dodatkowy bonus pieniężny gdy jest conajmniej 1 CT żywy
+				if g_roundData.aliveCT >= 1 then
 					money = money + 200
 				end
 				givePlayerMoneyEx(player, money)
 				advert.ok(getText("msg_moneyAward", player) .. money, player, true)
 			end
-		elseif reason == 3 or reason == 4 then -- kasa dla CT za rozbrojenie bomby lub dla TT za skończenie się czasu na rozbrojenie bomby
+
+		-- kasa dla CT za rozbrojenie bomby lub dla TT za skończenie się czasu na rozbrojenie bomby
+		elseif reason == 3 or reason == 4 then
 			for i, player in pairs( getPlayersInTeam(g_team[winTeam]) ) do
 				givePlayerMoneyEx(player, 3250)
 				advert.ok(getText("msg_moneyAward", player) .. 3250, player, true)
-			end	
+			end
 		-- CT nie dostaje kasy za uwolnienie zakładników bo nie wiem ile to ma być
 		-- to samo z TT - nie dostaje kasy za nie uwolnienie ich
 
-		elseif reason == 5 then -- uwolnienie zakładników
+		-- uwolnienie zakładników
+		elseif reason == 5 then
 			for k, v in pairs( getPlayersInTeam( g_team[winTeam] ) ) do
 				givePlayerMoneyEx(v, 1000)
 				advert.ok(getText("msg_moneyAward", v) .. 1000, v, true)
@@ -294,14 +306,16 @@ function onRoundEnd(winTeam, reason)
 		if winTeam ~= 3 then
 			local lostTeam = getOppositeTeam(winTeam)
 			if lostTeam then
-				for k, v in pairs(getPlayersInTeam( g_team[ lostTeam ] )) do -- zapomoga pieniężna dla przegrańców
+				-- zapomoga pieniężna dla przegrańców
+				for k, v in pairs(getPlayersInTeam( g_team[ lostTeam ] )) do
 					givePlayerMoneyEx(v, 1500)
 				end
 			end
 		else
 			for k, v in pairs(getElementsByType("player")) do
 				if getPlayerTeam(v) == g_team[1] or getPlayerTeam(v) == g_team[2] then
-					givePlayerMoneyEx(v, 1500) -- zapomoga dla obu drużyn podczas remisu
+					-- zapomoga dla obu drużyn podczas remisu
+					givePlayerMoneyEx(v, 1500)
 				end
 			end
 		end
@@ -372,7 +386,8 @@ function startRound()
 		end
 
 		for k, v in pairs( getPlayersInTeam(g_team[3]) ) do
-			setElementPosition(v, 0, 0, 4) -- ukrywanie martwych ciał spectatorów z mapy
+			-- ukrywanie martwych ciał spectatorów z mapy
+			setElementPosition(v, 0, 0, 4)
 		end
 		
 		for k, vehicle in pairs(getElementsByType("vehicle")) do
@@ -409,7 +424,7 @@ function startRound()
 
 			g_match.rounds = g_match.rounds + 1
 			if g_match.rounds == g_config["matchrounds"] - 1 then
-				voteMaps() -- głosowanie
+				voteMaps()
 			end			
 		end
 	end
@@ -449,40 +464,26 @@ end
 -- mniejsze funkcje
 function checkPlayers()
 	if isRoundStarted() then
-		--outputChatBox("SERWER: checkPlayers(): g_roundData.aliveTT = " .. g_roundData.aliveTT .. "; g_roundData.aliveCT = " .. g_roundData.aliveCT .. ";\ncheckPlayers(): playersInTT = " .. countPlayersInTeam(tt) .. "; playersInCT = " .. countPlayersInTeam(ct) .. ";")
-		--outputServerLog("checkPlayers(): g_roundData.aliveTT = " .. g_roundData.aliveTT .. "; g_roundData.aliveCT = " .. g_roundData.aliveCT .. ";\ncheckPlayers(): playersInTT = " .. countPlayersInTeam(g_team[1]) .. "; playersInCT = " .. countPlayersInTeam(g_team[2]) .. ";")
-		--if not getElementData(resourceRoot, "bombPlanted") or countPlayersInTeam(g_team[1]) + countPlayersInTeam(ct) == 0 then -- jeśli bomba jest podłożona to runda nie może skończyć się przez zabicie przeciwnej drużyny (no chyba, że nie ma nikogo online w teamach tt i ct)
-			-- ^ ni chuja nie rozumiem tego warunku
-			
-		--outputChatBox("SERWER: checkPlayers(): warunek 1")
 		if g_roundData.aliveTT >= 1 and g_roundData.aliveCT <= 0 then -- wygrywa TT
-			--outputChatBox("SERWER: checkPlayers(): warunek 1.1")
-			
 			if countPlayersInTeam(g_team[2]) <= 0 then
 				-- gdy w przeciwnym teamie nie będzie graczy to po prostu runda się nie kończy (w cs 1.6 tak jest)
 				-- chujowo to w cs 1.6 rozwiązali, zrobimy po swojemu.. :>
 				triggerEvent("onRoundEnd", root, 3, 10) -- po prostu remis
 			else
-				--outputChatBox("SERWER: checkPlayers(): warunek 1.1.2")
-			
 				-- tutaj kurwa trzeba zrobić jakoś jakiś warunek jeśli gracz dołączy do pustego teamu żeby dawało remis a nie wygrywał przeciwnik!
 				triggerEvent("onRoundEnd", root, 1, 1)
 			end
 		elseif g_roundData.aliveTT <= 0 and g_roundData.aliveCT >= 1 and not g_roundData.bomb then -- wygrywa CT (tylko jeśli bomba nie jest podłożona, w przeciwnym razie musi ją rozbroić aby wygrać)
-			--outputChatBox("SERWER: checkPlayers(): warunek 1.2")
-			
 			if countPlayersInTeam(g_team[1]) <= 0 then
-				--outputChatBox("SERWER: checkPlayers(): warunek 1.2.1")
-			
 				-- gdy w przeciwnym teamie nie będzie graczy to po prostu runda się nie kończy (w cs 1.6 tak jest)
 				-- chujowo to w cs 1.6 rozwiązali, zrobimy po swojemu.. :>
-				triggerEvent("onRoundEnd", root, 3, 10) -- po prostu remis
+				-- po prostu remis
+				triggerEvent("onRoundEnd", root, 3, 10)
 			else
-				--outputChatBox("SERWER: checkPlayers(): warunek 1.2.2")
 				triggerEvent("onRoundEnd", root, 2, 1)
 			end
-		elseif g_roundData.aliveTT <= 0 and g_roundData.aliveCT <= 0 then -- remis
-			--outputChatBox("SERWER: checkPlayers(): warunek 1.3")
+		elseif g_roundData.aliveTT <= 0 and g_roundData.aliveCT <= 0 then
+			-- remis
 			triggerEvent("onRoundEnd", root, 3, 1)
 		end
 	end
@@ -517,7 +518,6 @@ function balanceTeam(team)
 	local difference = count - oppositeCount
 	if difference >= 2 then
 		-- przerzucanie difference / 2 graczy do przeciwnej drużyny
-		
 		local players = getPlayersInTeam(team)
 		
 		for i = 1, difference / 2 do
@@ -555,7 +555,6 @@ function getTeamSkinValue(team)
 	end
 end
 
--- DEBUG CMD
 addCommandHandler("endround",
 	function(player)
 		if hasObjectPermissionTo(player, "function.kickPlayer") then

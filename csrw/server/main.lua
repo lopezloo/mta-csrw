@@ -6,7 +6,7 @@ g_resources = {
 g_player = {}
 
 g_core = {} -- todo: nieużywane?
-local DEFINE_VERSION = "0.9.3"
+local DEFINE_VERSION = "0.9.31"
 
 addEventHandler("onResourceStart", root,
 	function()

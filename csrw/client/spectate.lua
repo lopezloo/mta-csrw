@@ -26,14 +26,14 @@ function spectator.join(temporary)
 	
 	spectator.updateList()
 	if #specData.list < 1 then
-		advert.error("msg_specAlone") -- Jesteś sam na serwerze (...)
+		advert.error("msg_specAlone")
 		spectator.freecam()
 	else
 		spectator.spectatePlayer()
 		showHUD(true)
 		addEventHandler("onClientRender", root, renderSpectatorHUD)
 		addEventHandler("onClientPlayerQuit", root, updateSpectator)
-		addEventHandler("onClientPlayerWasted", root, updateSpectator)		
+		addEventHandler("onClientPlayerWasted", root, updateSpectator)
 	end
 	bindKey("arrow_l", "down", spectator.previous)
 	bindKey("arrow_r", "down", spectator.next)
@@ -156,10 +156,10 @@ function spectator.freecam(customPosition)
 	specData.mode = 1
 end
 
-function joinSpectatorsTemporary() -- specowanie tymczasowe - po zginięciu w rundzie
+function joinSpectatorsTemporary()
 	if source and source == localPlayer then
 		outputDebugString("temporary joining spectators")
-		specator.join(true)
+		spectator.join(true)
 	end
 end
 addEvent("joinSpectatorsTemporary", true)
@@ -220,12 +220,6 @@ function updateSpectator() -- 0.616+
 		end
 	end
 end
-
-addCommandHandler("speclist",
-	function()
-		outputChatBox(#specData.list)
-	end
-)
 
 -- interfejs
 local render = { -- 1440x900

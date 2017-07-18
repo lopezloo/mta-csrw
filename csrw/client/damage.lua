@@ -51,8 +51,6 @@ function calcDamage(victim, attacker, bodypart, gtaLoss, gtaWeapon)
 	local weapon = getElementData(attacker, "wSlot" .. slot)
 	if not weapon then return end
 
-	outputConsole("[DEBUG] calcDamage(attacker = " .. getPlayerName(attacker) .. "; bodypart = " .. tostring(bodypart) .. ")")
-
 	local x, y, z = getElementPosition(victim)
 	local x2, y2, z2 = getElementPosition(attacker)
 	local distance = getDistanceBetweenPoints3D(x, y, z, x2, y2, z2)
@@ -113,7 +111,7 @@ function calcDamage(victim, attacker, bodypart, gtaLoss, gtaWeapon)
 	end
 
 	if victim == localPlayer then
-		outputConsole("[DAMAGE TAKEN] From: " .. getPlayerName(attacker) .. " | Amount: " .. damage.health .. ", " .. damage.armor .. " | Distance: " .. distance)
+		outputConsole("[DAMAGE TAKEN] From: " .. getPlayerName(attacker) .. " | Amount: " .. damage.health + damage.armor)
 	end
 
 	if damage.health > 0 then
