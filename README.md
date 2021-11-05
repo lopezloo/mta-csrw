@@ -1,5 +1,9 @@
+<h1 align="center">
+CS:RW
+</h2>
+
 <p align="center">
-Team Deathmatch gamemode conformed to Counter Strike, originally released Dec 06 2014.
+  <a href="https://multitheftauto.com/">Multi Theft Auto: San Andreas</a> Team Deathmatch game mode inspired by Counter Strike.
 </p>
 <p align="center">
 <img alt="class selection" src="http://media.moddb.com/cache/images/mods/1/25/24608/thumb_300x150/6.jpg" />
@@ -9,18 +13,19 @@ Team Deathmatch gamemode conformed to Counter Strike, originally released Dec 06
 </p>
 
 __Features:__
-* interface based on CS:Source
+* interface inspired by Counter Strike: Source
 * full dynamic and easy customizable weapons including grenades as flashbang, decoy and stuff like nightvision goggles
 * custom damage system
 * weapons visible on player back, carrying C4 in the hands
-* spectator mode with freecam and "wallhacking" (like CSGO) teammates and weapons laying on ground
+* spectator mode with free camera mode and "wallhacking" (like CS:GO) teammates and weapons laying on ground
 * weapon drop
 * bomb defusal mode
 * hostage rescue mode
 * server Message of The Day, global news, new version notification
 * internal master server list
-* Rock The Vote (say "rtv") and nominating maps to the next vote (/nominate); auto vote after 30 rounds
-* localization system (by default: english and polish)
+* Rock The Vote and nominating maps to the next vote
+* locale system (by default: english and polish)
+* configurable
 
 __Links:__
 * [Multi Theft Auto community page](https://community.multitheftauto.com/index.php?p=resources&s=details&id=10487)
