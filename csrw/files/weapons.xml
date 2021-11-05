@@ -1,38 +1,39 @@
 <weapons>
 	<!--
-		Weapon shop categories, weapon cost etc. are in client/settings/shop.xml
+		Weapon shop categories, weapon cost etc. are stored in client/settings/shop.xml
 
-		weaponID special flags:
+		"weaponID" special flags:
 			-1 = kevlar
 			-2 = kevlar + helmet
 			-3 = nightvision goggles
 			-4 = thermalvision goggles
-			-5 = defusing kit
+			-5 = defuse kit
 			-6 = C4
 
-		objectID special flags:
+		"objectID" special flags:
 			-2 = flash grenade (+ weaponID="17" !)
 			-3 = decoy grenade (+ weaponID="17" !)
-			Smoke grenade it's just normal tear gas without any proper flag.
+			Smoke grenade is just normal tear gas (weaponID="17") without any proper flag.
 
 		damage special flags:
 			-1 or nil = no damage (nil = no parameter)
-			-2 = original GTA weapon damage (by weaponID)
-			-3 = instant dead (not implemented)
-
-		General notes:
-			* Grenades damage are hardcoded and always uses -2 flag (original GTA damage) due to some restrictions.
-			* Shot sounds are loaded from csrw-sounds resource (sounds/weapons/...)
-			* instantDamage = get HP and no matters on distance (default used for knife)
-			* All physical (for ex. kevlar is not physical) weapons are default droppable (droppable="true")
-				* Weapon aren't droppable too if objectID is < 0 or nil (but use droppable parameter if you want to make them not droppable!)
-			* Sprinting with melee weapons is hardcoded
+			-2 = original GTA weapon damage (based on weaponID)
+			-3 = instant dead (reserved, not implemented)
 
 		Weapon flags ("flags" parameter):
-			* bomb, knife
-			* NODM - weapon restricted on DeathMatch mode
-			* weapon can use many flags, example: flags="NODM,ASD"
-			* flag name is no case sensetive
+			* BOMB - weapon is used as bomb in bomb defusal mode
+                        * KNIFE - weapon is used as knife (players will spawn with it)
+			* NODM - weapon is restricted on DeathMatch mode
+			One weapon can use many flags, example: flags="NODM,ASD".
+			Flag names are case insensitive.
+
+		General notes:
+			* Grenade damage is hardcoded and always use -2 flag (original GTA damage).
+			* Shot sounds are loaded from csrw-sounds resource (sounds/weapons/...)
+			* "instantDamage" parameter = takes HP without regards of distance (by default used for knife)
+			* All physical (for ex. kevlar is not physical) weapons are by default droppable (droppable="true")
+				* Weapons aren't droppable too if objectID is < 0 or nil
+			* Sprinting ability with melee weapons is hardcoded
 	-->
 	
 	<slot id="1">
@@ -40,7 +41,7 @@
 		<weapon name="LEONE 12 GAUGER SUPER" weaponID="25" objectID="349" clip="8" ammo="32" skill="medium" headDamage="174" headDamageArmor="129" torsoDamage="105" torsoDamageArmor="90" stomachDamage="108" stomachDamageArmor="104" legsDamage="112" legsDamageArmor="112" shotSound="m3/m3-1.wav" image="shotguns/leone_12_gauge_super.png" /> <!-- 6 -->
 		<weapon name="LEONE YG1265 AUTO SHOTGUN" weaponID="27" objectID="351" clip="7" ammo="32" skill="medium" headDamage="158" headDamageArmor="117" torsoDamage="114" torsoDamageArmor="54" stomachDamage="120" stomachDamageArmor="72" legsDamage="84" legsDamageArmor="84" shotSound="xm1014/xm1014-1.wav" image="shotguns/leone_YG1265_auto.png" /> <!-- 7 -->
 		
-		<!-- maszynowe -->
+		<!-- machine guns -->
 		<weapon name="INGRAM MAC 10" weaponID="32" objectID="372" clip="30" ammo="100" skill="low" headDamage="113" headDamageArmor="54" torsoDamage="28" torsoDamageArmor="13" stomachDamage="35" stomachDamageArmor="17" legsDamage="21" legsDamageArmor="21" shotSound="mac10/mac10-1.wav" image="submachine-guns/ingram_mac-10.png" /> <!-- 8 -->
 		<weapon name="KM SUB MACHINE GUN" weaponID="29" objectID="353" clip="30" ammo="120" skill="medium" headDamage="102" headDamageArmor="51" torsoDamage="25" torsoDamageArmor="12" stomachDamage="32" stomachDamageArmor="16" legsDamage="19" legsDamageArmor="19" shotSound="mp5navy/mp5-1.wav" image="submachine-guns/KM_sub-machine_gun.png"  /> <!-- 9 -->
 		<weapon name="KM UMP45" weaponID="29" objectID="353" clip="25" ammo="100" skill="medium" headDamage="118" headDamageArmor="58" torsoDamage="29" torsoDamageArmor="14" stomachDamage="37" stomachDamageArmor="18" legsDamage="21" legsDamageArmor="21" shotSound="ump45/ump45-1.wav" image="submachine-guns/KM_UMP45.png" /> <!-- 10 -->
@@ -77,7 +78,7 @@
 		<weapon name="KNIFE" weaponID="4" clip="1" instantDamage="10" flags="KNIFE" />
 	</slot>
 
-	<slot id="S1"> <!-- equipment (not physicall weapons), the most attributes don't have any effect (ex. objectID) -->
+	<slot id="S1"> <!-- equipment (not physical weapons), most attributes don't produce any effect (ex. objectID) -->
 		<weapon name="KEVLAR" weaponID="-1" image="equipment/kevlar.png" /> <!-- 18 -->
 		<weapon name="KEVLAR + HELMET" weaponID="-2" image="equipment/kevlar_helmet.png" /> <!-- 19 -->
 		<weapon name="NIGHTVISION" weaponID="-3" objectID="368" clip="1" ammo="1" image="equipment/goggles.png" /> <!-- 24 -->
