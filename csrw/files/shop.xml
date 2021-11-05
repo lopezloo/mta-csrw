@@ -85,10 +85,10 @@
 		
 		<category name="equipment"> <!-- S1 -->
 			<weapon name="KEVLAR" cost="600" csWeaponID="1" slot="S1" info10="Protect your body." />
-			<weapon name="KEVLAR&HELMET" cost="1000" csWeaponID="2" slot="S1" info10="Protect your body and head." />
+			<weapon name="KEVLAR + HELMET" cost="1000" csWeaponID="2" slot="S1" info10="Protect your body and head." />
 			<weapon name="DEFUSE KIT" cost="200" csWeaponID="5" slot="S1" info10="Equipment used to decrease the defuse time of bombs." />
-			<weapon name="NIGHT VISION" cost="1250" csWeaponID="3" slot="S1" info10="Nightvision goggles is an equipment item that enable users to see in complete darkness." />
-			<weapon name="THERMAL VISION" cost="1800" csWeaponID="4" slot="S1" info10=" " />
+			<weapon name="NIGHT VISION GOGGLES" cost="1250" csWeaponID="3" slot="S1" info10="Nightvision goggles is an equipment item that enable users to see in complete darkness." />
+			<weapon name="THERMAL VISION GOGGLES" cost="1800" csWeaponID="4" slot="S1" info10=" " />
 		</category>	
 
 		<category name="grenades">
