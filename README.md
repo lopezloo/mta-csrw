@@ -23,7 +23,7 @@ __Features:__
 * hostage rescue mode
 * server Message of The Day, global news, new version notification
 * internal master server list
-* Rock The Vote and nominating maps to the next vote
+* Rock The Vote feature and ability to nominate maps for next vote
 * locale system (by default: english and polish)
 * configurable
 
