@@ -21,12 +21,16 @@ __Features:__
 * weapon drop
 * bomb defusal mode
 * hostage rescue mode
-* server Message of The Day, global news, new version notification
-* internal master server list
+* server Message of The Day, <s>global news</s>, new version notification
+* <s>internal master server list</s>
 * Rock The Vote feature and ability to nominate maps for next vote
 * locale system (by default: english and polish)
 * configurable
 
-__Links:__
+__Download:__
 * [Multi Theft Auto community page](https://community.multitheftauto.com/index.php?p=resources&s=details&id=10487)
+
+__Other:__
 * [Multi Theft Auto forum topic](https://forum.mtasa.com/viewtopic.php?t=72068)
+
+This repository consist of code and configuration files only. Assets are not included. Please use MTA:SA community site for download.
