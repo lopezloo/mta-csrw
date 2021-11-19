@@ -32,5 +32,6 @@ __Download:__
 
 __Other:__
 * [Multi Theft Auto forum topic](https://forum.mtasa.com/viewtopic.php?t=72068)
+* [Videos on YouTube](https://www.youtube.com/playlist?list=PLlZJGl2Rc-B-GrX5Vn66DSsKI_K0q28Aj)
 
 This repository consist of code and configuration files only. Assets are not included. Please use MTA:SA community site for download.
