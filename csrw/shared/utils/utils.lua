@@ -180,9 +180,10 @@ function output(text)
 	end
 end
 
-function table.find(table, toFind)
+function table.find(table, find)
+	if not table or not find then return false end
 	for k, v in pairs(table) do
-		if v == toFind then
+		if v == find then
 			return k
 		end
 	end
