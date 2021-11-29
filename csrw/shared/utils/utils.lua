@@ -40,15 +40,6 @@ function changeViewToRandomCamera(player)
 		fadeCamera(player, true)
 		outputConsole("Camera changed to " .. x .. ", " .. y .. ", " .. z, player)
 	end
-
-
-	--[[if not lobbyPed then
-		lobbyPed = createPed(104, 313.85488891602, 1832.0942382813, 6.9)
-		setElementFrozen(lobbyPed, false)
-		--setElementCollisionsEnabled(lobbyPed, false)
-		setElementRotation(lobbyPed, 90)
-		setPedAnimation(lobbyPed, "crack", "crckidle4", -1, true, false, false, false)
-	end]]--
 end
 
 function getRandomCameraPos(ifNoReturnSpawn)
