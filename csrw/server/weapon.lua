@@ -380,8 +380,6 @@ addEvent("csKillPed", true)
 addEventHandler("csKillPed", root, csKillPed)
 
 function csResetWeapons(player, quit)
-	--for i=1, #g_weapon do -- po stronie klienta to działa (c render/debug.lua), lol
-	--for i = 1, g_weapon_slotCount do -- pętla na all sloty
 	for i=1, #g_weapon do
 		if not quit then
 			setElementData(player, "wSlot" .. i, false)
@@ -417,7 +415,6 @@ function csTakeWeapon(player, slot, weapon, dontSendDataToClient)
 		weapon = g_playerWeaponData[player].weapon
 	end
 
-	--unloadBomb(player)
 	detachWeaponFromBody(player, slot)
 	if slot == DEF_BOMB[1] and weapon == DEF_BOMB[2] then stopAnimationWithWalking(player) end
 	if not dontSendDataToClient then

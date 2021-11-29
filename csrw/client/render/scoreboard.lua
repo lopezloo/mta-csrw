@@ -4,11 +4,9 @@
 --  ex. 321 / 1050 (pozycja Y)
 
 local tableShowing = false
-local tableCanBeSwitched = true -- czy tabela moze byc aktualnie odpalona/ukryta przez TAB
 
---[[if getElementData(resourceRoot, "currentMode") ~= "cs" then
-	langText["terrorists"] = getText("zombies")
-end]]--
+-- czy tabela moze byc aktualnie odpalona/ukryta przez TAB
+local tableCanBeSwitched = true
 
 local players = {}
 
@@ -129,22 +127,22 @@ function onScoreTableRender()
 	
 	dxDrawRectangle(render["ttBg"][1], render["ttBg"][2], render["ttBg"][3], render["ttBg"][4], tocolor(135, 26, 31, 180), alse) -- tło napisu TT
 	dxDrawRectangle(render["ctBg"][1], render["ctBg"][2], render["ctBg"][3], render["ctBg"][4], tocolor(24, 115, 177, 180), false) -- tło napisu CT
-	
-    dxDrawLine(render["line2"][1], render["line2"][2], render["line2"][3], render["line2"][2], tocolor(255, 255, 255, 255), 1, false)
-    dxDrawLine(render["line3"][1], render["line2"][2], render["line3"][2], render["line2"][2], tocolor(255, 255, 255), 1, false)
-	
-    dxDrawText(getText("terrorists"), render["ttText"][1], render["mainY"], render["ttText"][2], render["ttText"][3], tocolor(255, 255, 255, 255), render["mainSize"], "sans", "right", "top", false, false, false)
-    dxDrawText(getText("counterTerrorists"), render["ctText"][1], render["mainY"], render["ctText"][2], render["ctText"][3], tocolor(255, 255, 255, 255), render["mainSize"], "sans", "left", "top", false, false, false)
-	
+
+	dxDrawLine(render["line2"][1], render["line2"][2], render["line2"][3], render["line2"][2], tocolor(255, 255, 255, 255), 1, false)
+	dxDrawLine(render["line3"][1], render["line2"][2], render["line3"][2], render["line2"][2], tocolor(255, 255, 255), 1, false)
+
+	dxDrawText(getText("terrorists"), render["ttText"][1], render["mainY"], render["ttText"][2], render["ttText"][3], tocolor(255, 255, 255, 255), render["mainSize"], "sans", "right", "top", false, false, false)
+	dxDrawText(getText("counterTerrorists"), render["ctText"][1], render["mainY"], render["ctText"][2], render["ctText"][3], tocolor(255, 255, 255, 255), render["mainSize"], "sans", "left", "top", false, false, false)
+
 	dxDrawText(score[1], render["score1"][1], render["mainY"], render["score1"][2], render["score1"][3], tocolor(255, 255, 255, 255), render["mainSize"], "bankgothic", "left", "top", false, false, false) -- punkty tt
-    dxDrawText(score[2], render["score2"][1], render["mainY"], render["score2"][2], render["score2"][3], tocolor(255, 255, 255, 255), render["mainSize"], "bankgothic", "right", "top", false, false, false) -- punkty ct
+	dxDrawText(score[2], render["score2"][1], render["mainY"], render["score2"][2], render["score2"][3], tocolor(255, 255, 255, 255), render["mainSize"], "bankgothic", "right", "top", false, false, false) -- punkty ct
 
 	dxDrawText(getText("scoreboard_infoLabel"), render["label"][1], render["headerY"], render["label"][2], render["label"][3], tocolor(153, 0, 0, 255), render["headerSize"], "bankgothic", "left", "top", false, false, false)
-    dxDrawText(getText("scoreboard_player"), render["player"][1], render["headerY"], render["player"][2], render["player"][3], tocolor(153, 0, 0, 255), render["headerSize"], "bankgothic", "left", "top", false, false, false)
+	dxDrawText(getText("scoreboard_player"), render["player"][1], render["headerY"], render["player"][2], render["player"][3], tocolor(153, 0, 0, 255), render["headerSize"], "bankgothic", "left", "top", false, false, false)
 
-    dxDrawText(getText("scoreboard_infoLabel"), render["label2"][1], render["headerY"], render["label2"][2], render["label2"][3], tocolor(0, 51, 204, 255), render["headerSize"], "bankgothic", "left", "top", false, false, false)
-    dxDrawText(getText("scoreboard_player"), render["player2"][1], render["headerY"], render["player2"][2], render["player2"][3], tocolor(0, 51, 204, 255), render["headerSize"], "bankgothic", "left", "top", false, false, false)		
-	
+	dxDrawText(getText("scoreboard_infoLabel"), render["label2"][1], render["headerY"], render["label2"][2], render["label2"][3], tocolor(0, 51, 204, 255), render["headerSize"], "bankgothic", "left", "top", false, false, false)
+	dxDrawText(getText("scoreboard_player"), render["player2"][1], render["headerY"], render["player2"][2], render["player2"][3], tocolor(0, 51, 204, 255), render["headerSize"], "bankgothic", "left", "top", false, false, false)		
+
 	if not tempPlayers then
 		for k, v in pairs(players[1]) do -- TT
 			drawPlayer(v, k)

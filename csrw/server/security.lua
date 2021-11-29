@@ -12,13 +12,6 @@ local protectedDatas = {
 
 addEventHandler("onElementDataChange", root,
 	function(dataName, oldValue)
-
-		--[[local resName = "nil"
-		if sourceResource then
-			resName = getResourceName(sourceResource)
-		end
-		outputServerLog("[DEBUG] onElementDataChange(data='" .. tostring(dataName) .. "', oldVal='" .. tostring(oldValue) .. "') client='" .. tostring(client) .. "' src='" .. tostring(source) .. "' resource='" .. resName .. "'")]]--
-
 		if sourceResource and sourceResource ~= getThisResource() then
 			if source == getThisResource() then
 				outputServerLog("WARNING: Resource " .. getResourceName(sourceResource) .. " tried to change CSRW data.")
@@ -52,8 +45,10 @@ addEventHandler("onElementDataChange", root,
 				end
 			end
 
-		elseif client then -- jeśli data została zmieniona przez jakiegoś klienta
-			if source == getThisResource() then -- jeśli klient zmienia date skryptowi
+		-- jeśli data została zmieniona przez jakiegoś klienta
+		elseif client then
+			-- jeśli klient zmienia date skryptowi
+			if source == getThisResource() then
 				outputServerLog("DEBUG WARNING: Player " .. getPlayerName(client) .. " tried to change CSRW data (" .. dataName .. ").")
 				setElementData(source, dataName, oldValue)
 
@@ -66,7 +61,8 @@ addEventHandler("onElementDataChange", root,
 					end
 				end
 
-			elseif client == source then -- jeśli zmienia date sobie
+			-- jeśli zmienia date sobie
+			elseif client == source then
 				if (dataName == "health" or dataName == "money") and oldValue and tonumber(oldValue) < tonumber(getElementData(source, dataName)) then
 					-- jeśli zmienia HP, pancerz lub kase i wartość ta jest większa od starej
 					outputServerLog("WARNING: Player " .. getPlayerName(source) .. " tried to change his " .. dataName .. " data.")

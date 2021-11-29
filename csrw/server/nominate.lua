@@ -2,9 +2,9 @@ local playerNominations = { }
 local nominations = {}
 
 local nominateLimit = 5
-local currentVoteOptions = {} -- mapy w obecnym głosowaniu
 
--- TODO: języki
+-- lista map w obecnym głosowaniu
+local currentVoteOptions = {}
 
 function nominateMap(mapName)
 	if #currentVoteOptions > 0 then
@@ -172,12 +172,3 @@ addEventHandler("onPollEnd", root,
 		end
 	end
 )
-
---[[addCommandHandler("votedebug",
-	function(player)
-		if hasObjectPermissionTo(player, "function.kickPlayer") then
-			outputChatBox("votedebug")
-			voteMaps()
-		end
-	end
-)]]--

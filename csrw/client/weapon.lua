@@ -288,7 +288,9 @@ addEventHandler("updateWeaponData", root,
 				g_playerWeaponData = {}
 				return
 			end
+			
 			--outputChatBox("updateWeaponData " .. tostring(slot) .. ", " .. tostring(weapon) .. ", " .. tostring(ammo) .. ", " .. tostring(clip))
+
 			if not weapon then g_playerWeaponData[slot] = nil return end -- usuwanie danych o slocie
 			if not g_playerWeaponData[slot] then g_playerWeaponData[slot] = {} end
 			g_playerWeaponData[slot].weapon = weapon
@@ -296,7 +298,9 @@ addEventHandler("updateWeaponData", root,
 				g_playerWeaponData[slot].ammo = ammo
 				g_playerWeaponData[slot].clip = clip
 			end
-			if not hideHer then -- broń nie została schowana do ekwipunku
+			
+			if not hideHer then
+				-- broń nie została schowana do ekwipunku
 				g_playerWeaponData.current = weapon
 			end
 		end

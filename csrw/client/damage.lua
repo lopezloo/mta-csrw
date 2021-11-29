@@ -1,5 +1,3 @@
-
-
 function onSomeoneDamaged(attacker, weapon, bodypart, loss) -- source: zraniony
 	cancelEvent()
 	--outputChatBox("onSomeoneDamaged weapon " .. tostring(weapon))

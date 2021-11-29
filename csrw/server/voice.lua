@@ -1,3 +1,3 @@
-function setPlayerChannelByTeam(player) -- todo
+function setPlayerChannelByTeam(player) -- @todo
 
 end

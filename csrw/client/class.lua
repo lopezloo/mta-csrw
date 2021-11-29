@@ -5,6 +5,7 @@ local btnSpace = 0.065
 local classData = {}
 
 local classes = {
+	-- @todo: localize this
 	[1] = {
 		{"Phoenix Conexxion", "Having established a reputation for killing anyone that gets in their way, the Phoenix Connexion is one of the most feared terrorist groups in Eastern Europe. Formed shortly after the breakup of the USSR."},
 		{"Elite Crew", "Middle Eastern fundamentalist group bent on world domination."},

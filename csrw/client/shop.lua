@@ -422,7 +422,5 @@ function renderShop()
 		
 		dxDrawText(currentWeapon.text, render["txt"][1], render["txt"][2], render["txt"][3], render["txt"][4], tocolor(252, 85, 2, 255), 0.6, "bankgothic", "left", "top", false, true, false, false, false)
 		dxDrawText(currentWeapon.text2, render["txt2"][1], render["txt2"][2], render["txt2"][3], render["txt2"][4], tocolor(252, 85, 2, 255), 0.6, "bankgothic", "right", "top", false, true, false, false, false)
-	
-		--dxDrawText("$" .. currentWeapon.cost, 0.45297619047*sX, 0.4019047619*sY, 0.76547619047*sX, 0.4419047619*sY, tocolor(252, 85, 2, 100), 1, csFont, "center", "top", false, false, true, false, false)
 	end
 end

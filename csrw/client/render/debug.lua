@@ -1,3 +1,8 @@
+if true then
+	-- Disable debug stuff
+	return
+end
+
 local debug = {
 	enabled,
 }
@@ -78,7 +83,8 @@ function drawDebug_1()
 	dxDrawText(text, 26, 300, 483, 745, tocolor(255, 255, 255, 255), 1, "default-bold", "left", "top", false, false, false, true, false)
 end
 
---[[function drawDebug_2() -- debug dot. innych graczy
+-- draw other info about player debug
+function drawDebug_2()
 	for k, v in pairs(getElementsByType("player")) do
 		if v ~= localPlayer and isElementOnScreen(v) then
 			local x, y, z = getPedBonePosition(v, 8)
@@ -102,7 +108,8 @@ end
 	end
 end
 
-function drawDebug_3() -- debug broni na ziemi
+-- weapons lying on the ground debug
+function drawDebug_3()
 	for k, v in pairs(getElementsByType("colshape")) do
 		--if isElementOnScreen(v) then -- nie dziala na colshape o.o
 		local data = getElementData(v, "groundWeapon")
@@ -118,7 +125,8 @@ function drawDebug_3() -- debug broni na ziemi
 	end
 end
 
-function drawDebug_4() -- debug kości localPlayera
+-- localplayer bones debug
+function drawDebug_4()
 	for i=1, 60 do
 		local x, y, z = getPedBonePosition(localPlayer, i)
 		if x and y and z then
@@ -130,7 +138,8 @@ function drawDebug_4() -- debug kości localPlayera
 	end
 end
 
-function drawDebug_5() -- debug dystansu do graczy
+-- show distance to other players
+function drawDebug_5()
 	for k, v in pairs(getElementsByType("player")) do
 		if v ~= localPlayer and isElementStreamedIn(v) and getElementData(v, "alive") and isElementOnScreen(v) then
 			local x, y, z = getElementPosition(v)
@@ -175,9 +184,10 @@ function drawImpacts(weapon, ammo, clip, hitX, hitY, hitZ, hitElement, startX, s
 				removeEventHandler("onClientRender", root, drawThisImpact)
 			end, 2000, 1)
 	end
-end--]]
+end
 
---[[function spawnDebug()
+if false then
+function spawnDebug()
 	for k, v in pairs(getElementsByType("spawntt")) do
 		local x, y, z = getElementData(v, "posX"), getElementData(v, "posY"), getElementData(v, "posZ")
 		x, y = getScreenFromWorldPosition(x, y, z)
@@ -195,4 +205,5 @@ end--]]
 	end
 	dxDrawText("TT spawns: " .. #getElementsByType("spawntt") .. "\nCT spawns: " .. #getElementsByType("spawnct"), 300, 300)
 end
-addEventHandler("onClientRender", root, spawnDebug)]]--
+addEventHandler("onClientRender", root, spawnDebug)
+end

@@ -207,6 +207,7 @@ function onSmokeGrenadeExploded(grenade)
 		-- smoke już leży na ziemi nieruchomo, więc nie trzeba aktualizować pozycji dymu
 		table.remove(smokeGrenades, table.find(smokeGrenades, grenade))
 		destroyElement(grenade)	
+		
 		setTimer(
 			function()
 				if particle then
@@ -214,11 +215,15 @@ function onSmokeGrenadeExploded(grenade)
 					destroyElement(particle)
 				end
 			end, 20000, 1)
+		
 	else
 		if not g_misc.smokeUpdate and #smokeGrenades == 1 then
 			g_misc.smokeUpdate = true
-			addEventHandler("onClientPreRender", root, updateSmokeGrenadeParticles) -- włączanie tego eventu tylko na czas gdy są stworzone smokesy
+
+			-- włączanie tego eventu tylko na czas gdy są stworzone smokesy
+			addEventHandler("onClientPreRender", root, updateSmokeGrenadeParticles)
 		end
+
 		addEventHandler("onClientElementDestroy", grenade, onSmokeGrenadeDestroy)
 	end
 end
@@ -228,7 +233,6 @@ function updateSmokeGrenadeParticles()
 		local x, y, z = getElementPosition(v)
 		setElementPosition(getElementData(v, "particle"), x, y, z-2)
 	end
-	--dxDrawText("Smoke particle update. <---------------------------", 10, 600) -- było do 22.08.15 wtf
 end
 
 function onSmokeGrenadeDestroy()
@@ -257,7 +261,8 @@ function destroyGrenades()
 
 	for k, v in pairs(getElementsByType("projectile")) do
 		if getProjectileType(v) ~= 16 then
-			destroyElement(v) -- usuwanie wszystkich projectile oprocz normalnych granatów odłamkowych
+			-- usuwanie wszystkich projectile oprocz normalnych granatów odłamkowych
+			destroyElement(v)
 		end
 	end
 end

@@ -10,10 +10,6 @@ function onBombPlanted(player)
 	setElementCollisionsEnabled(bomb, false)
 	setElementData(bomb, "bomb", true)
 
-	--setElementData(resourceRoot, "roundTimeMinutes", 0)
-	--setElementData(resourceRoot, "roundTimeSeconds", 30)
-
-	--check1 = getTickCount()
 	bombBeepTimer = setTimer(bombBeep, 2000, 1, 2000)
 	triggerClientEvent("cPlaySound", root, "radio/bombpl.wav")
 	g_roundData.bomb = true
@@ -63,9 +59,11 @@ function onBombDefused(player)
 	setTimer(
 		function()
 			if countPlayersInTeam(g_team[1]) > 0 then
-				onRoundEnd(2, 3) -- jeśli jest conajmniej 1 TT to wygrywa CT
+				-- jeśli jest conajmniej 1 TT to wygrywa CT
+				onRoundEnd(2, 3)
 			else
-				onRoundEnd(3, 3) -- remis
+				-- remis
+				onRoundEnd(3, 3)
 			end
 		end, 1500, 1)
 end

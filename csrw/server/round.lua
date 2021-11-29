@@ -1,10 +1,13 @@
 zombieIdleTimers = {}
 
 g_roundData = {
-	state = "ended", -- status rundy: ended, starting, started
+	-- round state, can be: ended, starting, started
+	state = "ended",
 	aliveTT = 0,
 	aliveCT = 0,
-	bomb = false -- czy bomba jest podłożona
+
+	-- if bomb is planted
+	bomb = false
 }
 
 function updateClassInfos(skin, teamid) -- update teamu, skinu (z c class.lua)
@@ -79,7 +82,7 @@ function spawn(player) -- spawn
 
 		spawnPlayer(player, posX, posY, posZ, rotZ, getTeamSkinValue(theTeam) + g_player[player].skin, int, 0, theTeam)
 		setCameraTarget(player)
-		setPlayerChannelByTeam(player) -- kanał voice
+		setPlayerChannelByTeam(player)
 		
 		if not g_player[player].surviveLastRound then
 			--if g_match.mode == "cs" then csGiveWeapon(player, 34, 1) end

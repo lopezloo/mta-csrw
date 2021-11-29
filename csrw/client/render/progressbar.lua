@@ -46,7 +46,8 @@ function stopProgressBar()
 end
 
 function updateProgress()
-	if not progress.direction then -- w prawo
+	if not progress.direction then
+		-- w prawo
 		progress.count = progress.count + progress.updateCount
 		if progress.count >= 1 then
 			progress.count = 1
@@ -55,7 +56,8 @@ function updateProgress()
 		else
 			progress.timer = setTimer(updateProgress, 50, 1)
 		end
-	else -- w lewo
+	else
+		-- w lewo
 		progress.count = progress.count - progress.updateCount
 		if progress.count <= 0 then
 			progress.count = 0

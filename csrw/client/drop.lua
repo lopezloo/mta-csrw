@@ -42,6 +42,7 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 
 	local x2, y2, z2 = getPositionFromElementOffset(player, 0, 1.5, 0)
 	local velocity
+	
 	if not isLineOfSightClear(x, y, z + 0.05, x2, y2, z2 + 0.05, true, false, false) then
 		velocity = {0, 0, 0.05}
 	else
@@ -57,10 +58,13 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 	end
 
 	local model = g_weapon[slot][weapon]["objectID"]
-	local wepObj = createObject(model, x, y, z, 90, 0, rotz) -- obiekt o modelu broni zapada się pod ziemie jeśli nie ma wcześniej stworzonego projectile
+	-- obiekt o modelu broni zapada się pod ziemie jeśli nie ma wcześniej stworzonego projectile
+	local wepObj = createObject(model, x, y, z, 90, 0, rotz)
+	
 	for k, v in pairs(getElementsByType("player")) do
 		setElementCollidableWith(wepObj, v, false)
 	end
+	
 	for k, v in pairs(getElementsByType("colshape")) do
 		local relatedWeaponObj = getElementData(v, "related")
 		if relatedWeaponObj then
@@ -154,7 +158,8 @@ addEventHandler("syncGroundWeapons", root,
 	end
 )
 
-function onWeaponHitted(element, matchingDimension) -- projectile lub object
+-- projectile lub object
+function onWeaponHitted(element, matchingDimension)
 	-- Projectile / obiekt musi być dopiero usuwany gdy gracz KTÓRY W NIEGO WEJDZIE go podniesie (bo przecież może nie mieć miejsca na slocie)
 
 	if getElementType(element) == "player" and matchingDimension then
@@ -172,12 +177,9 @@ end
 
 function getWeaponFromGround(player, colshape)
 	local weapon = getElementData(colshape, "weapon")
-	--outputChatBox("siema tu klient chce bron ze slotu " .. weapon[1] .. " (id " .. weapon[2] .. " ammo " .. weapon[3] .. " / " .. weapon[4], client)
 
 	if not getElementData(player, "wSlot" .. weapon.slot) and (not (weapon.slot == DEF_BOMB[1] and weapon.weapon == DEF_BOMB[2]) or getPlayerTeam(player) == g_team[1]) then -- jeśli gracz nie ma nic na tym slocie
 	-- if not g_playerWeaponData[player][weapon.slot] then
-
-
 		local related = getElementData(colshape, "related")
 		destroyElement(related)
 		destroyElement(colshape)
@@ -189,10 +191,10 @@ function getWeaponFromGround(player, colshape)
 			playSound(":csrw-sounds/sounds/items/itempickup.wav")
 		end
 	else
-		--outputChatBox("Gracz " .. getPlayerName(player) .. " nie może podnieść fizycznej broni bo ma już coś na tym slocie (" .. tostring(weapon.slot) .. "), booyah!")
-		-- ? todo reset animacji ?
+		-- Gracz nie może podnieść broni bo ma już coś na tym slocie
+		-- @todo: reset animacji?
 		if player == localPlayer and getElementData(localPlayer, "currentSlot") == weapon.slot then
-			startDrawingWeapon(weapon.slot, weapon.weapon) -- rysowanie grafiki broni
+			startDrawingWeapon(weapon.slot, weapon.weapon)
 		end
 	end
 end

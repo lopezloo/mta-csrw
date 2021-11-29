@@ -1,8 +1,9 @@
 csReloading_clipAmmoTemp = 0
 csReloading_totalAmmoTemp = 0
 
-local reloadAnimation = { -- zbiór, animacja normalna, animacja podczas kucania
-	[2] = {"COLT45", "colt45_reload", "colt45_crouchreload"},-- pistolety
+local reloadAnimation = {
+	-- zbiór, animacja normalna, animacja podczas kucania
+	[2] = {"COLT45", "colt45_reload", "colt45_crouchreload"}, -- pistolety
 	[3] = {"BUDDY", "buddy_reload", "buddy_crouchreload"}, -- shotguny
 	[4] = {"UZI", "UZI_reload", "UZI_crouchreload"}, -- maszynowe
 	[5] = {"PYTHON", "python_reload", "python_crouchreload"}, -- karabiny

@@ -2,7 +2,7 @@ local hudShowing
 
 local csFont = dxCreateFont(":csrw-media/fonts/ccwstrike.ttf", 40)
 if not csFont then
-	outputChatBox("ERROR: I can't load HUD font! Using default.")
+	outputChatBox("WARNING: I can't load HUD font! Using default.")
 	csFont = "default-bold"
 end
 
@@ -119,21 +119,3 @@ function renderHUD()
 		dxDrawText(math.floor(getElementData(target, "money") or 0), render.money[1], render.money[2], render.money[3], render.money[4], color, csFontSize, csFont, "right", "top", false, false, false, false, false)	
 	end
 end
-
---[[function renderHUD()
-	dxDrawText("b", 31, 854, 61, 890, color, csFontSize, csFont, "left", "top", false, false, false, false, false)
-	dxDrawText("100", 61, 854, 178, 890, color, csFontSize, csFont, "right", "top", false, false, false, false, false)
-
-	dxDrawText("a", 314, 854, 344, 890, color, csFontSize, csFont, "left", "top", false, false, false, false, false)
-	dxDrawText("69", 344, 854, 461, 890, color, csFontSize, csFont, "right", "top", false, false, false, false, false)
-
-	dxDrawText("e", 643, 854, 673, 890, color, csFontSize, csFont, "left", "top", false, false, false, false, false)
-	dxDrawText("5:15", 673, 854, 808, 890, color, csFontSize, csFont, "right", "top", false, false, false, false, false)
-
-	dxDrawText("30", 1164, 854, 1254, 890, color, csFontSize, csFont, "right", "top", false, false, false, false, false)
-	dxDrawText("|", 1183, 854, 1356, 890, color, csFontSize, csFont, "center", "top", false, false, false, false, false)
-	dxDrawText("120", 1285, 854, 1394, 890, color, csFontSize, csFont, "left", "top", false, false, false, false, false)
-
-	dxDrawText("$", 1237, 801, 1404, 837, color, csFontSize, csFont, "left", "top", false, false, false, false, false)
-	dxDrawText("16000", 1237, 801, 1404, 837, color, csFontSize, csFont, "right", "top", false, false, false, false, false)	
-end]]--

@@ -1,5 +1,5 @@
 local motdFile = fileOpen("motd.txt")
-local motd = "Message Of The Day cannot be loadded."
+local motd = "Message Of The Day cannot be loadded." -- @todo: localize
 if motdFile then
     motd = fileRead(motdFile, fileGetSize(motdFile))
     fileClose(motdFile)
@@ -33,11 +33,7 @@ function renderMOTD()
     dxDrawText(motd, render["motd"][1], render["motd"][2], render["motd"][3], render["motd"][4], tocolor(255, 255, 255, 255), 1.00, "default", "left", "top", true, true, false, false, false) -- motd
     dxDrawLine(render["line"][1], render["line"][2], render["line"][1], render["line"][3], tocolor(255, 255, 255, 255), 1, false) -- linia środkowa
 
-    --dxDrawText(newsString, render["newsX"], 296, 1315, 933, tocolor(255, 255, 255, 255), 1.00, "default", "left", "top", true, true, false, false, false)
     dxDrawText("Global News:", render["globalHeader"][1], render["globalHeader"][2], render["globalHeader"][3], render["globalHeader"][4], tocolor(255, 255, 255, 255), 1.00, "bankgothic", "center", "top", false, false, false, false, false)
-    --[[dxDrawText(news[1].title, 870, 271, 1321, 291, tocolor(255, 255, 255, 255), 1.20, "clear", "left", "top", true, false, false, false, false) -- nagłówek 1 newsa
-    dxDrawLine(870, 291, 1320, 291, tocolor(255, 255, 255, 255), 1, false) -- linia pod nagłówkiem 1 newsa
-    dxDrawText(news[1].text, 870, 296, 1315, 933, tocolor(255, 255, 255, 255), 1.00, "default", "left", "top", true, true, false, false, false) -- treść 1 newsa]]--
 
     for k, v in pairs(news) do
         dxDrawText(news[k].title, render["news"][1], news[k].h1, render["globalHeader"][3], news[k].h2, tocolor(255, 255, 255, 255), render["newsHeaderScale"], "clear", "left", "top", true, false, false, false, false) -- nagłówek
@@ -67,10 +63,13 @@ for k, v in pairs( xmlNodeGetChildren(newsMainNode) ) do
     news[k].text = xmlNodeGetValue( v )
 
     if k == 1 then
-        news[k].h1 = render["line"][2] -- pozycja Y (271)
+        -- pozycja Y (271)
+        news[k].h1 = render["line"][2]
     else
         news[k].h1 = news[k-1].h1 + news[k-1].size
     end
-    news[k].h2 = news[k].h1 + 0.025*sY -- dodane 42px (1680x1050)   
+
+    -- dodane 42px (1680x1050)
+    news[k].h2 = news[k].h1 + 0.025*sY  
 end
 xmlUnloadFile(newsMainNode)
