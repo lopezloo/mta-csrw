@@ -1,5 +1,3 @@
-zombieIdleTimers = {}
-
 g_roundData = {
 	-- round state, can be: ended, starting, started
 	state = "ended",
@@ -12,19 +10,20 @@ g_roundData = {
 
 function updateClassInfos(skin, teamid) -- update teamu, skinu (z c class.lua)
 	--outputChatBox("SERWER: updateClassInfos: client: " .. getPlayerName(client))
-	if getElementData(client, "alive") then -- zmienia team będąc żywym
-		--local oldTeam = getElementData(client, "team")
+	-- zmienia team będąc żywym
+	if getElementData(client, "alive") then
 		local oldTeam = getPlayerTeam(client)
 		if oldTeam == g_team[1] then g_roundData.aliveTT = g_roundData.aliveTT - 1
 		elseif oldTeam == g_team[2] then aliveCT = g_roundData.aliveCT - 1 end
 		setElementData(client, "alive", false)
-		--checkPlayers() -- bo mógł być jedynym graczem w drużynie
 	end
 	
 	changePlayerTeam(client, g_team[teamid], skin)
 	g_player[client].surviveLastRound = false
 	csResetWeapons(client)
-	if teamid ~= 3 then -- jeśli gracz dołącza do speca to dalszy kod się nie wykonuje (czyli runda nie zostaje przez to zakończona)
+	
+	-- jeśli gracz dołącza do speca to dalszy kod się nie wykonuje (czyli runda nie zostaje przez to zakończona)
+	if teamid ~= 3 then
 		if not isRoundStarted() then
 			startRound()
 		else	
@@ -41,9 +40,6 @@ function updateClassInfos(skin, teamid) -- update teamu, skinu (z c class.lua)
 					joinSpectatorsTemporary(client)
 				end
 			end
-			--[[elseif getElementData(resourceRoot, "currentMode") == "zombie" then
-				spawn(client) -- spawn jako zombie
-			end]]--
 		end
 	end
 end
@@ -106,16 +102,21 @@ function joinSpectatorsTemporary(player)
 end
 
 function randomizeBomberMan()
-	if not isRoundStarted() then return false end -- runda nie jest rozpoczęta
+	if not isRoundStarted() then
+		return false
+	end
 
 	local terrorists = getPlayersInTeam(g_team[1])
 	for k, v in pairs(terrorists) do
-		if getElementData(v, "alive") == false then -- usuwanie nieżywych tt
+		-- usuwanie nieżywych tt
+		if getElementData(v, "alive") == false then
 			table.remove( terrorists, table.find( terrorists, v ) )
 		end
 	end
 	
-	if #terrorists < 1 then return false end -- musi być conajmniej 1 żywy terrorysta
+	if #terrorists < 1 then
+		return false
+	end
 	
 	local randomTerro = terrorists[math.random(1, #terrorists)]
 	csGiveWeapon(randomTerro, 8, 1, false, false, true)
@@ -128,11 +129,16 @@ function onPlayerSpawn(x, y, z, rot, theTeam, skin, int, dimension)
 	setElementCollisionsEnabled(source, true)
 	setElementData(source, "alive", true)
 	setElementData(source, "health", 100)
-	setPedFightingStyle(source, 16) -- "najmniejsza" animacja alt. bicia (CTRL + F; enter_exit)
-	setPedWalkingStyle(source, 56) -- MOVE_PLAYER_M
+	
+	-- "najmniejsza" animacja alt. bicia (CTRL + F; enter_exit)
+	setPedFightingStyle(source, 16)
+	
+	-- MOVE_PLAYER_M
+	setPedWalkingStyle(source, 56)
+
 	setPedHeadless(source, false)
 
-	-- napełnianie magazynków broni
+	-- refill weapon clips
 	for i=1, #g_weapon do
 		if g_playerWeaponData[source][i] then
 			local wep = g_playerWeaponData[source][i].weapon
@@ -142,30 +148,19 @@ function onPlayerSpawn(x, y, z, rot, theTeam, skin, int, dimension)
 			end
 		end
 	end
-
-	--[[if theTeam == g_team[1] and g_match.mode == "zombie" then
-		playZombieIdle(source, 0) -- 0 = scream na spawnie
-	end]]--
 end
 addEventHandler("onPlayerSpawn", root, onPlayerSpawn)
 
-function onPlayerWasted(ammo, killer, weapon, bodypart) -- gdy gracz zginie
+function onPlayerWasted(ammo, killer, weapon, bodypart)
 	if isRoundStarted() and getElementData(source, "alive") then
 		local team = getPlayerTeam(source)
-		--if getElementData(resourceRoot, "currentMode") == "cs" then
 		if team == g_team[1] then g_roundData.aliveTT = g_roundData.aliveTT - 1
 		elseif team == g_team[2] then g_roundData.aliveCT = g_roundData.aliveCT - 1 end
 		
 		if g_roundData.aliveTT < 0 or g_roundData.aliveCT < 0 then
-			outputChatBox("SERWER: Wystąpił błąd krytyczny, ilość graczy TT lub CT wynosi liczbę ujemną.", root, 204, 0, 0)
-			outputServerLog("Wystapil błąd krytyczny, ilosc graczy TT lub CT wynosi liczbe ujemna.")
+			outputChatBox("SERVER: ERROR: A fatal error has occurred, the number of TT or CT players is negative.", root, 204, 0, 0)
+			outputServerLog("ERROR: A fatal error has occurred, the number of TT or CT players is negative.")
 		end
-		
-		-- (wypadanie C4 zrobione po stronie klienta)
-		--[[if getElementData(source, "wSlot" .. DEF_BOMB[1]) == DEF_BOMB[2] and g_roundData.aliveTT >= 1 then
-			randomizeBomberMan()
-			outputText("msg_bombermanWasted", 255, 255, 255, root)
-		end]]--
 		
 		setElementData(source, "alive", false)
 		
@@ -188,34 +183,24 @@ function onPlayerWasted(ammo, killer, weapon, bodypart) -- gdy gracz zginie
 		stopAnimationWithWalking(source)
 		csResetWeapons(source)
 		setElementData(source, "armor", 0)
-		-- todo: wypadanie broni
+		-- @todo: weapon drop after death
 		
 		-- bonus (zapomoga po śmierci) za podłożenie bomby (niezależnie czy wygrano tą runde czy nie)
 		if getElementData(source, "hePlantedBomb") then
-			-- todo: zamienić na zmienną ^
+			-- @todo: zamienić na zmienną ^
 			setElementData(source, "hePlantedBomb", false)
 			givePlayerMoneyEx(source, 800)
 			advert.ok(getText("msg_moneyAward", source) .. 800, source, true)
 		end
 
-		-- brak kolizji ciał, todo: powinno być poza warunkiem isRoundStart() ?
+		-- brak kolizji ciał; @todo: powinno być poza warunkiem isRoundStart() ?
 		setElementCollisionsEnabled(source, false)
 
 		-- sprawdza ile jest żywych graczy, w razie potrzeby kończy rundę
 		if checkPlayers() then
 			joinSpectatorsTemporary(source)
 		end
-		-- todo: czy gracz może (i powinien) ginąć gdy nie jest w żadnym teamie?
-
-		--[[elseif g_match.mode == "zombie" then
-			if team == g_team[2] and g_roundData.aliveCT - 1 <= 0 then
-				triggerEvent("onRoundEnd", root, 2, 11) -- wygrywają zombie
-			else
-				setTimer(spawnAsZombie, 2000, 1, source, true)
-			end
-			
-			if isTimer(zombieIdleTimers[source]) then killTimer(zombieIdleTimers[source]) end
-		end]]--
+		-- @todo: czy gracz może (i powinien) ginąć gdy nie jest w żadnym teamie?
 	end
 end
 addEventHandler("onPlayerWasted", root, onPlayerWasted)
@@ -348,18 +333,8 @@ function onRoundEnd(winTeam, reason)
 			csTakeWeapon(v, DEF_BOMB[1])
 		end
 	end
-
-	if isTimer(randomizeZombieTimer1) then killTimer(randomizeZombieTimer1) end
-	if isTimer(randomizeZombieTimer2) then killTimer(randomizeZombieTimer2) end
 	
-	--[[if getElementData(resourceRoot, "currentMode") == "zombie" then
-		for i, player in pairs(getElementsByType("player")) do
-			if getElementData(player, "alive") and isTimer(zombieIdleTimers[player]) then killTimer(zombieIdleTimers[player]) end
-		end
-	else]]-- else balanceTeams()
 	balanceTeams()
-	
-	--destroyBots()
 	destroyBomb()
 	destroyGroundWeapons()
 	triggerClientEvent("onClientRoundEnd", root, winTeam, reason)
@@ -439,17 +414,15 @@ function countdownRoundTime(minutes, seconds)
 		
 		if minutes == 0 and seconds == 0 then
 			-- ^ jeśli jest 00:00 i jest przynajmniej jeden gracz w TT i CT
-			--if getElementData(resourceRoot, "currentMode") == "cs" then
 			if not g_roundData.bomb then
 				if g_roundData.aliveCT >= 1 and g_match.bombsites then
-					triggerEvent("onRoundEnd", root, 2, 4) -- to czas na podłożenie bomby się skończył i CT wygrywa (na mapie muszą być BSy)
+					-- to czas na podłożenie bomby się skończył i CT wygrywa (na mapie muszą być BSy)
+					triggerEvent("onRoundEnd", root, 2, 4)
 				else
-					triggerEvent("onRoundEnd", root, 3, 4) -- remis bo nie ma nikogo żywego w CT lub/i nie ma BSów
+					-- remis bo nie ma nikogo żywego w CT lub/i nie ma BSów
+					triggerEvent("onRoundEnd", root, 3, 4)
 				end
 			end
-			--[[elseif getElementData(resourceRoot, "currentMode") == "zombie" then
-				triggerEvent("onRoundEnd", root, 12, 1)
-			end]]--
 		else		
 			if minutes >= 0 then
 				setTimer(countdownRoundTime, 1000, 1, minutes, seconds - 1)
@@ -467,7 +440,7 @@ function checkPlayers()
 	if g_roundData.aliveTT >= 1 and g_roundData.aliveCT <= 0 then -- wygrywa TT
 		if countPlayersInTeam(g_team[2]) <= 0 then
 			-- gdy w przeciwnym teamie nie będzie graczy to po prostu runda się nie kończy (w cs 1.6 tak jest)
-			-- chujowo to w cs 1.6 rozwiązali, zrobimy po swojemu.. :>
+			-- słabo to w cs 1.6 rozwiązali, zrobimy po swojemu.. :>
 			triggerEvent("onRoundEnd", root, 3, 10) -- po prostu remis
 		else
 			-- tutaj kurwa trzeba zrobić jakoś jakiś warunek jeśli gracz dołączy do pustego teamu żeby dawało remis a nie wygrywał przeciwnik!
@@ -476,7 +449,7 @@ function checkPlayers()
 	elseif g_roundData.aliveTT <= 0 and g_roundData.aliveCT >= 1 and not g_roundData.bomb then -- wygrywa CT (tylko jeśli bomba nie jest podłożona, w przeciwnym razie musi ją rozbroić aby wygrać)
 		if countPlayersInTeam(g_team[1]) <= 0 then
 			-- gdy w przeciwnym teamie nie będzie graczy to po prostu runda się nie kończy (w cs 1.6 tak jest)
-			-- chujowo to w cs 1.6 rozwiązali, zrobimy po swojemu.. :>
+			-- słabo to w cs 1.6 rozwiązali, zrobimy po swojemu.. :>
 			-- po prostu remis
 			triggerEvent("onRoundEnd", root, 3, 10)
 		else

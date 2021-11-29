@@ -86,7 +86,6 @@ function onMapStop(stoppedMap)
 	g_match.hostages = false
 	
 	for k, v in pairs(getElementsByType("player")) do
-		--if getElementData(v, "alive") and isTimer(zombieIdleTimers[v]) then killTimer(zombieIdleTimers[v]) end
 		setElementData(v, "anim", false)
 		setElementData(v, "alive", false)
 	end
@@ -126,14 +125,7 @@ function onMapStart(startedMap)
 	if description == "" then description = false end
 	setElementData(resourceRoot, "mapDesc", description)
 	setGameType("CSRW: " .. string.gsub(getResourceName(startedMap), "csrw_", ""))
-	--setMapName(string.gsub(getResourceName(startedMap), "csrw_", ""))
 	setRuleValue("map", string.gsub(getResourceName(startedMap), "csrw_", ""))
-	
-	--[[if string.find(getResourceName(startedMap), "zm_") then
-		setElementData(resourceRoot, "currentMode", "zombie")
-	else
-		setElementData(resourceRoot, "currentMode", "cs") -- cs lub zombie
-	end]]--
 
 	-- wczytywanie pojazdów
 	for i, vehicle in pairs(getElementsByType("vehicle")) do
@@ -152,6 +144,7 @@ function onMapStart(startedMap)
 			setElementInterior(marker, getElementData(v, "interior") or 0)
 			setElementID(marker, bombsiteLetters[k])
 		end
+		
 		if #bombsites > 0 then
 			g_match.bombsites = true
 		end
@@ -192,19 +185,23 @@ function isValidMap(map)
 end
 
 function changeMap(newmap)
-	return exports["mapmanager"]:changeGamemodeMap(newmap) -- newmap to nie nazwa resource tylko resource !!!
+	-- newmap to nie nazwa resource tylko resource !!!
+	return exports["mapmanager"]:changeGamemodeMap(newmap)
 end
 
 function getCounterStrikeMaps()
 	local maps = exports["mapmanager"]:getMapsCompatibleWithGamemode(getThisResource())
 	if not maps then
 		outputServerLog("CRITICAL ERROR: Stupid 'mapmanager' can't believe this resource is gamemode. Please restart server.")
+		return {}
 	end
+
 	for k, v in pairs(maps) do
 		if getResourceName(v) == "editor_dump" or getResourceName(v) == "editor_test" then
 			table.remove(maps, k)
 		end
 	end
+
 	return maps
 end
 

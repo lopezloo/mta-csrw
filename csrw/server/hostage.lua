@@ -1,28 +1,29 @@
 function createHostages()
 	local hostageSites = getElementsByType("hostagesite")
+	if #hostageSites == 0 then
+		return
+	end
 
-	if #hostageSites > 0 then
-		outputServerLog("Hostagesites: " .. #hostageSites)
+	outputServerLog("Hostage sites amount: " .. #hostageSites)
 
-		local hostages = getElementsByType("hostage")
-		for k, hostage in pairs(getElementsByType("hostage")) do
-			local ped = createPed(50, getElementData(hostage, "posX"), getElementData(hostage, "posY"), getElementData(hostage, "posZ"), (getElementData(hostage, "rotZ") or 0) - 90)
-			setElementData(hostage, "ped", ped)
-			setElementData(ped, "health", 100)
+	local hostages = getElementsByType("hostage")
+	for k, hostage in pairs(getElementsByType("hostage")) do
+		local ped = createPed(50, getElementData(hostage, "posX"), getElementData(hostage, "posY"), getElementData(hostage, "posZ"), (getElementData(hostage, "rotZ") or 0) - 90)
+		setElementData(hostage, "ped", ped)
+		setElementData(ped, "health", 100)
 
-			playAnimationWithWalking("CRACK", "crckidle3", ped)
-			setElementFrozen(ped, true)
-			setElementInterior(ped, getElementData(hostage, "interior") or 0)
+		playAnimationWithWalking("CRACK", "crckidle3", ped)
+		setElementFrozen(ped, true)
+		setElementInterior(ped, getElementData(hostage, "interior") or 0)
+	end
+
+	if #hostages > 0 then
+		for k, v in pairs(hostageSites) do
+			local marker = createMarker(getElementData(v, "posX"), getElementData(v, "posY"), getElementData(v, "posZ"), "cylinder", getElementData(v, "size"), 255, 255, 255, 0, nil)
+			setElementInterior(marker, getElementData(v, "interior") or 0)
+			addEventHandler("onMarkerHit", marker, onHostageDelivered)
 		end
-
-		if #hostages > 0 then
-			for k, v in pairs(hostageSites) do
-				local marker = createMarker(getElementData(v, "posX"), getElementData(v, "posY"), getElementData(v, "posZ"), "cylinder", getElementData(v, "size"), 255, 255, 255, 0, nil)
-				setElementInterior(marker, getElementData(v, "interior") or 0)
-				addEventHandler("onMarkerHit", marker, onHostageDelivered)
-			end
-			g_match.hostages = true
-		end
+		g_match.hostages = true
 	end
 end
 
@@ -91,7 +92,8 @@ addEventHandler("onPlayerWasted", root, function() detachCarriedHostage(source) 
 
 function onHostageDelivered(element, matchingDimensions)
 	if getElementType(element) == "player" and matchingDimensions and g_player[element].carryingHost then
-		givePlayerMoneyEx(element, 300) -- nagroda pieniężna za doniesienie zakładnika
+		-- nagroda pieniężna za doniesienie zakładnika
+		givePlayerMoneyEx(element, 300)
 		advert.ok(getText("msg_moneyAward", element) .. 300, v, true)
 
 		destroyElement(g_player[element].carryingHost)
