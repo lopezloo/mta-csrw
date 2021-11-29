@@ -26,7 +26,7 @@ function syncPedAnimation(ped)
 		anim = split(a, ":")
 		--outputChatBox("c syncPedAnimation: " .. tostring(anim[1]))
 		
-		interruptable = true or ped.type == "ped"
+		interruptable = ped.type == "player"
 		setPedAnimation(ped, anim[1], anim[2], 200, true, false, interruptable, true) -- 200ms - zamrożenie na ten czas (podnosi peda z kucaka na animacji bomby (wtf, tylko na niej))
 	
 		if a == "BOMBER:BOM_Plant_Loop" then
