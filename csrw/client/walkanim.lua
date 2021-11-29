@@ -10,7 +10,6 @@ addEventHandler("onClientElementDataChange", root,
 	function(name)
 		if name == "anim" and (getElementType(source) == "player" or getElementType(source) == "ped") then
 			if getElementData(source, "anim") == false then
-				--setPedAnimation(source, "ped", "facanger", 0, true, true, true, true)
 				setPedAnimation(source, "ped", "facanger")
 				setTimer(setPedAnimation, 50, 1, source)
 			else
@@ -26,7 +25,9 @@ function syncPedAnimation(ped)
 		anim = {}
 		anim = split(a, ":")
 		--outputChatBox("c syncPedAnimation: " .. tostring(anim[1]))
-		setPedAnimation(ped, anim[1], anim[2], 200, true, false, true, true) -- 200ms - zamrożenie na ten czas (podnosi peda z kucaka na animacji bomby (wtf, tylko na niej))
+		
+		interruptable = true or ped.type == "ped"
+		setPedAnimation(ped, anim[1], anim[2], 200, true, false, interruptable, true) -- 200ms - zamrożenie na ten czas (podnosi peda z kucaka na animacji bomby (wtf, tylko na niej))
 	
 		if a == "BOMBER:BOM_Plant_Loop" then
 			-- zsynchronizowany dźwięk podkładania / rozbrajania C4 / brania hostów
