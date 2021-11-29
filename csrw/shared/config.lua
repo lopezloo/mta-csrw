@@ -11,7 +11,7 @@ if not localPlayer then
 		{"everything_is_free", false},
 		{"friendlyfire", false},
 		{"friendlycollisions", true}, -- nie dziala
-		{"freedefusingkit", false}, -- nie dziala
+		{"free_defusing_kit", false},
 		{"freekevlar", false},
 		{"nobomb", false},
 		{"nohostage", false},

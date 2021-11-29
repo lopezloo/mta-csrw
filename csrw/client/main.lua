@@ -118,6 +118,11 @@ addEventHandler("onClientPlayerSpawn", localPlayer,
 		elseif i == 2 then s = "locknload"
 		else s = "moveout" end
 		playSound(":csrw-sounds/sounds/radio/" .. s .. ".wav")
+
+		-- Give CT free defusing kit if enabled
+		if g_config["free_defusing_kit"] and getPlayerTeam(localPlayer) == g_team[2] then
+			g_player.items.defuser = true
+		end
 	end
 )
 
