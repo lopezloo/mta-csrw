@@ -10,18 +10,12 @@ box["elements"] = {} -- przyciski etc.
 function renderBox()
 	dxDrawRectangle(0.222619048*sX, 0.0485714286*sY, 0.567261905*sX, 0.161904762*sY, tocolor(0, 0, 0, 200), false) -- górne tło
 	dxDrawRectangle(0.222619048*sX, 0.216190476*sY, 0.567261905*sX, 0.686666667*sY, tocolor(0, 0, 0, 150), false) -- dolne tło (to większe)
-
-
-	--[[
-		pasek co ma ta sama wysokosc co ten box \/
-		dxDrawRectangle(374, 925, 953, 21, tocolor(255, 255, 255, 255), true)
-	--]]
 	
 	dxDrawText(box["label"], 0.338095238*sX, 0.102857143*sY, 0.699404762*sX, 0.215238095*sY, tocolor(255, 130, 0, 255), 0.00119047619*sX, "bankgothic", "left", "top", false, false, false) 
 	dxDrawImage(0.236904762*sX, 0.0647619048*sY, 0.0964285714*sX, 0.132380952*sY, ":csrw-media/images/cstrike.png", 0, 0, 0, tocolor(255, 255, 255, 255), false)
 end
 
-function enableLatestBox() -- TODO
+function enableLatestBox() -- @TODO
 	--[[if box["latestWindow"] then
 		-- class
 		setBoxVisible(true, box["label"], box["latestWindow"], box["renderHandlers"], box["elements"])
@@ -34,7 +28,6 @@ function setBoxVisible(draw, name, window, renderHandlers, elements)
 		if not window then return false end
 		
 		if isBoxVisible() then -- jeśli inne okno jest otwarte
-			--outputChatBox("Inne okno jest już otwarte, zamykam je.")
 			setBoxVisible(false)
 		end
 	
@@ -86,12 +79,10 @@ end
 
 function clearBoxElements()
 	if #box["elements"] >= 1 then
-		--outputChatBox("clearBoxElements " .. #box["elements"])
 		for k, v in ipairs(box["elements"]) do
 			if isElement(v) then
 				if string.find(getElementType(v), "gui-") then
 					guiSetVisible(v, false)
-					--outputChatBox(getElementType(v))
 				end
 			end
 		end
@@ -165,14 +156,3 @@ function removeElementsFromCurrentBox(elements)
 		return true
 	else return false end
 end
-
--- DEBUG CODE
---[[addCommandHandler("box", 
-	function(cmd, label)
-		if label == "0" then setBoxVisible(false) return end
-		if label then
-			label = string.gsub(label, "-", " ")
-		end
-		setBoxVisible(true, label, "boxdebug")
-	end
-)]]--

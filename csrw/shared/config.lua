@@ -8,14 +8,18 @@ if not localPlayer then
 		{"matchrounds", 30},
 		{"startmoney", 800},
 		{"maxmoney", 10000},
+		{"everything_is_free", false},
 		{"friendlyfire", false},
 		{"friendlycollisions", true}, -- nie dziala
 		{"freedefusingkit", false}, -- nie dziala
 		{"freekevlar", false},
 		{"nobomb", false},
 		{"nohostage", false},
+		{"weapon_drop", true},
 		{"autobalance", false},
-		{"gore", false}
+		{"gore", false},
+		{"locales", "en,pl"},
+		{"default_locale", "en"},
 	}
 end
 

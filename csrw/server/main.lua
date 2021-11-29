@@ -1,12 +1,28 @@
 g_resources = {
-	toStop = { "defaultstats", "helpmanager", "mapcycler", "scoreboard", "spawnmanager", "freeroam", "reload" },
-	toStart = { "csrw-media", "csrw-models", "csrw-sounds", "bone_attach", "topbarchat", "object_light_fix", "mapmanager", "votemanager" }
+	toStop = {
+		"defaultstats",
+		"helpmanager",
+		"mapcycler",
+		"scoreboard",
+		"spawnmanager",
+		"freeroam",
+		"reload"
+	},
+
+	toStart = {
+		"csrw-media",
+		"csrw-models",
+		"csrw-sounds",
+		"bone_attach",
+		"topbarchat",
+		"object_light_fix",
+		"mapmanager",
+		"votemanager"
+	}
 }
 
 g_player = {}
-
-g_core = {} -- todo: nieużywane?
-local DEFINE_VERSION = "0.9.31"
+local DEFINE_VERSION = "1.0.1"
 
 addEventHandler("onResourceStart", root,
 	function()
@@ -79,10 +95,11 @@ addEventHandler("onResourceStart", root,
 				errors = 0,
 				criticals = 0
 			}
+			
 			local neededPermissions = {
 				{"function.stopResource", "stopping useless resources"},
 				{"function.startResource", "starting required resources"},
-				--{"function.restartResource", "restarting yourself in auto update"},
+				--{"function.restartResource", "restarting in auto update"},
 				--{"function.fetchRemote", "global news, master server list"},
 				{"function.callRemote", "new version notification"},
 			}
@@ -100,7 +117,11 @@ addEventHandler("onResourceStart", root,
 				end
 			end
 
-			local resourceTemp = { toStart = "", toStop = "", stopped = "" }
+			local resourceTemp = {
+				toStart = "",
+				toStop = "",
+				stopped = ""
+			}
 
 			for k, v in pairs(g_resources.toStop) do
 				local resource = getResourceFromName(v)
@@ -279,67 +300,29 @@ addEventHandler("onVehicleStartEnter", root,
 addEvent("sendMeLocalization", true)
 addEventHandler("sendMeLocalization", root,
 	function(loc)
+		output("sendMeLocalization " .. loc)
 		if client then
 			if g_lang[loc] then
 				g_player[client].localization = loc
 			else
-				g_player[client].localization = "en"
+				g_player[client].localization = g_config["default_locale"]
 			end
 		end
 	end
 )
 
---
-addCommandHandler("logdebug",
-	function(player)
-		if hasObjectPermissionTo(player, "general.ModifyOtherObjects") then
-			local file = fileCreate("debuglog.txt")
-
-			local data = {}
-			data.version = "Version: " .. DEFINE_VERSION .. "\n"
-			if getResourceState(getResourceFromName("mapmanager")) == "running" then
-				local map = exports.mapmanager:getRunningGamemodeMap()
-				data.map = "Map: " .. tostring(getResourceName(map)) .. "\n"
-
-				local mapMeta = xmlLoadFile(":" .. getResourceName(map) .. "/meta.xml")
-				local mapChild
-				if mapMeta then
-					mapChild = xmlFindChild(mapMeta, "map", 0)
-				end
-
-				local elements = {"spawntt", "spawnct", "hostage", "bombsite", "hostagesite", "object", "vehicle", "camera"}
-				if mapMeta and mapChild then
-					local mapPatch = xmlNodeGetAttribute(mapChild, "src")
-					local mapRoot = getResourceMapRootElement(map, mapPatch)
-					data.map = data.map .. "Map path: " .. tostring(mapPatch) .. "\n"
-					for k, v in pairs(elements) do
-						data.map = data.map .. v .. " = " .. #getElementsByType(v) .. " | " .. #getElementsByType(v, mapRoot) .. "\n"
-					end
-				else
-					data.map = data.map .. "\nCan't load map meta."
-					for k, v in pairs(elements) do
-						data.map = data.map .. v .. " = " .. #getElementsByType(v) .. "\n"
-					end					
-				end
-			else
-				data.map = "Map: Mapmanager is not running!\n"
-			end
-
-			data.resources = "\n==== RESOURCES ====\nRunned/starting/stopping resources:\n"
-			for k, v in pairs(getResources()) do
-				if getResourceState(v) == "running" or getResourceState(v) == "starting" or getResourceState(v) == "stopping" then
-					data.resources = data.resources .. getResourceName(v) .. "\n"
-				end
-			end
-
-			data.resources = data.resources .. "\nFailed to load resources:\n"
-			for k, v in pairs(getResources()) do
-				if getResourceState(v) == "failed to load" then
-					data.resources = data.resources .. getResourceName(v) .. " (" .. getResourceLoadFailureReason(v) .. ")\n"
-				end
-			end
-			fileWrite(file, data.version, data.map, data.resources)
-			fileClose(file)
+function outputText(txt, r, g, b, to)
+	if to == root or to == nil or getElementType(to) == "team" then
+		if to == root or to == nil then
+			to = getElementsByType("player")
+		elseif getElementType(to) == "team" then
+			to = getPlayersFromTeam(to)
 		end
+
+		for k, v in pairs(to) do
+			outputChatBox(getText(txt, v), v, r, g, b)
+		end
+	elseif getElementType(to) == "player" then
+		outputChatBox(getText(txt, to), to, r, g, b)
 	end
-)
+end

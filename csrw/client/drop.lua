@@ -6,6 +6,10 @@ local physicFixer = createProjectile(localPlayer, 16, 0, 0, -4) -- obiekty broni
 destroyElement(physicFixer)
 
 function dropWeapon(forced, slot)
+	if not g_config["weapon_drop"] then
+		return
+	end
+
 	if forced or (g_player.canChangeSlot and not isPedInVehicle(localPlayer) and not isCursorShowing() and not g_player.reloading and getElementData(localPlayer, "alive") == true and not getControlState("fire") and not getControlState("aim_weapon") and (getPedSimplestTask(localPlayer) == "TASK_SIMPLE_PLAYER_ON_FOOT" or getPedSimplestTask(localPlayer) == "TASK_SIMPLE_SWIM")) then
 		-- zablokowane wyrzucanie podczas bycia w powietrzu i np. skoku bo wtedy gracz odrazu złapie tą broń co wyrzucił (timer 50ms)
 		if not slot then
@@ -18,7 +22,7 @@ function dropWeapon(forced, slot)
 				local x, y, z = getElementPosition(localPlayer)
 				local x2, y2, z2 = getPositionFromElementOffset(localPlayer, 0, 1.5, 0)
 				if not isLineOfSightClear(x, y, z + 0.05, x2, y2, z2 + 0.05, true, false, false) then
-					advert.error("You're too close wall to drop weapon.", localPlayer, true)
+					advert.error(getText("drop_wall_close"), localPlayer, true)
 					return
 				end
 
@@ -221,7 +225,6 @@ function drawWeapon()
 end
 
 function startDrawingWeapon(slot, weapon)
-	--outputChatBox("Chcesz zamienić broń na " .. weapon .. "? grafika: " .. g_weapon[slot][weapon]["image"])
 	if not drop_currentWeapon then
 		drop_currentWeapon = {slot, weapon}
 		addEventHandler("onClientRender", root, drawWeapon)

@@ -5,6 +5,10 @@ local weapons = {} -- xyzString, slot, weapon, totalAmmo, clipAmmo
 addEvent("dropPhysicWeapon", true)
 addEventHandler("dropPhysicWeapon", root,
 	function(slot, weapon, totalAmmo, clipAmmo)
+		if not g_config["weapon_drop"] then
+			return
+		end
+
 		if client and client == source then
 			weaponCount = weaponCount + 1
 			csTakeWeapon(client, slot, weapon, dontChangeSlot)
@@ -15,7 +19,6 @@ addEventHandler("dropPhysicWeapon", root,
 
 function onPhysicWeaponTaken(slot, weapon, totalAmmo, clipAmmo)
 	if client and client == source then
-		--outputChatBox("siema tu serwer lap bron " .. weapon .. " ze slotu " .. slot .. " z totalAmmo = " .. tostring(totalAmmo) .. "; clipAmmo = " .. tostring(clipAmmo), client)
 		csGiveWeapon(client, tonumber(slot), tonumber(weapon), tonumber(totalAmmo), tonumber(clipAmmo), false)
 	end
 end

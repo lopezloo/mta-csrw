@@ -1,0 +1,380 @@
+﻿<locale name="Polish" name_local="Polski">
+	<terrorists>
+		Terroryści
+	</terrorists>
+	
+	<counterTerrorists>
+		Antyterroryści
+	</counterTerrorists>
+	
+	<spectators>
+		Obserwatorzy
+	</spectators>
+	
+	<ignore>
+		Zignoruj
+	</ignore>
+	
+	<dead>
+		*NIE ŻYJE* 
+	</dead>
+
+	<nominateMap>
+		Nominuj mapę
+	</nominateMap>
+
+	<map>
+		Mapa
+	</map>
+
+	<author>
+		Autor
+	</author>
+	
+	<!-- scoreboard -->
+	<scoreboard_infoLabel>
+		Wynik Zgony Opóźnienie
+	</scoreboard_infoLabel>
+	
+	<scoreboard_player>
+		Gracz
+	</scoreboard_player>
+	
+	<!-- nametags -->
+	<nametags_enemy>
+		Wróg
+	</nametags_enemy>
+	
+	<nametags_friend>
+		Towarzysz
+	</nametags_friend>
+	
+	<nametags_hostage>
+		Zakładnik
+	</nametags_hostage>
+	
+	<!-- class selection -->
+	<class_chose1>
+		Wybierz druzyne
+	</class_chose1>
+	
+	<class_chose2>
+		Wybierz klase
+	</class_chose2>
+	
+	<class_auto1>
+		PRZYDZIEL AUTOMATYCZNIE
+	</class_auto1>
+	
+	<class_auto2>
+		AUTOMATYCZNY WYBÓR
+	</class_auto2>
+	
+	<class_watch>
+		OGLĄDAJ
+	</class_watch>
+
+	<class_team1_class1_desc>
+		Po zdobyciu reputacji zabijania każdego, kto stanie im na drodze, Phoenix Connexion jest jedną z najbardziej przerażających grup terrorystycznych w Europie Wschodniej. Utworzony wkrótce po rozpadzie ZSRR.
+	</class_team1_class1_desc>
+
+	<class_team1_class2_desc>
+		Grupa fundamentalistów z Bliskiego Wschodu dążyła do dominacji nad światem.
+	</class_team1_class2_desc>
+
+	<class_team1_class3_desc>
+		Szwedzka frakcja terrorystyczna założona w 1977 roku. Znana z bombardowania kanadyjskiej ambasady w 1990 roku.
+	</class_team1_class3_desc>
+
+	<class_team1_class4_desc>
+		Ta frakcja terrorystyczna założona na Bliskim Wschodzie ma reputację bezwzględności. Ich obrzydzenie do amerykańskiego stylu życia zostało zademonstrowane podczas bombardowania szkolnego autobusu pełnego muzyków rock and rolla w 1982 roku.
+	</class_team1_class4_desc>
+
+	<class_team2_class1_desc>
+		ST-6 (późniejsza nazwa DEVGRU) została założona w 1980 roku. Pod dowództwem komandora podporucznika Richarda Marcincko. ST-6 został umieszczony w stałej gotowości do reagowania na ataki terrorystyczne na cele amerykańskie na całym świecie.
+	</class_team2_class1_desc>
+
+	<class_team2_class2_desc>
+		GSG-9 narodził się z tragicznych wydarzeń, które doprowadziły do ​​śmierci kilku izraelskich sportowców podczas igrzysk olimpijskich w Monachium w 1972 roku.
+	</class_team2_class2_desc>
+
+	<class_team2_class3_desc>
+		Znany na całym świecie brytyjski SAS został założony w czasie II wojny światowej przez człowieka o nazwisku David Stirling. Ich rola podczas II wojny światowej (WW2) polegała na gromadzeniu informacji wywiadowczych za liniami wroga oraz wykonywaniu ataków sabotażowych i zabójstw na kluczowe cele.
+	</class_team2_class3_desc>
+
+	<class_team2_class4_desc>
+		GIGN, elitarna francuska jednostka antyterrorystyczna, została zaprojektowana jako siła szybkiego reagowania, która może zdecydowanie zareagować na każdy incydent terrorystyczny na dużą skalę. Składający się z nie więcej niż 100 ludzi GIGN zdobył swoją reputację dzięki historii udanych operacji.
+	</class_team2_class4_desc>
+	
+	<!-- shop -->
+	<shop>
+		Sklep
+	</shop>
+	
+	<cancel>
+		anuluj
+	</cancel>
+	
+	<!-- weapon info in shop -->
+	<shop_info1>
+		Kraj pochodzenia	
+	</shop_info1>
+	
+	<shop_info2>
+		Kaliber	
+	</shop_info2>
+	
+	<shop_info3>
+		Magazynek	
+	</shop_info3>
+	
+	<shop_info4>
+		Szybkostrzelność
+	</shop_info4>
+
+	<shop_info5>
+		Waga (pusty)	
+	</shop_info5>
+	
+	<shop_info6>
+		Waga (załadowany)	
+	</shop_info6>
+	
+	<shop_info7>
+		Masa pocisku	
+	</shop_info7>
+	
+	<shop_info8>
+		Prędkość wylotowa	
+	</shop_info8>
+	
+	<shop_info9>
+		Energia wylotowa	
+	</shop_info9>
+	
+	<shop_info10>
+		Opis	
+	</shop_info10>
+	
+	<!-- shop categories -->
+	<shop_cat_guns>
+		Pistolety
+	</shop_cat_guns>
+	
+	<shop_cat_shotguns>
+		Strzelby
+	</shop_cat_shotguns>
+	
+	<shop_cat_machineguns>
+		Maszynowe
+	</shop_cat_machineguns>
+	
+	<shop_cat_rifles>
+		Karabiny
+	</shop_cat_rifles>
+	
+	<shop_cat_equipment>
+		Wyposażenie
+	</shop_cat_equipment>
+	
+	<shop_cat_melee>
+		Broń biała
+	</shop_cat_melee>
+
+	<shop_cat_grenades>
+		Granaty
+	</shop_cat_grenades>
+	
+	<!-- random messages -->
+	<msg_arleadyInThisTeam>
+		Jesteś już w tej drużynie!
+	</msg_arleadyInThisTeam>
+	
+	<msg_roundStarting>
+		Nowa runda właśnie się rozpoczyna.. poczekaj do jej startu.
+	</msg_roundStarting>
+	
+	<msg_roundStarting2>
+		Nowa runda rozpoczyna się..
+	</msg_roundStarting2>
+	
+	<msg_roundArleadyStarted>
+		Runda jest już zaczęta i trwa ponad 30 sekund! Musisz poczekać do jej końca.
+	</msg_roundArleadyStarted>
+	
+	<msg_roundEndNoPlayers>
+		Runda kończy się, ponieważ nie ma żadnego gracza w grze.
+	</msg_roundEndNoPlayers>
+	
+	<msg_roundCantStartEmptyTeams>
+		Runda nie może się zacząć, ponieważ drużyny są puste.
+	</msg_roundCantStartEmptyTeams>
+	
+	<msg_bombIsPlanted>
+		Nie możesz przejść w tej chwili do innej drużyny, ponieważ bomba jest podłożona!
+	</msg_bombIsPlanted>
+	
+	<msg_buyTime>
+		Możesz kupować jedynie przez 15 sekund od rozpoczęcia rundy.
+	</msg_buyTime>
+	
+	<msg_buyNeedSpawn>
+		Musisz być w pobliżu swojego spawnu aby otworzyć menu kupowania broni!
+	</msg_buyNeedSpawn>
+	
+	<msg_enabled>
+		włączone
+	</msg_enabled>
+	
+	<msg_disabled>
+		wyłączone
+	</msg_disabled>
+	
+	<msg_bomberman>
+		Dostałeś bombę! Podłóż ją w miejscu oznaczonym literą A, B lub C na radarze.
+	</msg_bomberman>
+	
+	<msg_bombermanLeft>
+		Gracz z C4 opuścił serwer. Bomba została rozlosowana ponownie.
+	</msg_bombermanLeft>
+	
+	<msg_bombermanWasted>
+		Gracz z C4 zginął. Bomba została rozlosowana ponownie.
+	</msg_bombermanWasted>
+	
+	<msg_joinedServer>
+		dołączył do gry.
+	</msg_joinedServer>
+	
+	<msg_leftServer>
+		opuścił serwer
+	</msg_leftServer>
+	
+	<msg_killedHostage>
+		 zabił zakładnika!
+	</msg_killedHostage>
+	
+	<msg_changedNick>
+		widnieje teraz jako
+	</msg_changedNick>
+	
+	<msg_suicide>
+		popełnił samobójstwo!
+	</msg_suicide>
+	
+	<msg_cantSuicide>
+		Nie możesz popełnić samobójstwa, bo już nie żyjesz!
+	</msg_cantSuicide>
+	
+	<msg_cantChangeNick>
+		Nie możesz zmienić swojego nicku, ponieważ jesteś zalogowany!
+	</msg_cantChangeNick>
+	
+	<msg_noMoney>
+		Nie stać cię na to!
+	</msg_noMoney>
+	
+	<msg_tooMuchGrenades>
+		Nie możesz mieć przy sobie więcej granatów tego typu!
+	</msg_tooMuchGrenades>
+	
+	<!-- nominating, voting, map changing -->
+	<msg_voteStarting>
+		Głosowanie na nową mapę rozpoczyna się..
+	</msg_voteStarting>
+	
+	<msg_ArleadyVoting>
+		Nie możesz już nominować mapy, ponieważ głosowanie zostało już zainicjowane bądź mapa jest właśnie zmieniana!
+	</msg_ArleadyVoting>
+	
+	<msg_nomIsCurrently>
+		Ta mapa jest właśnie rozgrywana! Nie możesz jej nominować
+	</msg_nomIsCurrently>
+	
+	<msg_nominateLimitReached>
+		Limit map do nominowania został osiągnięty.
+	</msg_nominateLimitReached>
+
+	<msg_mapAlreadyNominated>
+		Ta mapa została już znominowana!
+	</msg_mapAlreadyNominated>
+
+	<msg_mapNominatedByYou>
+		Już znominowałeś tę mapę.
+	</msg_mapNominatedByYou>
+
+	<msgPart_nominated>
+		 znominował mapę 
+	</msgPart_nominated>
+
+	<nomChanged>
+		 zmienił swoją nominację mapy z 
+	</nomChanged>
+
+	<to>
+		na
+	</to>
+	
+	<msg_arleadyUsed>
+		Rock the Vote zostało już użyte na tej mapie!
+	</msg_arleadyUsed>
+	
+	<rtv_arleadyUsedByPlayer>
+		Nie możesz wpisywać Rock the Vote więcej niż raz!
+	</rtv_arleadyUsedByPlayer>
+	
+	<rtv_mapChanging>
+		Trwa zmiana mapy.
+	</rtv_mapChanging>
+
+	<rtv_currentMapTime>
+		Obecna mapa trwa już
+	</rtv_currentMapTime>
+	
+	<minutes>
+		minut
+	</minutes>
+	
+	<rtv_newMapVoteMinute>
+		Głosowanie na nową rozpocznie się za minutę..
+	</rtv_newMapVoteMinute>
+	
+	<rtv_nominatedMap>
+		nominował mapę
+	</rtv_nominatedMap>
+	
+	<!-- spectator -->
+	<msg_specAlone>
+		Jesteś sam na serwerze, możliwe jest oglądanie jedynie w trybie wolnej kamery.
+	</msg_specAlone>
+	
+	<!-- adverts -->
+	<ad_shopHelp>
+		Naciśnij B aby wejść do menu kupowania broni.
+	</ad_shopHelp>
+	
+	<ad_zombie>
+		Jesteś zombie, użyj noża aby kogoś zarazić.
+	</ad_zombie>
+	
+	<ad_turnOn>
+		Podpowiedzi włączone.
+	</ad_turnOn>
+	
+	<ad_turnOff>
+		Podpowiedzi wyłączone.	
+	</ad_turnOff>
+	
+	<msg_moneyAward>
+		Wygrana za tą runde wynosi: $
+	</msg_moneyAward>
+
+	<!-- drop -->
+	<drop_text>
+		Naciśnij G aby zamienić broń
+	</drop_text>
+
+	<drop_wall_close>
+		Jesteś zbyt blisko ściany aby upuścić broń.
+	</drop_wall_close>
+</locale>

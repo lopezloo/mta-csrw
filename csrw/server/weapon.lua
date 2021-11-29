@@ -325,34 +325,36 @@ function getPedArmorEx(ped)
 	return armor
 end
 
-function buyWeapon(weaponCost, csSlot, csWeaponID) -- wywoływane w c shop.lua
-	if getPlayerMoneyEx(client) >= weaponCost then
-		local gtaWeaponID = tonumber(g_weapon[csSlot][csWeaponID]["weaponID"])
-		if gtaWeaponID == 16 or gtaWeaponID == 17 or gtaWeaponID == 18 then
-			local maxGrenades = 1
-			if csSlot == 4 then maxGrenades = 2 end
-
-			local clip = 0
-			if g_playerWeaponData[client][csSlot] then
-				clip = g_playerWeaponData[client][csSlot].clip or 0
-			end
-
-			takePlayerMoneyEx(client, weaponCost)
-			csGiveWeapon(client, csSlot, csWeaponID, clip + 1)
-			--outputChatBox("SERWER: Granat kupiony za $" .. weaponCost .. ". csWeaponID = " .. csWeaponID, client)
-		else
-			--local ammo = tonumber(g_weapon[csSlot][csWeaponID]["ammo"]) + tonumber(g_weapon[csSlot][csWeaponID]["clip"])
-			local ammo = tonumber(g_weapon[csSlot][csWeaponID]["ammo"])
-			
-			--detachWeaponFromBody(client, csSlot)
-			takePlayerMoneyEx(client, weaponCost)
-			--outputChatBox("buyWeapon " .. csSlot .. " " .. csWeaponID .. " " .. tostring(ammo))
-			csGiveWeapon(client, csSlot, csWeaponID, ammo)
-			--outputChatBox("SERWER: Broń " .. weaponName .. "(" .. csWeaponID .. ") z " .. ammo .. " nabojami kupiona za $" .. weaponCost, client)
-		end
-	else
-		advert.error("msg_noMoney")
+-- Called from client/shop.lua
+function buyWeapon(weaponCost, csSlot, csWeaponID)
+	if getPlayerMoneyEx(client) < weaponCost and not g_config["everything_is_free"] then
+		advert.error("msg_noMoney", client)
 		triggerClientEvent("cPlaySound", client, "files/sounds/buttons/weapon_cant_buy.wav")
+		return
+	end
+
+	local gtaWeaponID = tonumber(g_weapon[csSlot][csWeaponID]["weaponID"])
+	if gtaWeaponID == 16 or gtaWeaponID == 17 or gtaWeaponID == 18 then
+		local maxGrenades = 1
+		if csSlot == 4 then maxGrenades = 2 end
+
+		local clip = 0
+		if g_playerWeaponData[client][csSlot] then
+			clip = g_playerWeaponData[client][csSlot].clip or 0
+		end
+
+		takePlayerMoneyEx(client, weaponCost)
+		csGiveWeapon(client, csSlot, csWeaponID, clip + 1)
+		--outputChatBox("SERWER: Granat kupiony za $" .. weaponCost .. ". csWeaponID = " .. csWeaponID, client)
+	else
+		--local ammo = tonumber(g_weapon[csSlot][csWeaponID]["ammo"]) + tonumber(g_weapon[csSlot][csWeaponID]["clip"])
+		local ammo = tonumber(g_weapon[csSlot][csWeaponID]["ammo"])
+		
+		--detachWeaponFromBody(client, csSlot)
+		takePlayerMoneyEx(client, weaponCost)
+		--outputChatBox("buyWeapon " .. csSlot .. " " .. csWeaponID .. " " .. tostring(ammo))
+		csGiveWeapon(client, csSlot, csWeaponID, ammo)
+		--outputChatBox("SERWER: Broń " .. weaponName .. "(" .. csWeaponID .. ") z " .. ammo .. " nabojami kupiona za $" .. weaponCost, client)
 	end
 end
 addEvent("buyWeapon", true)
@@ -364,12 +366,6 @@ function csKillPed(ped, attacker, weapon, bodypart)
 	killPed(ped, attacker, weapon, bodypart)
 	setElementData(ped, "alive", false)
 	setElementData(ped, "health", 0)
-
-	--[[if getElementType(ped) == "ped" and getElementData(ped, "BotTeam") == g_team[4] then
-		if getElementData(ped, "BotTeam") == g_team[4] then
-			onHostageKilled(ped)
-		end
-	end]]--
 
 	setElementCollisionsEnabled(ped, false)
 	if bodypart == 9 and g_config["gore"] then

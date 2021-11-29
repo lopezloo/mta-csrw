@@ -1,109 +1,90 @@
---[[
-	System języków bazujący na lokalizacji gracza (z 1.4).
-]]
-g_lang = {} -- serwer: g_lang[lang][text] = var | klient: g_lang[text] = var
+-- Locale system
 
-local standardLang = "en"
+-- serwer: g_lang[lang][text] = var | klient: g_lang[text] = var
+g_lang = {}
+
+local defaultLocale = g_config["default_locale"]
 
 local function getAvailableLanguages()
 	local langFile = xmlLoadFile("files/lang.xml")
 	local availableLangs = xmlNodeGetAttribute(langFile, "available")
 	xmlUnloadFile(langFile)
-
 	return split(availableLangs, ",")
 end
 
-local function isLanguageAvailable(lang)
-	local availableLangs = getAvailableLanguages()
-	for k, v in pairs(availableLangs) do
-		if lang == v then
+local function getLocales()
+	return split(g_config["locales"], ",")
+end
+
+local function isLocaleAvailable(locale)
+	local locales = getLocales()
+	for _, v in pairs(locales) do
+		if locale == v then
 			return true
 		end
 	end
 	return false
 end
 
-local lang
-if localPlayer then
-	function getLocalLanguage()
-		local lang = getLocalization().code
-		if string.find(lang, "en_") or not isLanguageAvailable(lang) then
-			lang = standardLang
-		end
-		return lang
-	end
-	lang = getLocalLanguage()
-end
+local function loadLocales()
+	local locales = getLocales()
 
-local function loadLanguage()
-	local langFile = xmlLoadFile("files/lang.xml")
-	if not langFile then
-		if not localPlayer then
-			outputServerLog("CRITICAL ERROR: Can't find language file, please reinstall gamemode.")
-		else
-			outputChatBox("CRITICAL ERROR: Can't find language file.")
-		end
-	else
-		for k, v in pairs(xmlNodeGetChildren(langFile)) do
-			local txtName = xmlNodeGetName(v)
-
-			for k2, v2 in pairs(xmlNodeGetChildren(v)) do
-
-				if localPlayer then
-
-					if xmlNodeGetName(v2) == lang then
-						-- trzymanie tylko jednego języka po stronie klienta
-						g_lang[txtName] = xmlNodeGetValue(v2)
-						break
-					end
-
-				else
-
-					local lang = xmlNodeGetName(v2)
-					if not g_lang[lang] then
-						g_lang[lang] = {}
-					end
-					g_lang[lang][txtName] = xmlNodeGetValue(v2)
-					--outputServerLog("g_lang[" .. lang .. "][" .. txtName .. "] = " .. tostring(g_lang[lang][txtName]))
-
-				end
-
+	for _, locale in pairs(locales) do
+		local file = xmlLoadFile("files/locales/" .. locale .. ".xml")
+		if file then
+			g_lang[locale] = {}
+			for _, node in pairs(xmlNodeGetChildren(file)) do
+				strname = xmlNodeGetName(node)
+				strval = xmlNodeGetValue(node)
+				strval = strip(strval)
+				g_lang[locale][strname] = strval
 			end
+		else
+			output("ERROR: Cant load " .. locale .. " locale.")
 		end
-		xmlUnloadFile(langFile)
 	end
 end
-loadLanguage()
+loadLocales()
+
+if localPlayer then
+
+function getLocalLanguage()
+	local code = getLocalization().code
+	if isLocaleAvailable(code) then
+		return code
+	end
+	return defaultLocale
+end
+
+function getText(txt)
+	local locale = getLocalLanguage()
+	return getLanguageText(locale, txt)
+end
+
+else
 
 function getText(txt, player)
-	if player and not localPlayer then
-		--outputServerLog("getText " .. txt .. ", " .. tostring(player) .. " loc " .. tostring(g_player[player].localization))
-		if g_lang[ g_player[player].localization ] then
-			return g_lang[ g_player[player].localization ][txt] or g_lang[standardLang][txt] or "err"
-		else
-			return "err"
-		end
-	elseif localPlayer then
-		if g_lang then
-			return g_lang[txt] or "err"
-		else
-			return "err"
-		end
+	if not player then
+		outputChatBox("getText player is nil")
 	end
+
+	local locale = g_player[player].localization
+	return getLanguageText(locale, txt)
 end
 
-function outputText(txt, r, g, b, to)
-	if to == root or to == nil or getElementType(to) == "team" then
-		if to == root or to == nil then
-			to = getElementsByType("player")
-		elseif getElementType(to) == "team" then
-			to = getPlayersFromTeam(to)
-		end
+end
 
-		for k, v in pairs(to) do
-			outputChatBox(getText(txt, v), v, r, g, b)
+function getLanguageText(locale, txt)
+	if not g_lang[locale] or not g_lang[locale][txt] then
+		if locale ~= defaultLocale then
+			return getLanguageText(defaultLocale, txt)
 		end
-	elseif getElementType(to) == "player" then
-		outputChatBox(getText(txt, to), to, r, g, b)
+		return ""
 	end
+
+	return g_lang[locale][txt]
+end
+
+function getDefaultLocaleText(txt)
+	return getLanguageText(defaultLocale, txt)
 end

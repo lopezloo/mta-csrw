@@ -20,6 +20,18 @@ local classes = {
 	}
 }
 
+local classes = {}
+for team = 1, 2 do
+	classes[team] = {}
+	for class = 1, 4 do
+		local strn = "class_team" .. team .. "_class" .. class .. "_name"
+		classes[team][class] = {
+			getText(strn) or getDefaultLangText(strn),
+			getText("class_team" .. team .. "_class" .. class .. "_desc"),
+		}
+	end
+end
+
 function loadClassSelection()
 	for i = 1, 10 do
 		if i == 1 then

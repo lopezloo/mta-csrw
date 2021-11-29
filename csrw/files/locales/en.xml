@@ -1,0 +1,412 @@
+﻿<locale name="English" name_local="English">
+	<terrorists>
+		Terrorists
+	</terrorists>
+	
+	<counterTerrorists>
+		Counter Terrorists
+	</counterTerrorists>
+	
+	<spectators>
+		Spectators
+	</spectators>
+	
+	<ignore>
+		Ignore
+	</ignore>
+	
+	<dead>
+		*DEAD* 
+	</dead>
+
+	<nominateMap>
+		Nominate map
+	</nominateMap>
+
+	<map>
+		Map
+	</map>
+
+	<author>
+		Author
+	</author>
+	
+	<!-- scoreboard -->
+	<scoreboard_infoLabel>
+		Score Deaths Latency
+	</scoreboard_infoLabel>
+	
+	<scoreboard_player>
+		Player
+	</scoreboard_player>
+	
+	<!-- nametags -->
+	<nametags_enemy>
+		Enemy
+	</nametags_enemy>
+	
+	<nametags_friend>
+		Friend
+	</nametags_friend>
+	
+	<nametags_hostage>
+		Hostage
+	</nametags_hostage>
+	
+	<!-- class selection -->
+	<class_chose1>
+		Choose team
+	</class_chose1>
+	
+	<class_chose2>
+		Choose class
+	</class_chose2>
+	
+	<class_auto1>
+		AUTO ASIGN
+	</class_auto1>
+	
+	<class_auto2>
+		AUTO SELECT
+	</class_auto2>
+	
+	<class_watch>
+		WATCH
+	</class_watch>
+
+	<class_team1_class1_name>
+		Phoenix Conexxion
+	</class_team1_class1_name>
+
+	<class_team1_class2_name>
+		Elite Crew
+	</class_team1_class2_name>
+
+	<class_team1_class3_name>
+		Arctic Avengers
+	</class_team1_class3_name>
+
+	<class_team1_class4_name>
+		Guerilla Warfare
+	</class_team1_class4_name>
+
+	<class_team2_class1_name>
+		Seal Team 6
+	</class_team2_class1_name>
+
+	<class_team2_class2_name>
+		GSG-9
+	</class_team2_class2_name>
+
+	<class_team2_class3_name>
+		SAS
+	</class_team2_class3_name>
+
+	<class_team2_class4_name>
+		GIGN
+	</class_team2_class4_name>
+
+	<class_team1_class1_desc>
+		Having established a reputation for killing anyone that gets in their way, the Phoenix Connexion is one of the most feared terrorist groups in Eastern Europe. Formed shortly after the breakup of the USSR.
+	</class_team1_class1_desc>
+
+	<class_team1_class2_desc>
+		Middle Eastern fundamentalist group bent on world domination.
+	</class_team1_class2_desc>
+
+	<class_team1_class3_desc>
+		Swedish terrorist faction founded in 1977. Famous for their bombing of the Canadian embassy in 1990.
+	</class_team1_class3_desc>
+
+	<class_team1_class4_desc>
+		A terrorist faction founded in the Middle East, this group has a reputation for ruthlessness. Their disgust for the American lifestyle was demonstrated in their 1982 bombing of a school bus full of Rock and Roll musicians.
+	</class_team1_class4_desc>
+
+	<class_team2_class1_desc>
+		ST-6 (to be known later as DEVGRU) was founded in 1980. Under the command of Lieutenant-Commander Richard Marcincko. ST-6 was placed on permanent alert to respond Terrorist attacks against American targets worldwide.
+	</class_team2_class1_desc>
+
+	<class_team2_class2_desc>
+		The GSG-9 was born out of the tragic events that led to the death of several Israeli athletes during the 1972 Olympics in Munich.
+	</class_team2_class2_desc>
+
+	<class_team2_class3_desc>
+		The world-renowned British SAS was founded in the Second World War by a man named David Stirling. Their role during World War II (WW2) involved gathering intelligence behind enemy lines and executing sabotage strikes and assassinations against key targets.
+	</class_team2_class3_desc>
+
+	<class_team2_class4_desc>
+		France's elite Counter-Terrorist unit, the GIGN, was designed to be a fast response force that could decisively react to any large-scale terrorist incident. Consisting of no more than 100 men, the GIGN has earned its reputation through a history of successful ops.
+	</class_team2_class4_desc>
+	
+	<!-- shop -->
+	<shop>
+		Shop
+	</shop>
+	
+	<cancel>
+		cancel
+	</cancel>
+	
+	<!-- weapon info in shop -->
+	<shop_info1>
+		Country	
+	</shop_info1>
+	
+	<shop_info2>
+		Caliber	
+	</shop_info2>
+	
+	<shop_info3>
+		Clip	
+	</shop_info3>
+	
+	<shop_info4>
+		Fastfire
+	</shop_info4>
+
+	<shop_info5>
+		Weight (empty)	
+	</shop_info5>
+	
+	<shop_info6>
+		Weight (loaded)	
+	</shop_info6>
+	
+	<shop_info7>
+		Bullet weight	
+	</shop_info7>
+	
+	<shop_info8>
+		Velocity	
+	</shop_info8>
+	
+	<shop_info9>
+		Power outlet	
+	</shop_info9>
+	
+	<shop_info10>
+		Description	
+	</shop_info10>
+	
+	<!-- shop categories -->
+	<shop_cat_guns>
+		Handguns
+	</shop_cat_guns>
+	
+	<shop_cat_shotguns>
+		Handguns
+	</shop_cat_shotguns>
+	
+	<shop_cat_machineguns>
+		Machine guns
+	</shop_cat_machineguns>
+	
+	<shop_cat_rifles>
+		Rifles
+	</shop_cat_rifles>
+	
+	<shop_cat_equipment>
+		Equipment
+	</shop_cat_equipment>
+	
+	<shop_cat_melee>
+		Melee
+	</shop_cat_melee>
+
+	<shop_cat_grenades>
+		Grenades
+	</shop_cat_grenades>
+	
+	<!-- random messages -->
+	<msg_arleadyInThisTeam>
+		You arleady in this team!
+	</msg_arleadyInThisTeam>
+	
+	<msg_roundStarting>
+		New round is starting.. wait moment.
+	</msg_roundStarting>
+	
+	<msg_roundStarting2>
+		New round is starting..
+	</msg_roundStarting2>
+	
+	<msg_roundArleadyStarted>
+		Round is started and takes over 30 seconds! You must wait to end.
+	</msg_roundArleadyStarted>
+	
+	<msg_roundEndNoPlayers>
+		Round has ended, because all players left the game.
+	</msg_roundEndNoPlayers>
+	
+	<msg_roundCantStartEmptyTeams>
+		Round can't start, because teams are empty.
+	</msg_roundCantStartEmptyTeams>
+	
+	<msg_bombIsPlanted>
+		You can't change team at this moment, because bomb is planted!
+	</msg_bombIsPlanted>
+	
+	<msg_buyTime>
+		You can buy weapons only on 15 seconds from the round start.
+	</msg_buyTime>
+	
+	<msg_buyNeedSpawn>
+		You need to be near your spawn for buy weapons!
+	</msg_buyNeedSpawn>
+	
+	<msg_enabled>
+		enabled
+	</msg_enabled>
+	
+	<msg_disabled>
+		disabled
+	</msg_disabled>
+	
+	<msg_bomberman>
+		You got bomb! Plant it in a place marked with the letter A, B or C on the radar.
+	</msg_bomberman>
+	
+	<msg_bombermanLeft>
+		Player with C4 left the server. Bomb has assigned to next random player.
+	</msg_bombermanLeft>
+	
+	<msg_bombermanWasted>
+		Player with C4 wasted. Bomb has assigned to next random player.
+	</msg_bombermanWasted>
+	
+	<msg_joinedServer>
+		joined to game.
+	</msg_joinedServer>
+	
+	<msg_leftServer>
+		left the server
+	</msg_leftServer>
+	
+	<msg_killedHostage>
+		 killed hostage!
+	</msg_killedHostage>
+	
+	<msg_changedNick>
+		changed nick to
+	</msg_changedNick>
+	
+	<msg_suicide>
+		suicide!
+	</msg_suicide>
+	
+	<msg_cantSuicide>
+		You can't suicide, because you're arleady dead!
+	</msg_cantSuicide>
+	
+	<msg_cantChangeNick>
+		You can't change nick, because you are logged!
+	</msg_cantChangeNick>
+	
+	<msg_noMoney>
+		You don't have money for that!
+	</msg_noMoney>
+	
+	<msg_tooMuchGrenades>
+		You can't buy more grenades of this type!
+	</msg_tooMuchGrenades>
+	
+	<!-- nominating, voting, map changing -->
+	<msg_voteStarting>
+		Vote for next map starting..
+	</msg_voteStarting>
+	
+	<msg_ArleadyVoting>
+		You can't nominate map, because voting has already started or map is currently changing!
+	</msg_ArleadyVoting>
+	
+	<msg_nomIsCurrently>
+		This map is currently played! You can't nominate her.
+	</msg_nomIsCurrently>
+	
+	<msg_nominateLimitReached>
+		Nominate map limit reached.
+	</msg_nominateLimitReached>
+
+	<msg_mapAlreadyNominated>
+		This map was already nominated!
+	</msg_mapAlreadyNominated>
+
+	<msg_mapNominatedByYou>
+		You have already nominated this map.
+	</msg_mapNominatedByYou>
+
+	<msgPart_nominated>
+		 nominated map 
+	</msgPart_nominated>
+
+	<nomChanged>
+		 changed map nomination from 
+	</nomChanged>
+
+	<to>
+		to
+	</to>
+	
+	<msg_arleadyUsed>
+		Rock the Vote has been already used on this map!
+	</msg_arleadyUsed>
+	
+	<rtv_arleadyUsedByPlayer>
+		You can't use Rock the Vote more than once!
+	</rtv_arleadyUsedByPlayer>
+	
+	<rtv_mapChanging>
+		Map has been changing.
+	</rtv_mapChanging>
+
+	<rtv_currentMapTime>
+		current map has been going
+	</rtv_currentMapTime>
+	
+	<minutes>
+		minutes
+	</minutes>
+	
+	<rtv_newMapVoteMinute>
+		Vote for the new map will start in a minute..
+	</rtv_newMapVoteMinute>
+	
+	<rtv_nominatedMap>
+		nominated map
+	</rtv_nominatedMap>
+	
+	<!-- spectator -->
+	<msg_specAlone>
+		You are alone on the server, possible is only viewing in free cam mode.
+	</msg_specAlone>
+	
+	<!-- adverts -->
+	<ad_shopHelp>
+		Press B to buy weapons.
+	</ad_shopHelp>
+	
+	<ad_zombie>
+		You are zombie, use knife to infect someone :D.
+	</ad_zombie>
+	
+	<ad_turnOn>
+		Hints enabled.
+	</ad_turnOn>
+	
+	<ad_turnOff>
+		Hints disabled.	
+	</ad_turnOff>
+	
+	<msg_moneyAward>
+		You win: $
+	</msg_moneyAward>
+
+	<!-- drop -->
+	<drop_text>
+		Press G to switch weapon
+	</drop_text>
+
+	<drop_wall_close>
+		You're too close to wall to drop weapon.
+	</drop_wall_close>
+</locale>

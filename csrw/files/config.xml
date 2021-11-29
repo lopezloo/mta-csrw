@@ -1,13 +1,18 @@
 <config>
-    <matchrounds>30</matchrounds>
-    <startmoney>800</startmoney>
-    <maxmoney>10000</maxmoney>
-    <friendlyfire>false</friendlyfire>
-    <friendlycollisions>true</friendlycollisions>
-    <freedefusingkit>false</freedefusingkit>
-    <freekevlar>false</freekevlar>
-    <nobomb>false</nobomb>
-    <nohostage>false</nohostage>
-    <autobalance>true</autobalance>
-    <gore>false</gore>
+	<matchrounds>30</matchrounds>
+	<startmoney>800</startmoney>
+	<maxmoney>10000</maxmoney>
+	<everything_is_free>true</everything_is_free>
+	<friendlyfire>false</friendlyfire>
+	<friendlycollisions>true</friendlycollisions>
+	<freedefusingkit>false</freedefusingkit>
+	<freekevlar>false</freekevlar>
+	<nobomb>false</nobomb>
+	<nohostage>false</nohostage>
+	<weapon_drop>true</weapon_drop>
+	<autobalance>true</autobalance>
+	<gore>false</gore>
+
+	<locales>en,pl</locales>
+	<default_locale>en</default_locale>
 </config>

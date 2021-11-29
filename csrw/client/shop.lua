@@ -316,63 +316,64 @@ function buyWeapon(cost, slot, weapon)
 		gtaWepID = tonumber(g_weapon[slot][weapon]["weaponID"])
 	end
 
-	if getPlayerMoneyEx(localPlayer) >= cost then
-
-		if g_playerWeaponData[slot] then
-			dropWeapon(true, slot)
-		end
-
-		local noserver = true
-		if gtaWepID == -1 then -- kamizelka
-			csSetPedArmor(localPlayer, 100)
-
-		elseif gtaWepID == -2 then -- kamizelka + hełm
-			csSetPedArmor(localPlayer, 100)
-			g_player.items.helmet = true
-
-		elseif gtaWepID == -3 or gtaWepID == -4 then -- termowizor lub noktowizor
-			local g = 1
-			if gtaWepID == -4 then g = 2 end
-			g_player.items.goggles = g
-			if goggleState then
-				setCameraGoggleEffect("normal")
-				goggleState = false
-				triggerServerEvent("detachWeaponFromBody", localPlayer, localPlayer, "goggle")
-			end
-
-		elseif gtaWepID == -5 then -- defusing kit
-			g_player.items.defuser = true
-
-		else
-			if gtaWepID == 16 or gtaWepID == 17 or gtaWepID == 18 then -- granaty
-				local maxGrenades = 1
-				if slot == 4 then maxGrenades = 2 end
-				local clip = 0
-				if g_playerWeaponData[slot] then
-					clip = g_playerWeaponData[slot].clip
-				end
-				if clip >= maxGrenades then
-					advert.error("msg_tooMuchGrenades")
-					playSound(":csrw-sounds/sounds/buttons/weapon_cant_buy.wav")
-					return
-				end
-			end
-
-			noserver = false
-			triggerServerEvent("buyWeapon", localPlayer, cost, slot, weapon)
-			if CFirstPerson.enabled then
-				setControlState("aim_weapon", true)
-			end
-		end
-		playSound(":csrw-sounds/sounds/buttons/weapon_confirm.wav")
-
-		--outputChatBox("noserver " .. tostring(noserver))
-		if noserver then
-			takePlayerMoneyEx(localPlayer, cost)
-		end
-	else
+	if getPlayerMoneyEx(localPlayer) < cost and not g_config["everything_is_free"] then
 		advert.error("msg_noMoney")
 		playSound(":csrw-sounds/sounds/buttons/weapon_cant_buy.wav")
+		return
+	end
+
+	if g_playerWeaponData[slot] then
+		dropWeapon(true, slot)
+	end
+
+	local noserver = true
+	if gtaWepID == -1 then -- kamizelka
+		csSetPedArmor(localPlayer, 100)
+
+	elseif gtaWepID == -2 then -- kamizelka + hełm
+		csSetPedArmor(localPlayer, 100)
+		g_player.items.helmet = true
+
+	elseif gtaWepID == -3 or gtaWepID == -4 then -- termowizor lub noktowizor
+		local g = 1
+		if gtaWepID == -4 then g = 2 end
+		g_player.items.goggles = g
+		if goggleState then
+			setCameraGoggleEffect("normal")
+			goggleState = false
+			triggerServerEvent("detachWeaponFromBody", localPlayer, localPlayer, "goggle")
+		end
+
+	elseif gtaWepID == -5 then
+		-- defusing kit
+		g_player.items.defuser = true
+
+	else
+		if gtaWepID == 16 or gtaWepID == 17 or gtaWepID == 18 then -- granaty
+			local maxGrenades = 1
+			if slot == 4 then maxGrenades = 2 end
+			local clip = 0
+			if g_playerWeaponData[slot] then
+				clip = g_playerWeaponData[slot].clip
+			end
+			if clip >= maxGrenades then
+				advert.error("msg_tooMuchGrenades")
+				playSound(":csrw-sounds/sounds/buttons/weapon_cant_buy.wav")
+				return
+			end
+		end
+
+		noserver = false
+		triggerServerEvent("buyWeapon", localPlayer, cost, slot, weapon)
+		if CFirstPerson.enabled then
+			setControlState("aim_weapon", true)
+		end
+	end
+	playSound(":csrw-sounds/sounds/buttons/weapon_confirm.wav")
+
+	--outputChatBox("noserver " .. tostring(noserver))
+	if noserver and not g_config["everything_is_free"] then
+		takePlayerMoneyEx(localPlayer, cost)
 	end
 end
 
@@ -412,11 +413,18 @@ local render = { -- 1680x1050 ?
 	["txt"] = {0.45238095238*sX, 0.45809523809*sY, 0.60738095238*sX, 0.73904761904*sY},
 	["txt2"] = {0.57559523809*sX, 0.45809523809*sY, 0.76547619047*sX, 0.73904761904*sY}
 }
+
+local free_str = getText("free")
 function renderShop()
 	if currentWeapon.id then
 		dxDrawImage(render["img"][1], render["img"][2], render["img"][3], render["img"][4], ":csrw-media/images/shop/" .. currentWeapon.image, 0, 0, 0, tocolor(255, 255, 255, 255), false)
 	
-		dxDrawText("$" .. currentWeapon.cost, render["cost"][1], render["cost"][2], render["cost"][3], render["cost"][4], tocolor(252, 85, 2, 255), 1, "bankgothic", "center", "top", false, false, false, false, false)
+		local cost = "$" .. currentWeapon.cost
+		if g_config["everything_is_free"] then
+			cost = free_str
+		end
+
+		dxDrawText(cost, render["cost"][1], render["cost"][2], render["cost"][3], render["cost"][4], tocolor(252, 85, 2, 255), 1, "bankgothic", "center", "top", false, false, false, false, false)
 	
 		dxDrawLine(render["line"][1], render["line"][2], render["line"][3], render["line"][4], tocolor(255, 255, 255, 255), 1, false)
 		

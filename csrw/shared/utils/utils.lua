@@ -188,3 +188,7 @@ function table.find(table, toFind)
 	end
 	return false
 end
+
+function strip()
+	return string.gsub(strval, "^%s*(.-)%s*$", "%1")
+end
