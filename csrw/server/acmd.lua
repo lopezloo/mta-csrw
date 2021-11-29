@@ -8,6 +8,11 @@ addCommandHandler("endround",
 			return
 		end
 
+		if not isRoundStarted() then
+			outputChatBox("ERROR: Round is not started.")
+			return
+		end
+
 		outputChatBox(" ** Round was ended by admin " .. getPlayerName(player))
 		onRoundEnd(3, 7)
 	end
