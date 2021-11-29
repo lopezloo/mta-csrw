@@ -12,6 +12,7 @@
 	<script type="shared" src="shared/language.lua" />
 	<script type="shared" src="shared/weapon_core.lua" />
 
+	<script type="server" src="server/acmd.lua" />
 	<!--<script type="server" src="server/update.lua" />-->
 	<script type="server" src="server/match.lua" />
 	<script type="server" src="server/main.lua" />

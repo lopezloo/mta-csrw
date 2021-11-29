@@ -237,199 +237,193 @@ local roundEndReasons = {
 	"time expired"
 }
 function onRoundEnd(winTeam, reason)
-	if isRoundStarted() then
-		--outputChatBox("SERWER: onRoundEnd(): winTeam = " .. winTeam .. "; reason = " .. reason)
-
-		-- reason:
-		-- 0 = unkown
-		-- 1 = zginęli wszyscy członkowie drużyny
-		-- 2 = bomba wybuchła
-		-- 3 = bomba została rozbrojona
-		-- 4 = bomba nie została podłożona (czas się skończył)
-		-- 5 = zakładnicy zostali uwolnieni
-		-- 6 = zakładnicy nie zostali uwolnieni (czas się skończył)
-		-- 7 = manualnie przez admina
-		-- 8 = manualnie przez admina (bez rozpoczynania nowej)
-		-- 9 = wszyscy gracze opuścili gre
-		-- 10 = game connecting (ktoś dołączył do pustej drużyny)
-		
-		-- zombie:
-		-- 11 = wszyscy ct zostali zarażeni (wygrywa zombie)
-		-- 12 = czas się skończył (wygrywają ct)
-
-		if winTeam == 1 or winTeam == 2 then
-			setElementData(g_team[ winTeam ], "score", getElementData(g_team[ winTeam ], "score") + 1)
-		end
-		outputServerLog("Round ended. Team " .. getTeamName( g_team[ winTeam ] ) .. " win (reason: " .. reason .. " - " .. roundEndReasons[reason] .. ").")
-		g_roundData.state = "ended"
-		
-		-- kasa za wygranie rundy poprzez zabicie wszystkich członków pozostałej drużyny (jednakowa dla obu drużyn)
-		if reason == 1 then
-			for i, player in pairs( getPlayersInTeam(g_team[winTeam]) ) do
-				givePlayerMoneyEx(player, 3250)
-				advert.ok(getText("msg_moneyAward", player) .. 3250, player, true)
-			end
-
-		-- kasa dla TT za wybuch bomby
-		elseif reason == 2 then
-			for i, player in pairs( getPlayersInTeam(g_team[1]) ) do
-				local money = 3500
-				-- dodatkowy bonus pieniężny gdy jest conajmniej 1 CT żywy
-				if g_roundData.aliveCT >= 1 then
-					money = money + 200
-				end
-				givePlayerMoneyEx(player, money)
-				advert.ok(getText("msg_moneyAward", player) .. money, player, true)
-			end
-
-		-- kasa dla CT za rozbrojenie bomby lub dla TT za skończenie się czasu na rozbrojenie bomby
-		elseif reason == 3 or reason == 4 then
-			for i, player in pairs( getPlayersInTeam(g_team[winTeam]) ) do
-				givePlayerMoneyEx(player, 3250)
-				advert.ok(getText("msg_moneyAward", player) .. 3250, player, true)
-			end
-		-- CT nie dostaje kasy za uwolnienie zakładników bo nie wiem ile to ma być
-		-- to samo z TT - nie dostaje kasy za nie uwolnienie ich
-
-		-- uwolnienie zakładników
-		elseif reason == 5 then
-			for k, v in pairs( getPlayersInTeam( g_team[winTeam] ) ) do
-				givePlayerMoneyEx(v, 1000)
-				advert.ok(getText("msg_moneyAward", v) .. 1000, v, true)
-			end
-
-		elseif reason == 8 then
-			triggerClientEvent("changeViewToRandomCamera", root)
-		elseif reason == 9 then
-			outputText("msg_roundEndNoPlayers", 255, 255, 255, root)
-		elseif reason == 10 then
-			restartMatch()
-		end
-
-		if winTeam ~= 3 then
-			local lostTeam = getOppositeTeam(winTeam)
-			if lostTeam then
-				-- zapomoga pieniężna dla przegrańców
-				for k, v in pairs(getPlayersInTeam( g_team[ lostTeam ] )) do
-					givePlayerMoneyEx(v, 1500)
-				end
-			end
-		else
-			for k, v in pairs(getElementsByType("player")) do
-				if getPlayerTeam(v) == g_team[1] or getPlayerTeam(v) == g_team[2] then
-					-- zapomoga dla obu drużyn podczas remisu
-					givePlayerMoneyEx(v, 1500)
-				end
-			end
-		end
-
-		local players = getElementsByType("player")
-		for i, player in pairs(players) do
-			if getElementData(player, "alive") then
-				g_player[player].surviveLastRound = true
-				setPlayerChannelByTeam(player)
-			end
-		end
-	
-		g_roundData.aliveTT = 0
-		g_roundData.aliveCT = 0
-		if g_match.nextMap then
-			setTimer(changeMap, 5000, 1, g_match.nextMap)
-		else
-			g_roundData.state = "starting"
-			setTimer(startRound, 5000, 1)
-		end
-		
-		for k, v in pairs( getPlayersInTeam(g_team[1]) ) do
-			if getElementData(v, "wSlot" .. DEF_BOMB[1]) == DEF_BOMB[2] then
-				csTakeWeapon(v, DEF_BOMB[1])
-			end
-		end
-
-		if isTimer(randomizeZombieTimer1) then killTimer(randomizeZombieTimer1) end
-		if isTimer(randomizeZombieTimer2) then killTimer(randomizeZombieTimer2) end
-		
-		--[[if getElementData(resourceRoot, "currentMode") == "zombie" then
-			for i, player in pairs(getElementsByType("player")) do
-				if getElementData(player, "alive") and isTimer(zombieIdleTimers[player]) then killTimer(zombieIdleTimers[player]) end
-			end
-		else]]-- else balanceTeams()
-		balanceTeams()
-		
-		--destroyBots()
-		destroyBomb()
-		destroyGroundWeapons()
-		triggerClientEvent("onClientRoundEnd", root, winTeam, reason)
-		setElementData(resourceRoot, "defusingBomb", false)
+	if not isRoundStarted() then
+		return
 	end
+
+	--outputChatBox("SERWER: onRoundEnd(): winTeam = " .. winTeam .. "; reason = " .. reason)
+
+	-- reason:
+	-- 0 = unkown
+	-- 1 = zginęli wszyscy członkowie drużyny
+	-- 2 = bomba wybuchła
+	-- 3 = bomba została rozbrojona
+	-- 4 = bomba nie została podłożona (czas się skończył)
+	-- 5 = zakładnicy zostali uwolnieni
+	-- 6 = zakładnicy nie zostali uwolnieni (czas się skończył)
+	-- 7 = manualnie przez admina
+	-- 8 = manualnie przez admina (bez rozpoczynania nowej)
+	-- 9 = wszyscy gracze opuścili gre
+	-- 10 = game connecting (ktoś dołączył do pustej drużyny)
+	
+	-- zombie:
+	-- 11 = wszyscy ct zostali zarażeni (wygrywa zombie)
+	-- 12 = czas się skończył (wygrywają ct)
+
+	if winTeam == 1 or winTeam == 2 then
+		setElementData(g_team[ winTeam ], "score", getElementData(g_team[ winTeam ], "score") + 1)
+	end
+	outputServerLog("Round ended. Team " .. getTeamName( g_team[ winTeam ] ) .. " win (reason: " .. reason .. " - " .. roundEndReasons[reason] .. ").")
+	g_roundData.state = "ended"
+	
+	-- kasa za wygranie rundy poprzez zabicie wszystkich członków pozostałej drużyny (jednakowa dla obu drużyn)
+	if reason == 1 then
+		for i, player in pairs( getPlayersInTeam(g_team[winTeam]) ) do
+			givePlayerMoneyEx(player, 3250)
+			advert.ok(getText("msg_moneyAward", player) .. 3250, player, true)
+		end
+
+	-- kasa dla TT za wybuch bomby
+	elseif reason == 2 then
+		for i, player in pairs( getPlayersInTeam(g_team[1]) ) do
+			local money = 3500
+			-- dodatkowy bonus pieniężny gdy jest conajmniej 1 CT żywy
+			if g_roundData.aliveCT >= 1 then
+				money = money + 200
+			end
+			givePlayerMoneyEx(player, money)
+			advert.ok(getText("msg_moneyAward", player) .. money, player, true)
+		end
+
+	-- kasa dla CT za rozbrojenie bomby lub dla TT za skończenie się czasu na rozbrojenie bomby
+	elseif reason == 3 or reason == 4 then
+		for i, player in pairs( getPlayersInTeam(g_team[winTeam]) ) do
+			givePlayerMoneyEx(player, 3250)
+			advert.ok(getText("msg_moneyAward", player) .. 3250, player, true)
+		end
+	-- CT nie dostaje kasy za uwolnienie zakładników bo nie wiem ile to ma być
+	-- to samo z TT - nie dostaje kasy za nie uwolnienie ich
+
+	-- uwolnienie zakładników
+	elseif reason == 5 then
+		for k, v in pairs( getPlayersInTeam( g_team[winTeam] ) ) do
+			givePlayerMoneyEx(v, 1000)
+			advert.ok(getText("msg_moneyAward", v) .. 1000, v, true)
+		end
+
+	elseif reason == 8 then
+		triggerClientEvent("changeViewToRandomCamera", root)
+	elseif reason == 9 then
+		outputText("msg_roundEndNoPlayers", 255, 255, 255, root)
+	elseif reason == 10 then
+		restartMatch()
+	end
+
+	if winTeam ~= 3 then
+		local lostTeam = getOppositeTeam(winTeam)
+		if lostTeam then
+			-- zapomoga pieniężna dla przegrańców
+			for k, v in pairs(getPlayersInTeam( g_team[ lostTeam ] )) do
+				givePlayerMoneyEx(v, 1500)
+			end
+		end
+	else
+		for k, v in pairs(getElementsByType("player")) do
+			if getPlayerTeam(v) == g_team[1] or getPlayerTeam(v) == g_team[2] then
+				-- zapomoga dla obu drużyn podczas remisu
+				givePlayerMoneyEx(v, 1500)
+			end
+		end
+	end
+
+	local players = getElementsByType("player")
+	for i, player in pairs(players) do
+		if getElementData(player, "alive") then
+			g_player[player].surviveLastRound = true
+			setPlayerChannelByTeam(player)
+		end
+	end
+
+	g_roundData.aliveTT = 0
+	g_roundData.aliveCT = 0
+	if g_match.nextMap then
+		setTimer(changeMap, 5000, 1, g_match.nextMap)
+	else
+		g_roundData.state = "starting"
+		setTimer(startRound, 5000, 1)
+	end
+	
+	for k, v in pairs( getPlayersInTeam(g_team[1]) ) do
+		if getElementData(v, "wSlot" .. DEF_BOMB[1]) == DEF_BOMB[2] then
+			csTakeWeapon(v, DEF_BOMB[1])
+		end
+	end
+
+	if isTimer(randomizeZombieTimer1) then killTimer(randomizeZombieTimer1) end
+	if isTimer(randomizeZombieTimer2) then killTimer(randomizeZombieTimer2) end
+	
+	--[[if getElementData(resourceRoot, "currentMode") == "zombie" then
+		for i, player in pairs(getElementsByType("player")) do
+			if getElementData(player, "alive") and isTimer(zombieIdleTimers[player]) then killTimer(zombieIdleTimers[player]) end
+		end
+	else]]-- else balanceTeams()
+	balanceTeams()
+	
+	--destroyBots()
+	destroyBomb()
+	destroyGroundWeapons()
+	triggerClientEvent("onClientRoundEnd", root, winTeam, reason)
+	setElementData(resourceRoot, "defusingBomb", false)
 end
 addEvent("onRoundEnd", false)
 addEventHandler("onRoundEnd", root, onRoundEnd, winTeam, reason)
 
 function startRound()
-	if not isRoundStarted() then
-		local spawnedTT = 0
-		local spawnedCT = 0
-		g_roundData.aliveTT = 0
-		g_roundData.aliveCT = 0
-		
-		for k, v in pairs(getPlayersInTeam(g_team[1])) do
-			spawn(v)
-			spawnedTT = spawnedTT + 1
-		end
-		--[[elseif getElementData(resourceRoot, "currentMode") == "zombie" then
-			for k, v in pairs(getPlayersInTeam(g_team[1])) do
-				setPlayerTeam(v, g_team[2])
-			end
-		end]]--
+	if isRoundStarted() then
+		return
+	end
 
-		for k, v in pairs(getPlayersInTeam(g_team[2])) do
-			spawn(v)
-			spawnedCT = spawnedCT + 1
-		end
+	local spawnedTT = 0
+	local spawnedCT = 0
+	g_roundData.aliveTT = 0
+	g_roundData.aliveCT = 0
+	
+	for k, v in pairs(getPlayersInTeam(g_team[1])) do
+		spawn(v)
+		spawnedTT = spawnedTT + 1
+	end
 
-		for k, v in pairs( getPlayersInTeam(g_team[3]) ) do
-			-- ukrywanie martwych ciał spectatorów z mapy
-			setElementPosition(v, 0, 0, 4)
-		end
-		
-		for k, vehicle in pairs(getElementsByType("vehicle")) do
-			if getElementData(vehicle, "wreck") ~= "true" then
-				respawnVehicle(vehicle)
-			else
-				if not isVehicleBlown(vehicle) then
-					blowVehicle(vehicle, false)
-				end
-			end
-		end
-		respawnHostages()
+	for k, v in pairs(getPlayersInTeam(g_team[2])) do
+		spawn(v)
+		spawnedCT = spawnedCT + 1
+	end
 
-		if spawnedTT == 0 and spawnedCT == 0 then
-			outputText("msg_roundCantStartEmptyTeams", 255, 102, 102, root)
-			g_roundData.state = "ended"
+	for k, v in pairs( getPlayersInTeam(g_team[3]) ) do
+		-- ukrywanie martwych ciał spectatorów z mapy
+		setElementPosition(v, 0, 0, 4)
+	end
+	
+	for k, vehicle in pairs(getElementsByType("vehicle")) do
+		if getElementData(vehicle, "wreck") ~= "true" then
+			respawnVehicle(vehicle)
 		else
-			outputText("msg_roundStarting2", 255, 255, 255, root)
-			
-			outputServerLog("Round started!")
-			g_roundData.state = "started"
-
-			setElementData(resourceRoot, "bombPlanted", false)
-			
-			--if getElementData(resourceRoot, "currentMode") == "zombie" then countdownRoundTime(10, 0) end -- else
-			
-			countdownRoundTime(5, 0) -- odliczanie do końca rundy
-			if g_match.bombsites then
-				randomizeBomberMan()
-			--[[elseif getElementData(resourceRoot, "currentMode") == "zombie" then
-				randomizeZombieTimer1 = setTimer(randomizeZombies, 20000, 1, 1) -- 20 sekund
-				randomizeZombieTimer2 = setTimer(randomizeZombies, 60000, 1, 2) -- 60 sekund]]--
+			if not isVehicleBlown(vehicle) then
+				blowVehicle(vehicle, false)
 			end
-
-			g_match.rounds = g_match.rounds + 1
-			if g_match.rounds == g_config["matchrounds"] - 1 then
-				voteMaps()
-			end			
 		end
+	end
+	respawnHostages()
+
+	if spawnedTT == 0 and spawnedCT == 0 then
+		outputText("msg_roundCantStartEmptyTeams", 255, 102, 102, root)
+		g_roundData.state = "ended"
+	else
+		outputText("msg_roundStarting2", 255, 255, 255, root)
+		
+		outputServerLog("Round started!")
+		g_roundData.state = "started"
+
+		setElementData(resourceRoot, "bombPlanted", false)
+
+		countdownRoundTime(5, 0)
+		if g_match.bombsites then
+			randomizeBomberMan()
+		end
+
+		g_match.rounds = g_match.rounds + 1
+		if g_match.rounds == g_config["matchrounds"] - 1 then
+			voteMaps()
+		end			
 	end
 end
 
@@ -466,31 +460,32 @@ end
 
 -- mniejsze funkcje
 function checkPlayers()
-	if isRoundStarted() then
-		if g_roundData.aliveTT >= 1 and g_roundData.aliveCT <= 0 then -- wygrywa TT
-			if countPlayersInTeam(g_team[2]) <= 0 then
-				-- gdy w przeciwnym teamie nie będzie graczy to po prostu runda się nie kończy (w cs 1.6 tak jest)
-				-- chujowo to w cs 1.6 rozwiązali, zrobimy po swojemu.. :>
-				triggerEvent("onRoundEnd", root, 3, 10) -- po prostu remis
-			else
-				-- tutaj kurwa trzeba zrobić jakoś jakiś warunek jeśli gracz dołączy do pustego teamu żeby dawało remis a nie wygrywał przeciwnik!
-				triggerEvent("onRoundEnd", root, 1, 1)
-			end
-		elseif g_roundData.aliveTT <= 0 and g_roundData.aliveCT >= 1 and not g_roundData.bomb then -- wygrywa CT (tylko jeśli bomba nie jest podłożona, w przeciwnym razie musi ją rozbroić aby wygrać)
-			if countPlayersInTeam(g_team[1]) <= 0 then
-				-- gdy w przeciwnym teamie nie będzie graczy to po prostu runda się nie kończy (w cs 1.6 tak jest)
-				-- chujowo to w cs 1.6 rozwiązali, zrobimy po swojemu.. :>
-				-- po prostu remis
-				triggerEvent("onRoundEnd", root, 3, 10)
-			else
-				triggerEvent("onRoundEnd", root, 2, 1)
-			end
-		elseif g_roundData.aliveTT <= 0 and g_roundData.aliveCT <= 0 then
-			-- remis
-			triggerEvent("onRoundEnd", root, 3, 1)
-		end
+	if not isRoundStarted() then
+		return false
 	end
-	return isRoundStarted()
+
+	if g_roundData.aliveTT >= 1 and g_roundData.aliveCT <= 0 then -- wygrywa TT
+		if countPlayersInTeam(g_team[2]) <= 0 then
+			-- gdy w przeciwnym teamie nie będzie graczy to po prostu runda się nie kończy (w cs 1.6 tak jest)
+			-- chujowo to w cs 1.6 rozwiązali, zrobimy po swojemu.. :>
+			triggerEvent("onRoundEnd", root, 3, 10) -- po prostu remis
+		else
+			-- tutaj kurwa trzeba zrobić jakoś jakiś warunek jeśli gracz dołączy do pustego teamu żeby dawało remis a nie wygrywał przeciwnik!
+			triggerEvent("onRoundEnd", root, 1, 1)
+		end
+	elseif g_roundData.aliveTT <= 0 and g_roundData.aliveCT >= 1 and not g_roundData.bomb then -- wygrywa CT (tylko jeśli bomba nie jest podłożona, w przeciwnym razie musi ją rozbroić aby wygrać)
+		if countPlayersInTeam(g_team[1]) <= 0 then
+			-- gdy w przeciwnym teamie nie będzie graczy to po prostu runda się nie kończy (w cs 1.6 tak jest)
+			-- chujowo to w cs 1.6 rozwiązali, zrobimy po swojemu.. :>
+			-- po prostu remis
+			triggerEvent("onRoundEnd", root, 3, 10)
+		else
+			triggerEvent("onRoundEnd", root, 2, 1)
+		end
+	elseif g_roundData.aliveTT <= 0 and g_roundData.aliveCT <= 0 then
+		-- remis
+		triggerEvent("onRoundEnd", root, 3, 1)
+	end
 end
 
 function changePlayerTeam(player, team, theSkin)
@@ -557,12 +552,3 @@ function getTeamSkinValue(team)
 		return 0
 	end
 end
-
-addCommandHandler("endround",
-	function(player)
-		if hasObjectPermissionTo(player, "function.kickPlayer") then
-			outputChatBox(" ** Round was ended by admin " .. getPlayerName(player))
-			onRoundEnd(3, 7)
-		end
-	end
-)
