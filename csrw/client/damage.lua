@@ -1,13 +1,32 @@
-function onSomeoneDamaged(attacker, weapon, bodypart, loss) -- source: zraniony
+function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 	cancelEvent()
-	--outputChatBox("onSomeoneDamaged weapon " .. tostring(weapon))
+
 	if getElementType(source) == "ped" then
+		if weapon == 37 then
+			-- Do not let hostages catch fire
+			setPedOnFire(source, false)
+			return
+		end
+
+		-- Play hostage pain sounds
+		-- Rate limit it to max once per 2s
+		local ts = getElementData(source, "lastPainSoundTime")
+		if ts and getTickCount() - ts < 2000 then
+			return
+		end
+
 		playSound3D(":csrw-sounds/sounds/hostage/hpain/hpain" .. math.random(1, 6) .. ".wav", getElementPosition(source))
+		setElementData(source, "lastPainSoundTime", getTickCount(), false)
 		return
 	end
+
 	-- Jeśli atakujący w momencie zadania obrażenia będzie miał inną broń (np. wyrzuci granat i zmieni slot) to calcDamage() pobierze zabierze złą ilość HP
 	
-	if weapon == 17 then return end -- tear gas
+	if weapon == 17 then
+		-- tear gas
+		return
+	end
+
 	if attacker and getElementType(attacker) == "player" and not g_config["friendlyfire"] and getPlayerTeam(attacker) == getPlayerTeam(source) then
 		return
 	end
@@ -17,7 +36,8 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss) -- source: zraniony
 			calcDamage(source, attacker, bodypart, loss, weapon)
 		end
 	else
-		if weapon == 54 then -- upadek
+		-- upadek
+		if weapon == 54 then
 			if not attacker and bodypart == 3 then
 				-- blokowanie glitcha, który zabija przy wspinaniu się na niektóre obiekty
 		    	local task = {}
@@ -28,7 +48,9 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss) -- source: zraniony
 			end
 
 			playSound3D(":csrw-sounds/sounds/player/damage" .. math.random(1, 3) .. ".wav", getElementPosition(source))
-			loss = loss * 2 -- podwójne obrażenia od upadku
+
+			-- podwójne obrażenia od upadku
+			loss = loss * 2
 		end
 		
 		if source == localPlayer then
@@ -123,7 +145,9 @@ function calcDamage(victim, attacker, bodypart, gtaLoss, gtaWeapon)
 			if bodypart == 9 then
 				playSound(":csrw-sounds/sounds/player/headshot" .. math.random(1, 2) .. ".wav")
 			end
-			return -- koniec i pomijanie zmiany daty pancerza po triggerze
+
+			-- koniec i pomijanie zmiany daty pancerza po triggerze
+			return
 		else
 			csSetPedHealth(victim, new.health)
 		end
