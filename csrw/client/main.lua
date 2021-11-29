@@ -53,6 +53,7 @@ function preInit() -- wykonuje sie na starcie skryptu oraz przy zmianie mapy
 	setAmbientSoundEnabled("general", false)
 	setAmbientSoundEnabled("gunfire", false)
 	setTime(12, 0)
+	clearWorld()
 
 	local enableSounds = {55, 51, 55, 66, 69, 70, 71, 72, 84, 85, 31, 32, 88}
 	for i=1, 100 do -- wyłączanie dźwięków broni
@@ -60,9 +61,13 @@ function preInit() -- wykonuje sie na starcie skryptu oraz przy zmianie mapy
 			setWorldSoundEnabled(5, i, false)
 		end
 	end
-	setWorldSoundEnabled(25, false) -- dziwne oddychanie CJa w interiorach
-	setWorldSoundEnabled(0, false) --||--
-	setWorldSoundEnabled(4, false) -- wybuchy
+
+	-- strange CJ breathing sound
+	setWorldSoundEnabled(25, false)
+	setWorldSoundEnabled(0, false)
+
+	-- explosions
+	setWorldSoundEnabled(4, false)
 
 	--[[
 		Dźwięki przeładowania broni:
@@ -85,19 +90,28 @@ function preInit() -- wykonuje sie na starcie skryptu oraz przy zmianie mapy
 	setWorldSoundEnabled(24, false)		
 end
 
-function init() -- -- wykonuje sie na starcie skryptu oraz po zmianie mapy
+-- wykonuje sie przy starcie skryptu oraz po zmianie mapy
+function init()
 	loadClassSelection()
 	changeViewToRandomCamera()
 	--showClassSelection()
 	showMOTD()
 end
 
+function clearWorld()
+	destroyGroundWeapons()
+	destroyGrenades()
+	extinguishFire(0, 0, 0, 999999)
+end
+
 addEventHandler("onClientPlayerSpawn", localPlayer,
 	function()
+		-- Round started
 		spectator.exit()
 		showRadar(true)
 		showHUD(true)
 		setWindowFlashing(true, 3)
+		clearWorld()
 
 		local i = math.random(1, 3)
 		if i == 1 then s = "letsgo"
@@ -113,9 +127,11 @@ addEventHandler("onClientPlayerWasted", localPlayer,
 		showHUD(false)
 
 		if getElementData(localPlayer, "alive") then
-			setBoxVisible(false) -- chowanie otwartego okna
+			setBoxVisible(false)
 		end
+
 		setCameraGoggleEffect("normal")
+
 		g_player.goggleState = false
 		g_player.reloading = false
 		--g_player.flashed = false
@@ -162,8 +178,6 @@ addEventHandler("onClientRoundEnd", root,
 			setBoxVisible(false)
 		end
 
-		destroyGroundWeapons()
-		destroyGrenades()
 		cancelDefuse()
 		cancelPlant()
 	end
