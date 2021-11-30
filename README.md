@@ -31,7 +31,7 @@ __Download:__
 * [Multi Theft Auto community page](https://community.multitheftauto.com/index.php?p=resources&s=details&id=10487)
 
 __Other:__
-* [Multi Theft Auto forum topic](https://forum.mtasa.com/viewtopic.php?t=72068)
+* [Multi Theft Auto forum topic](https://forum.mtasa.com/topic/61129-rel-counter-strike-renderware-gamemode/)
 * [Videos on YouTube](https://www.youtube.com/playlist?list=PLlZJGl2Rc-B-GrX5Vn66DSsKI_K0q28Aj)
 
 This repository consist of code and configuration files only. Assets are not included. Please use MTA:SA community site for download.
