@@ -15,11 +15,11 @@ function math.round(num)
     upper = math.floor(num) + 1
     underV = -(under - num)
     upperV = upper - num
-    if (upperV > underV) then
+    if upperV > underV then
         return under
-    else
-        return upper
     end
+    
+    return upper
 end
 
 function round(num)
@@ -59,20 +59,20 @@ function getRandomCameraPos(ifNoReturnSpawn)
 
 		local int = getElementData(cam, "interior") or 0
 		return int, x, y, z, tX, tY, tZ, roll, fov
-	else
-		if ifNoReturnSpawn then
-			local spawnsTT = getElementsByType("spawntt")
-			local spawnSlot = 1 -- slot spawnu
-
-			local int = getElementData(spawnsTT[spawnSlot], "interior") or 0
-			local x2 = getElementData(spawnsTT[spawnSlot], "posX")
-			local y2 = getElementData(spawnsTT[spawnSlot], "posY")
-			local z2 = getElementData(spawnsTT[spawnSlot], "posZ")
-			return int, x2, y2, z2 + 5, 0, 0, 0, 0, 70
-		else
-			return 0, 300.59533691406, 1836.1302490234, 6.973030090332, 393.78421020508, 1803.8177490234, 23.457494735718
-		end
 	end
+
+	if ifNoReturnSpawn then
+		local spawnsTT = getElementsByType("spawntt")
+		local spawnSlot = 1 -- slot spawnu
+
+		local int = getElementData(spawnsTT[spawnSlot], "interior") or 0
+		local x2 = getElementData(spawnsTT[spawnSlot], "posX")
+		local y2 = getElementData(spawnsTT[spawnSlot], "posY")
+		local z2 = getElementData(spawnsTT[spawnSlot], "posZ")
+		return int, x2, y2, z2 + 5, 0, 0, 0, 0, 70
+	end
+
+	return 0, 300.59533691406, 1836.1302490234, 6.973030090332, 393.78421020508, 1803.8177490234, 23.457494735718
 end
 
 function getWeaponSkillID(gtaWeaponID)
@@ -158,18 +158,18 @@ function getPlayerMoneyEx(player)
 end
 
 function getPositionFromElementOffset(element,offX,offY,offZ)
-	local m = getElementMatrix ( element )  -- Get the matrix
-	local x = offX * m[1][1] + offY * m[2][1] + offZ * m[3][1] + m[4][1]  -- Apply transform
+	local m = getElementMatrix(element) -- Get the matrix
+	local x = offX * m[1][1] + offY * m[2][1] + offZ * m[3][1] + m[4][1] -- Apply transform
 	local y = offX * m[1][2] + offY * m[2][2] + offZ * m[3][2] + m[4][2]
 	local z = offX * m[1][3] + offY * m[2][3] + offZ * m[3][3] + m[4][3]
-	return x, y, z                               -- Return the transformed point
+	return x, y, z -- Return the transformed point
 end
 
 function getPointFromDistanceRotation(x, y, dist, angle)
-  local a = math.rad(90 - angle)
-  local dx = math.cos(a) * dist
-  local dy = math.sin(a) * dist
-  return x + dx, y + dy
+	local a = math.rad(90 - angle)
+	local dx = math.cos(a) * dist
+	local dy = math.sin(a) * dist
+	return x + dx, y + dy
 end
 
 function output(text)
@@ -182,11 +182,13 @@ end
 
 function table.find(table, find)
 	if not table or not find then return false end
+	
 	for k, v in pairs(table) do
 		if v == find then
 			return k
 		end
 	end
+	
 	return false
 end
 

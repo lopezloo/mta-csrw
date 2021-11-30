@@ -4,7 +4,7 @@ function createHostages()
 		return
 	end
 
-	outputServerLog("Hostage sites amount: " .. #hostageSites)
+	outputServerLog("Hostage sites count: " .. #hostageSites)
 
 	local hostages = getElementsByType("hostage")
 	for k, hostage in pairs(getElementsByType("hostage")) do
@@ -75,18 +75,21 @@ addEventHandler("onElementDataChange", root,
 	end
 )
 
-function detachCarriedHostage(player) -- upadanie zakładnika na ziemie przy śmierci noszącego; dołączone do onPlayerQuit w main.lua
-	if g_player[player].carryingHost then
-		exports.bone_attach:detachElementFromBone(g_player[player].carryingHost)
-		setElementPosition(g_player[player].carryingHost, getElementPosition(player))
-		setElementRotation(g_player[player].carryingHost, getElementRotation(player))
-		playAnimationWithWalking("CRACK", "crckidle3", g_player[player].carryingHost)
-
-		setElementData(g_player[player].carryingHost, "carryBy", false)
-		setElementData(g_player[player].carryingHost, "picking", false)
-
-		g_player[player].carryingHost = nil
+-- Drop carried hostage on the ground
+function detachCarriedHostage(player)
+	if not g_player[player].carryingHost then
+		return
 	end
+
+	exports.bone_attach:detachElementFromBone(g_player[player].carryingHost)
+	setElementPosition(g_player[player].carryingHost, getElementPosition(player))
+	setElementRotation(g_player[player].carryingHost, getElementRotation(player))
+	playAnimationWithWalking("CRACK", "crckidle3", g_player[player].carryingHost)
+
+	setElementData(g_player[player].carryingHost, "carryBy", false)
+	setElementData(g_player[player].carryingHost, "picking", false)
+
+	g_player[player].carryingHost = nil
 end
 addEventHandler("onPlayerWasted", root, function() detachCarriedHostage(source) end)
 

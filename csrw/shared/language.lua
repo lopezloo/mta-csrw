@@ -1,6 +1,4 @@
 -- Locale system
-
--- serwer: g_lang[lang][text] = var | klient: g_lang[text] = var
 g_lang = {}
 
 local defaultLocale = g_config["default_locale"]

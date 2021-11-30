@@ -1,5 +1,15 @@
 local protectedDatas = {
-	ped = {"money", "health", "armor", "anim", "defusingBomb", "wSlot", "currentSlot", "score", "deaths"}
+	ped = {
+		"money",
+		"health",
+		"armor",
+		"anim",
+		"defusingBomb",
+		"wSlot",
+		"currentSlot",
+		"score",
+		"deaths"
+	}
 }
 
 --[[

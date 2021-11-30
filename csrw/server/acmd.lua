@@ -9,7 +9,7 @@ addCommandHandler("endround",
 		end
 
 		if not isRoundStarted() then
-			outputChatBox("ERROR: Round is not started.")
+			outputChatBox("ERROR: Round is not started.", player)
 			return
 		end
 
@@ -27,24 +27,24 @@ addCommandHandler("givemoney",
 		end
 
 		if not playerNameTo then
-			outputChatBox("USAGE: /givemoney [player] [amount]")
+			outputChatBox("USAGE: /givemoney [player] [amount]", player)
 			return
 		end
 
 		local playerTo = getPlayerFromName(playerNameTo)
 		if not playerTo then
-			outputChatBox("ERROR: Player which such name not found.")
+			outputChatBox("ERROR: Player which such name not found.", player)
 			return
 		end
 
 		if not amount then
-			outputChatBox("USAGE: /givemoney [player] [amount]")
+			outputChatBox("USAGE: /givemoney [player] [amount]", player)
 			return
 		end
 
-		local amount = tonumber(amount)
+		amount = tonumber(amount)
 		if not amount or amount < 0 then
-			outputChatBox("ERROR: Invalid amount.")
+			outputChatBox("ERROR: Invalid amount.", player)
 			return
 		end
 

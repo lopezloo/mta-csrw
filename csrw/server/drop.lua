@@ -30,7 +30,15 @@ addEventHandler("syncThrowedWeapon", root,
 	function(uniqueID, xyzString, slot, weapon, totalAmmo, clipAmmo, rotz, int)
 		if client and client == source then
 			triggerClientEvent("syncThrowedWeaponStepTwo", resourceRoot, uniqueID, xyzString)
-			weapons[uniqueID] = {xyzString = xyzString, slot = slot, weapon = weapon, totalAmmo = totalAmmo, clipAmmo = clipAmmo, rotz = rotz, int = int}
+			weapons[uniqueID] = {
+				xyzString = xyzString,
+				slot = slot,
+				weapon = weapon,
+				totalAmmo = totalAmmo,
+				clipAmmo = clipAmmo,
+				rotz = rotz,
+				int = int
+			}
 		end
 	end
 )

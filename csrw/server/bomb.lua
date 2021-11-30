@@ -24,7 +24,7 @@ function bombBeep(interval)
 	setTimer(destroyElement, 50, 1, light)
 	triggerClientEvent("cPlaySound", root, "weapons/c4/c4_beep1.wav", x, y, z, 50)
 
-	interval = interval-50 -- ~40 sekund
+	interval = interval-50 -- ~40 s
 	if interval <= 0 then
 		onBombExploded()
 	else
@@ -35,12 +35,13 @@ end
 function onBombExploded()
 	local x, y, z = getElementPosition(bomb)
 	createExplosion(x, y, z, 6)
+	triggerClientEvent("cPlaySound", root, "weapons/c4/c4_explode1.wav", x, y, z, 100)
+
 	if countPlayersInTeam(g_team[2]) > 0 then
 		onRoundEnd(1, 2) -- jeśli jest conajmniej 1 CT to wygrywa TT
 	else
 		onRoundEnd(3, 2) -- remis
 	end
-	triggerClientEvent("cPlaySound", root, "weapons/c4/c4_explode1.wav", x, y, z, 100)
 end
 
 function destroyBomb()

@@ -64,11 +64,15 @@ addEventHandler("onElementDataChange", root,
 				toggleControl(source, "sprint", false)
 			end
 
-			if newSlot == DEF_BOMB[1] and newWeapon == DEF_BOMB[2] then -- nowa broń to C4
+			if newSlot == DEF_BOMB[1] and newWeapon == DEF_BOMB[2] then
+				-- nowa broń to C4
 				playAnimationWithWalking("CARRY", "crry_prtial", source)
-				attachWeaponToBody(source, DEF_BOMB[2], newSlot, "hands") -- podczepianie bomby do rąk
+				-- podczepianie bomby do rąk
+				attachWeaponToBody(source, DEF_BOMB[2], newSlot, "hands")
+			
 			elseif oldValue then
-				attachWeaponToBody(source, g_playerWeaponData[source][oldValue].weapon, oldValue, "body") -- doczepianie starej broni do ciała -- wywala błąd przy zmianie slotu przy skradaniu się
+				-- doczepianie starej broni do ciała -- wywala błąd przy zmianie slotu przy skradaniu się
+				attachWeaponToBody(source, g_playerWeaponData[source][oldValue].weapon, oldValue, "body")
 				if oldValue == DEF_BOMB[1] and g_playerWeaponData[source][oldValue].weapon == DEF_BOMB[2] then
 					-- stara broń to bomba
 					stopAnimationWithWalking(source)				
@@ -119,7 +123,7 @@ function attachWeaponToBody(player, weapon, slot, bombType)
 	
 	local objectID
 	if slot == "goggle" then
-		--todo
+		-- @todo
 		--local wep = getElementData(player, "wSlotE1") -- 24, 25 (weapons.xml) ; wSlotE1 - extra slot (gogle termowizyjne / nocnowizyjne)
 		--playerAttachments[slot][player] = createObject(368, 0, 0, 0)
 		objectID = 368
@@ -286,33 +290,41 @@ addEventHandler("csGiveWeapon", root, csGiveWeapon, player, csweaponID, ammo, am
 
 function unloadSlotWeapon(player, slot) -- uwaga! funkcja nie przerzuca na niższy slot, dlatego po niej należy dać funkcję zmiany slota bądź nadać nową broń!
 	-- nie stosować przed nadaniem nowej broni (gta)
-	if player then
-		if not slot then
-			slot = getElementData(player, "currentSlot")
-		end
-		
-		if slot then
-			local weapon = g_playerWeaponData[player][slot].weapon
-			if weapon then
-				attachWeaponToBody(player, weapon, slot)
-				local gtaWeaponID = tonumber(g_weapon[slot][weapon]["weaponID"])
-				if gtaWeaponID then
-					if gtaWeaponID > 0 then
-						takeWeapon(player, gtaWeaponID)
-					elseif slot == DEF_BOMB[1] and weapon == DEF_BOMB[2] then -- chowanie c4
-						stopAnimationWithWalking(player)
-						toggleControl(player, "jump", true)
-						toggleControl(player, "crouch", true)
-					end
-				end
-			end
-		end
-		
-		--[[
-			TODO - temp broni
-			Zamiast kasowania broni można by wtedy zmienić slot na pięść.
-		]]
+	if not player then
+		return
 	end
+
+	if not slot then
+		slot = getElementData(player, "currentSlot")
+	end
+
+	if not slot then
+		return
+	end
+	
+	local weapon = g_playerWeaponData[player][slot].weapon
+	if not weapon then
+		return
+	end
+
+	attachWeaponToBody(player, weapon, slot)
+	local gtaWeaponID = tonumber(g_weapon[slot][weapon]["weaponID"])
+	if gtaWeaponID then
+		return
+	end
+
+	if gtaWeaponID > 0 then
+		takeWeapon(player, gtaWeaponID)
+	elseif slot == DEF_BOMB[1] and weapon == DEF_BOMB[2] then -- chowanie c4
+		stopAnimationWithWalking(player)
+		toggleControl(player, "jump", true)
+		toggleControl(player, "crouch", true)
+	end
+	
+	--[[
+		@TODO - temp broni
+		Zamiast kasowania broni można by wtedy zmienić slot na pięść.
+	]]
 end
 
 function setPedArmorEx(ped, armor)
@@ -336,7 +348,9 @@ function buyWeapon(weaponCost, csSlot, csWeaponID)
 	local gtaWeaponID = tonumber(g_weapon[csSlot][csWeaponID]["weaponID"])
 	if gtaWeaponID == 16 or gtaWeaponID == 17 or gtaWeaponID == 18 then
 		local maxGrenades = 1
-		if csSlot == 4 then maxGrenades = 2 end
+		if csSlot == 4 then
+			maxGrenades = 2
+		end
 
 		local clip = 0
 		if g_playerWeaponData[client][csSlot] then
@@ -406,7 +420,11 @@ function csTakeWeapon(player, slot, weapon, dontSendDataToClient)
 	if not slot then
 		slot = getElementData(player, "currentSlot")
 	end
-	if not g_playerWeaponData[player][slot] then return end
+
+	if not g_playerWeaponData[player][slot] then
+		return
+	end
+
 	if not weapon then
 		weapon = g_playerWeaponData[player].weapon
 	end
@@ -420,7 +438,8 @@ function csTakeWeapon(player, slot, weapon, dontSendDataToClient)
 	setElementData(player, "wSlot" .. slot, false)
 end
 
---[[addEvent("switchWeaponAimMovingSkill", true)
+--[[
+addEvent("switchWeaponAimMovingSkill", true)
 addEventHandler("switchWeaponAimMovingSkill", root,
 	function(switch)
 		local skillName = getWeaponSkillID(getPedWeapon(client))
@@ -439,4 +458,5 @@ addEventHandler("switchWeaponAimMovingSkill", root,
 			setPedStat(client, skillName, getWeaponSkillAmount( validSkill ))
 		end
 	end
-)]]--
+)
+]]--

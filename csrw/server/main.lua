@@ -176,7 +176,7 @@ addEventHandler("onResourceStart", root,
 			end
 		else
 			-- inne zasoby
-			for k, v in pairs(g_resources.toStop) do
+			for _, v in pairs(g_resources.toStop) do
 				local resource = getResourceFromName(v)
 				if source == resource then
 					if not hasObjectPermissionTo(getThisResource(), "function.stopResource") then
@@ -185,7 +185,7 @@ addEventHandler("onResourceStart", root,
 						outputServerLog("Stopping useless resource (" .. v .. ").")
 						stopResource(resource)
 					end
-					break
+					break -- @todo: is this right?
 				end
 			end
 		end
@@ -206,11 +206,27 @@ end
 
 addEventHandler("onResourceStop", resourceRoot,
 	function()
-		local allWeapons = { "ak-47", "m4", "shotgun", "combat shotgun", "mp5", "rifle"	}
-		local parameters = { "weapon_range", "target_range", "accuracy", "flag_aim_arm", "anim_loop_stop", "anim2_loop_stop" }
+		local allWeapons = {
+			"ak-47",
+			"m4",
+			"shotgun",
+			"combat shotgun",
+			"mp5",
+			"rifle"
+		}
+
+		local parameters = {
+			"weapon_range",
+			"target_range",
+			"accuracy",
+			"flag_aim_arm",
+			"anim_loop_stop",
+			"anim2_loop_stop"
+		}
+
 		for k, v in pairs(allWeapons) do
 			for k2, v2 in pairs(parameters) do
-				for k3, v3 in pairs( { "poor", "std", "pro" } ) do
+				for k3, v3 in pairs({"poor", "std", "pro"}) do
 					setWeaponProperty(v, v3, v2, getOriginalWeaponProperty(v, v3, v2))
 				end
 			end
@@ -255,6 +271,7 @@ function onPlayerJoinFunc(player)
 		rtv = false,
 		carryingHost = nil
 	}
+
 	setPlayerMoneyEx(player, g_config["startmoney"])
 	setElementData(player, "alive", false)
 	setElementData(player, "armor", 0)
@@ -277,6 +294,7 @@ function setPlayerSneaking(player, key, keyState)
 		if getPedWeaponSlot(player) == 1 then -- broń biała
 			toggleControl(player, "sprint", false)
 		end
+		
 	else
 		g_player[player].sneaking = false
 		setPedWalkingStyle(player, 56) -- MOVE_PLAYER_M
@@ -300,7 +318,6 @@ addEventHandler("onVehicleStartEnter", root,
 addEvent("sendMeLocalization", true)
 addEventHandler("sendMeLocalization", root,
 	function(loc)
-		output("sendMeLocalization " .. loc)
 		if client then
 			if g_lang[loc] then
 				g_player[client].localization = loc
