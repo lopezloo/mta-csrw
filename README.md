@@ -5,14 +5,16 @@ CS:RW
 <p align="center">
   <a href="https://multitheftauto.com/">Multi Theft Auto: San Andreas</a> Team Deathmatch game mode inspired by Counter Strike.
 </p>
+
 <p align="center">
-<img alt="class selection" src="http://media.moddb.com/cache/images/mods/1/25/24608/thumb_300x150/6.jpg" />
-<img alt="scoreboard" src="http://media.moddb.com/cache/images/mods/1/25/24608/thumb_300x150/3.jpg" />
-<img alt="spectator mode" src="http://media.moddb.com/cache/images/mods/1/25/24608/thumb_300x150/1.jpg" />
-<img alt="weapon shop" src="http://media.moddb.com/cache/images/mods/1/25/24608/thumb_300x150/4.jpg" />
+<a href="https://media.moddb.com/images/mods/1/25/24608/6.jpg" title="class selection"><img alt="class selection" src="https://media.moddb.com/cache/images/mods/1/25/24608/thumb_300x150/6.jpg"></a>
+<a href="https://media.moddb.com/images/mods/1/25/24608/3.jpg" title="scoreboard"><img alt="scoreboard" src="https://media.moddb.com/cache/images/mods/1/25/24608/thumb_300x150/3.jpg"></a>
+<a href="https://media.moddb.com/images/mods/1/25/24608/1.jpg" title="weapons in spectator mode"><img alt="weapons in spectator mode" src="https://media.moddb.com/cache/images/mods/1/25/24608/thumb_300x150/1.jpg"></a>
+<a href="https://media.moddb.com/images/mods/1/25/24608/4.jpg" title="weapon shop"><img alt="weapon shop" src="https://media.moddb.com/cache/images/mods/1/25/24608/thumb_300x150/4.jpg"></a>
+<a href="https://media.moddb.com/images/mods/1/25/24608/mta-screen_2014-03-12_16-15-52.png" title="smoke grenade"><img alt="smoke grenade" src="https://media.moddb.com/cache/images/mods/1/25/24608/thumb_300x150/mta-screen_2014-03-12_16-15-52.png"></a>
 </p>
 
-__Features:__
+## Features
 * interface inspired by Counter Strike: Source
 * full dynamic and easy customizable weapons including grenades as flashbang, decoy and stuff like nightvision goggles
 * custom damage system
@@ -27,10 +29,10 @@ __Features:__
 * locale system (by default: english and polish)
 * configurable
 
-__Download:__
+## Download
 * [Multi Theft Auto community page](https://community.multitheftauto.com/index.php?p=resources&s=details&id=10487)
 
-__Other:__
+## Other
 * [Multi Theft Auto forum topic](https://forum.mtasa.com/topic/61129-rel-counter-strike-renderware-gamemode/)
 * [Videos on YouTube](https://www.youtube.com/playlist?list=PLlZJGl2Rc-B-GrX5Vn66DSsKI_K0q28Aj)
 
