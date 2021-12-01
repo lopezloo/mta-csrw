@@ -14,7 +14,7 @@ CS:RW
 <a href="https://media.moddb.com/images/mods/1/25/24608/mta-screen_2014-03-12_16-15-52.png" title="smoke grenade"><img alt="smoke grenade" src="https://media.moddb.com/cache/images/mods/1/25/24608/thumb_300x150/mta-screen_2014-03-12_16-15-52.png"></a>
 </p>
 
-## Features:
+## Features
 * interface inspired by Counter Strike: Source
 * full dynamic and easy customizable weapons including grenades as flashbang, decoy and stuff like nightvision goggles
 * custom damage system
@@ -29,10 +29,10 @@ CS:RW
 * locale system (by default: english and polish)
 * configurable
 
-## Download:
+## Download
 * [Multi Theft Auto community page](https://community.multitheftauto.com/index.php?p=resources&s=details&id=10487)
 
-## Other:
+## Other
 * [Multi Theft Auto forum topic](https://forum.mtasa.com/topic/61129-rel-counter-strike-renderware-gamemode/)
 * [Videos on YouTube](https://www.youtube.com/playlist?list=PLlZJGl2Rc-B-GrX5Vn66DSsKI_K0q28Aj)
 
