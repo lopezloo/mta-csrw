@@ -1,4 +1,4 @@
--- originally made by Ren
+-- thanks to Ren712 <3
 
 local specularPower=2;
 local effectMaxDistance=70
@@ -7,7 +7,6 @@ local updateTimer
 
 CWallShader = {}
 
---function enableWallEffect(element, r, g, b, a)
 function CWallShader:enable(element, r, g, b, a)
 	if not wallShader[element] then
 		wallShader[element] = {}
@@ -20,7 +19,6 @@ function CWallShader:enable(element, r, g, b, a)
 	end
 end
 
---function disableWallEfect(element)
 function CWallShader:disable(element)
 	if wallShader[element] then
 		destroyWallEffect(element)
@@ -100,7 +98,7 @@ function updateElements()
 	end
 end
 
---addEventHandler("onClientElementStreamOut", root, function() CWallShader:disable(source) end) -- todo: to powinno blokować tylko na chwile, a nie permamentalnie
+--addEventHandler("onClientElementStreamOut", root, function() CWallShader:disable(source) end) -- @todo: to powinno blokować tylko na chwile, a nie permamentalnie
 addEventHandler("onClientPlayerWasted", root, function() CWallShader:disable(source) end)
 addEventHandler("onClientPedWasted", root, function() CWallShader:disable(source) end)
 addEventHandler("onClientPlayerQuit", root, function() CWallShader:disable(source) end)

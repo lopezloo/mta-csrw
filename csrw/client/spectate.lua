@@ -14,7 +14,9 @@ function spectator.join(temporary)
 	outputDebugString("joining spectators")
 	g_player.spectating = true
 	
-	if not temporary then classUpdatePlayer(nil, 3) end
+	if not temporary then
+		classUpdatePlayer(nil, 3)
+	end
 	
 	if getElementData(localPlayer, "alive") then
 		csSetPedHealth(localPlayer, 0)
@@ -35,19 +37,22 @@ function spectator.join(temporary)
 		addEventHandler("onClientPlayerQuit", root, updateSpectator)
 		addEventHandler("onClientPlayerWasted", root, updateSpectator)
 	end
+
 	bindKey("arrow_l", "down", spectator.previous)
 	bindKey("arrow_r", "down", spectator.next)
 	bindKey("space", "down", spectator.switchMode)
 
 	local team = getPlayerTeam(localPlayer)
-	if (team == g_team[1] or team == g_team[2]) then -- wallhackowanie swojego teamu
+	if (team == g_team[1] or team == g_team[2]) then
+		-- wallhackowanie swojego teamu
 		local r, g, b = getTeamColor(team)
 		for k, v in pairs(getPlayersInTeam(team)) do
 			if getElementHealth(v) > 0 then
 				CWallShader:enable(v, r, g, b)
 			end
 		end
-	else -- wallhackowanie wszystkich
+	else
+		-- wallhackowanie wszystkich
 		for k, v in pairs( getElementsByType("player") ) do
 			if getElementHealth(v) > 0 then
 				local team = getPlayerTeam(v)
@@ -59,24 +64,23 @@ function spectator.join(temporary)
 		end
 	end
 	addEventHandler("onClientPlayerSpawn", root, onNewPlayerSpawned)
-	
-	--bindKey("tab", "down", function() hud_scoretable(true) end)
-	--bindKey("tab", "up", function() hud_scoretable(false) end)	
 end
 
-function onNewPlayerSpawned(team) -- spawn nowego gracza (jeśli się jest w teamie spectatorów)
-	outputDebugString("onNewPlayerSpawned")
-	if team then
-		if not table.find(specData.list, source) then
-			table.insert(specData.list, source) -- dodanie gracza do listy specowanych
-		end
-
-		if getPlayerTeam(localPlayer) == g_team[3] or getPlayerTeam(localPlayer) == team then
-			local r, g, b = getTeamColor(team)
-			CWallShader:enable(source, r, g, b)
-		end
-	else
+-- spawn nowego gracza (jeśli się jest w teamie spectatorów)
+function onNewPlayerSpawned(team)
+	if not team then
 		outputDebugString("Spectator: onNewPlayerSpawned: player spawned without team", 2)
+		return
+	end
+
+	if not table.find(specData.list, source) then
+		-- dodanie gracza do listy specowanych
+		table.insert(specData.list, source)
+	end
+
+	if getPlayerTeam(localPlayer) == g_team[3] or getPlayerTeam(localPlayer) == team then
+		local r, g, b = getTeamColor(team)
+		CWallShader:enable(source, r, g, b)
 	end
 end
 
@@ -166,14 +170,17 @@ addEvent("joinSpectatorsTemporary", true)
 addEventHandler("joinSpectatorsTemporary", root, joinSpectatorsTemporary)
 
 function spectator.switchMode()
-	if specData.mode == 0 then -- przełączanie na swobodną kamerę
+	if specData.mode == 0 then
+		-- przełączanie na swobodną kamerę
 		spectator.freecam(true)
 		playSound(":csrw-sounds/sounds/gui/whooshes/short_whoosh1.wav")
 		removeEventHandler("onClientRender", root, renderSpectatorHUD)
 		removeEventHandler("onClientPlayerQuit", root, updateSpectator)
 		removeEventHandler("onClientPlayerWasted", root, updateSpectator)
-	else -- przełączanie na podglądanie gracza
-		if spectator.updateList() > 0 then -- jeśli są żywi gracze
+	else
+		-- przełączanie na podglądanie gracza
+		if spectator.updateList() > 0 then
+			-- jeśli są żywi gracze
 			setFreecamDisabled()
 			
 			spectator.spectatePlayer(specData.currentID)
@@ -183,29 +190,22 @@ function spectator.switchMode()
 			addEventHandler("onClientPlayerQuit", root, updateSpectator)
 			addEventHandler("onClientPlayerWasted", root, updateSpectator)			
 		else
-			advert.error("msg_specAlone") -- Jesteś sam na serwerze (...)
+			advert.error("msg_specAlone")
 		end
 	end
 end
 
---[[function updateSpectator() -- 0.615
-	if g_player.spectating and getElementData(source, "alive") == true and source ~= localPlayer then
-		-- mam nadzieję, że getElementData(source, "alive") zwraca jeszcze starą date z przed killa
-		if spectator.updateList() > 0 and specData.mode == 0 and getCameraTarget(localPlayer) == source then
-			spectator.next()
-		end
-	end
-end]]--
-
-function updateSpectator() -- 0.616+
+function updateSpectator()
 	if g_player.spectating and source ~= localPlayer then
 		for k, v in pairs(specData.list) do
 			if v == source then
-				table.remove(specData.list, k) -- usuwanie gracza z listy specowanych, który wyszedł/umarł
+				-- remove dead/non-existing player from spectator list
+				table.remove(specData.list, k)
 			end
 		end
 
-		if specData.currentPlayer == source then -- przeskok na następnego gracza
+		-- switch to next alive player or freecam
+		if specData.currentPlayer == source then
 			if #specData.list == 0 then
 				advert.error("msg_specAlone")
 				specData.mode = 0
@@ -241,6 +241,8 @@ function renderSpectatorHUD()
 	    dxDrawText(getPlayerName( specData.currentPlayer ), render.name[1], render.name[2], render.name[3], render.name[4], tocolor(0, 0, 0, 255), 1.00, "bankgothic", "left", "top", false, false, false, false, false)
 	    dxDrawText(getPlayerName( specData.currentPlayer ), render.name[1]-1, render.name[2]-1, render.name[3]-1, render.name[4]-1, render.specNamesColors[getPlayerTeam( specData.currentPlayer )], 1.00, "bankgothic", "left", "top", false, false, false, false, false)
 	    --dxDrawRectangle(437, 509, 0, 0, tocolor(255, 255, 255, 255), true) -- ?
+
+	    -- @todo: localize
 	    dxDrawText("Kills: " .. (getElementData(specData.currentPlayer, "score") or 0) .. "\nDeaths: " .. (getElementData(specData.currentPlayer, "deaths") or 0), render.stats[1], render.stats[2], render.stats[3], render.stats[4], tocolor(255, 255, 255, 255), 1.00, "clear", "left", "top", false, false, false, false, false)
 	      
 	    local slot = getElementData(specData.currentPlayer, "currentSlot")
@@ -488,9 +490,6 @@ local function freecamMouse (cX,cY,aX,aY)
     end
 end
 
--- PUBLIC
-
--- params: x, y, z  sets camera's position (optional)
 function setFreecamEnabled (x, y, z)
 	if freecamState then
 		return false
@@ -505,7 +504,6 @@ function setFreecamEnabled (x, y, z)
 	return true
 end
 
--- param:  dontChangeFixedMode  leaves toggleCameraFixedMode alone if true, disables it if false or nil (optional)
 function setFreecamDisabled()
 	if not freecamState then
 		return false

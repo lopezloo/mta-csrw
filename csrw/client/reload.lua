@@ -34,7 +34,7 @@ addCommandHandler("Reload weapon",
 )
 bindKey("r", "down", "Reload weapon")
 
-function onClientPlayerReloading(slot) -- z onClientPlayerWeaponFire w c weapon.lua
+function onClientPlayerReloading(slot)
 	local gtaSlot = getPedWeaponSlot(localPlayer)
 	duckState = isPedDucked(localPlayer) 
 	
@@ -54,35 +54,23 @@ function onClientPlayerReloading(slot) -- z onClientPlayerWeaponFire w c weapon.
 	-- induced = true = przeładowywanie wywołane przez skrypt reload (przycisk R); false = naturalnie po skończeniu się amunicji w magazynku;
 
 	g_player.reloading = true
-	--setElementData(localPlayer, "reloading", 2)
 	
-	--local slot = getSlotFromWeapon(getPedWeapon(localPlayer))
+	-- @todo: play reload sound
+
+	-- czas dodania nowej amunicji może być różny na różnych fpsach
+	-- 1100 ms to za mało.. wtedy jeszcze gta nie daje nowej amunicji; 1800 jest ok bo minimalnie wyprzedza ten czas
 	local tim = 1700
 	if gtaSlot == 2 then tim = 1000
 	elseif gtaSlot == 4 then tim = 1300 end
 	
-	setTimer(triggerEvent, tim, 1, "onClientPlayerReloadingEnd", localPlayer, slot) -- 1100 ms to za mało.. wtedy jeszcze gta nie daje nowej amunicji; 1800 jest ok bo minimalnie wyprzedza ten czas
-	-- czas dodania nowej amunicji może być różny na różnych fpsach
-	--[[if not induced then
-		--setElementData(localPlayer, "reloading", 1)
-		setTimer(checkPlayerIsStillReloading, 100, 1) -- jak jest naturalnie to trzeba sprawdzać ile to czasu trwa bo czas jest wtedy różny
-	end]]--
+	setTimer(triggerEvent, tim, 1, "onClientPlayerReloadingEnd", localPlayer, slot)
 end
 
---[[function checkPlayerIsStillReloading()
-	--if getPedAmmoInClip(localPlayer) ~= csReloading_clipAmmoTemp then
-	if getPedAmmoInClip(localPlayer) ~= 0 then
-		--outputChatBox(getPedAmmoInClip(localPlayer))
-		triggerEvent("onClientPlayerReloadingEnd", localPlayer)
-	else
-		-- jeszcze przeładowuje
-		--outputChatBox("Postać nadal nie skończyła przeładowywać broni, triggerowanie do serwera zablokowane. Ponowna próba za 100ms")
-		setTimer(checkPlayerIsStillReloading, 100, 1)
-	end
-end--]]
-
 function onClientPlayerReloadingEnd(slot)
-	if not getElementData(source, "alive") then return false end -- nie wykonuje się jak gracz jest nieżywy
+	if not getElementData(source, "alive") then
+		-- nie wykonuje się jak gracz jest nieżywy
+		return false
+	end
 
 	stopAnimationWithWalking()
 	if not g_playerWeaponData[slot] then
@@ -91,7 +79,8 @@ function onClientPlayerReloadingEnd(slot)
 	end
 
 	local clipCapacity = tonumber(g_weapon[slot][ g_playerWeaponData[slot].weapon ]["clip"])
-	if clipCapacity > g_playerWeaponData[slot].ammo then -- wrzucanie resztek (całego ammo) do magazynka
+	if clipCapacity > g_playerWeaponData[slot].ammo then
+		-- wrzucanie resztek (całego ammo) do magazynka
 		clipCapacity = g_playerWeaponData[slot].ammo
 		g_playerWeaponData[slot].ammo = 0
 	else
@@ -103,19 +92,26 @@ function onClientPlayerReloadingEnd(slot)
 		function(source)
 			--setElementData(source, "reloading", 0)
 			toggleControl("aim_weapon", true)
-			toggleControl("crouch", true)	
-			toggleControl("jump", true)			
+			toggleControl("crouch", true)
+			toggleControl("jump", true)
+
 			setTimer(
 				function()
-					if getControlState("aim_weapon") then -- jeśli celuje
+					if getControlState("aim_weapon") then
+						-- jeśli celuje
 						toggleControl("fire", true)
-					end		
+					end
 				end, 100, 1)
-			if duckState then setDucked(true) end
+
+			if duckState then
+				setDucked(true)
+			end
+
 			if CFirstPerson.enabled then
 				setControlState("aim_weapon", true)
-			end					
+			end
 		end, 50, 1, source)
+
 	g_player.reloading = false
 	return true
 end

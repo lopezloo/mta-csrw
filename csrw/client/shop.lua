@@ -18,46 +18,50 @@ addCommandHandler("Shop",
 bindKey("B", "down", "Shop")
 
 function showShop()
-	if getElementData(localPlayer, "alive") then
-		-- jeśli runda nie trwa ponad 15 sekund
-		--if getElementData(resourceRoot, "currentMode") == "cs" or getPlayerTeam(localPlayer) == ct then -- w trybie zombie tylko dla CT
-		local mapTime = 5
-		if getElementData(resourceRoot, "currentMode") == "zombie" then mapTime = 10 end
-	
-		--if (getElementData(resourceRoot, "roundTimeMinutes") == 5 and getElementData(resourceRoot, "roundTimeSeconds") == 0) or (getElementData(resourceRoot, "roundTimeMinutes") == 10 and getElementData(resourceRoot, "roundTimeSeconds") == 0) or (getElementData(resourceRoot, "roundTimeMinutes") == mapTime - 1 and getElementData(resourceRoot, "roundTimeSeconds") >= 15) then
-		if 1 == 1 then
-			local plus = 0
-			if getPlayerTeam(localPlayer) == g_team[1] then
-				spawnsTT = getElementsByType("spawntt")
-				for i, spawn in pairs(spawnsTT) do
-					local x = getElementData(spawn, "posX")
-					local y = getElementData(spawn, "posY")
-					local z = getElementData(spawn, "posZ")
-					if isElementInRangeOfPoint(localPlayer, x, y, z, 5.0) then
-						plus = plus + 1
-					end
+	if not getElementData(localPlayer, "alive") then
+		return
+	end
+
+	-- jeśli runda nie trwa ponad 15 sekund
+	--if getElementData(resourceRoot, "currentMode") == "cs" or getPlayerTeam(localPlayer) == ct then -- w trybie zombie tylko dla CT
+	local mapTime = 5
+	if getElementData(resourceRoot, "currentMode") == "zombie" then
+		mapTime = 10
+	end
+
+	--if (getElementData(resourceRoot, "roundTimeMinutes") == 5 and getElementData(resourceRoot, "roundTimeSeconds") == 0) or (getElementData(resourceRoot, "roundTimeMinutes") == 10 and getElementData(resourceRoot, "roundTimeSeconds") == 0) or (getElementData(resourceRoot, "roundTimeMinutes") == mapTime - 1 and getElementData(resourceRoot, "roundTimeSeconds") >= 15) then
+	if 1 == 1 then
+		local plus = 0
+		if getPlayerTeam(localPlayer) == g_team[1] then
+			spawnsTT = getElementsByType("spawntt")
+			for i, spawn in pairs(spawnsTT) do
+				local x = getElementData(spawn, "posX")
+				local y = getElementData(spawn, "posY")
+				local z = getElementData(spawn, "posZ")
+				if isElementInRangeOfPoint(localPlayer, x, y, z, 5.0) then
+					plus = plus + 1
 				end
-			elseif getPlayerTeam(localPlayer) == g_team[2] then
-				spawnsCT = getElementsByType("spawnct")
-				for i, spawn in pairs(spawnsCT) do
-					local x = getElementData(spawn, "posX")
-					local y = getElementData(spawn, "posY")
-					local z = getElementData(spawn, "posZ")
-					if isElementInRangeOfPoint(localPlayer, x, y, z, 5.0) then
-						plus = plus + 1
-					end
-				end	
 			end
-			
-			if plus >= 1 then
-				activateWindow_shop()
-			else
-				advert.error("msg_buyNeedSpawn")
-			end					
-		else -- jeśli trwa
-			playSound(":csrw-sounds/sounds/resource/warning.wav")
-			--advert.Error("msg_buyTime")
+		elseif getPlayerTeam(localPlayer) == g_team[2] then
+			spawnsCT = getElementsByType("spawnct")
+			for i, spawn in pairs(spawnsCT) do
+				local x = getElementData(spawn, "posX")
+				local y = getElementData(spawn, "posY")
+				local z = getElementData(spawn, "posZ")
+				if isElementInRangeOfPoint(localPlayer, x, y, z, 5.0) then
+					plus = plus + 1
+				end
+			end	
 		end
+		
+		if plus >= 1 then
+			activateWindow_shop()
+		else
+			advert.error("msg_buyNeedSpawn")
+		end					
+	else -- jeśli trwa
+		playSound(":csrw-sounds/sounds/resource/warning.wav")
+		--advert.Error("msg_buyTime")
 	end
 end
 
@@ -96,52 +100,50 @@ addEventHandler("onClientResourceStart", resourceRoot,
 
 function loadShopWeapons()
 	-- wczytywanie kategori broni teamów i broni przypisanych do nich
-	shopFile = xmlLoadFile("files/shop.xml")
-	if shopFile then
-		for k, v in pairs(xmlNodeGetChildren(shopFile)) do -- wykona się 2 razy (2 teamy) (nod <teamX>)
-			for k2, v2 in pairs(xmlNodeGetChildren(v)) do -- pętla na kategorie
-				shop[k][k2] = {}
-
-				shop[k][k2]["name"] = xmlNodeGetAttribute(v2, "name")
-				--shop[k][k2]["slot"] = xmlNodeGetAttribute(v2, "slot") -- slot[team][kategoria][info kategorii/bron][parametr]
-
-				for k3, v3 in pairs(xmlNodeGetChildren(v2)) do -- pętla na wszystkie bronie z kategorii
-					shop[k][k2][k3] = {}
-					for attribute, value in pairs(xmlNodeGetAttributes(v3)) do -- uzyskiwanie atrybutów broni
-						if attribute == "csWeaponID" or attribute == "cost" then
-							value = tonumber(value)
-						end
-						if attribute == "slot" then
-							if not string.find(value, "S") then
-								value = tonumber(value)
-							end
-						end
-						shop[k][k2][k3][attribute] = value
-
-						--[[if value ~= "-1" then -- debug
-							--outputChatBox(tostring(attribute) .. " = " .. value)
-							--outputChatBox("shop[" .. k .. "][" .. k2 .. "][" .. k3 .. "][" .. attribute .. "]")
-							--outputChatBox("shop[" .. k .. "][" .. k2 .. "][" .. k3 .. "][" .. attribute .. "] = " .. value)
-						end]]--
-					end
-					if not shop[k][k2][k3]["csWeaponID"] or not shop[k][k2][k3]["slot"] then
-						--outputChatBox("shop[" .. k .. "][" .. k2 .. "][" .. k3 .. "][name] = " .. tostring(shop[k][k2][k3]["name"]) .. " ?")
-						outputChatBox("CRITICAL ERROR: Weapon " .. tostring(k3) .. " (category " .. tostring(k2) .. ", team " .. tostring(k) .. ") has not setted csWeaponID or slot.")
-					end
-				end
-			end
-		end
-		xmlUnloadFile(shopFile)
-	else
+	local shopFile = xmlLoadFile("files/shop.xml")
+	if not shopFile then
 		outputDebugString("CRTICAL ERROR: shop configuration file don't exists or is damaged", 1)
 		outputChatBox("CRTICAL ERROR: shop configuration file don't exists or is damaged")
 		outputChatBox("BŁĄD KRYTYCZNY! Nie znaleziono pliku z konfiguracją sklepu z bronią lub jest on uszkodzony.")
+		return
 	end
+
+	for k, v in pairs(xmlNodeGetChildren(shopFile)) do -- wykona się 2 razy (2 teamy) (nod <teamX>)
+		for k2, v2 in pairs(xmlNodeGetChildren(v)) do -- pętla na kategorie
+			shop[k][k2] = {}
+
+			shop[k][k2]["name"] = xmlNodeGetAttribute(v2, "name")
+			--shop[k][k2]["slot"] = xmlNodeGetAttribute(v2, "slot") -- slot[team][kategoria][info kategorii/bron][parametr]
+
+			for k3, v3 in pairs(xmlNodeGetChildren(v2)) do -- pętla na wszystkie bronie z kategorii
+				shop[k][k2][k3] = {}
+				for attribute, value in pairs(xmlNodeGetAttributes(v3)) do -- uzyskiwanie atrybutów broni
+					if attribute == "csWeaponID" or attribute == "cost" then
+						value = tonumber(value)
+					end
+					if attribute == "slot" then
+						if not string.find(value, "S") then
+							value = tonumber(value)
+						end
+					end
+					shop[k][k2][k3][attribute] = value
+
+					--[[if value ~= "-1" then -- debug
+						--outputChatBox(tostring(attribute) .. " = " .. value)
+						--outputChatBox("shop[" .. k .. "][" .. k2 .. "][" .. k3 .. "][" .. attribute .. "]")
+						--outputChatBox("shop[" .. k .. "][" .. k2 .. "][" .. k3 .. "][" .. attribute .. "] = " .. value)
+					end]]--
+				end
+				if not shop[k][k2][k3]["csWeaponID"] or not shop[k][k2][k3]["slot"] then
+					--outputChatBox("shop[" .. k .. "][" .. k2 .. "][" .. k3 .. "][name] = " .. tostring(shop[k][k2][k3]["name"]) .. " ?")
+					outputChatBox("CRITICAL ERROR: Weapon " .. tostring(k3) .. " (category " .. tostring(k2) .. ", team " .. tostring(k) .. ") has not setted csWeaponID or slot.")
+				end
+			end
+		end
+	end
+
+	xmlUnloadFile(shopFile)
 	outputDebugString("shop weapons configuration loaded")
-	--outputChatBox(shop[2][6][4]["slot"])
-	--outputChatBox(tostring(shop[1][1]["name"]))
-	--outputChatBox("aa: " .. tostring(shop[1][1][1]["name"]))
-	-- KONIEC WCZYTYWANIA BRONI Z PLIKU XML	
 end
 
 function shop_loadCategories()
@@ -154,7 +156,6 @@ function shop_loadCategories()
 	currentWeapon = {}
 	setBoxLabel(getText("shop"))
 	
-	local tempCategory
 	local team = getTeamID(getPlayerTeam(localPlayer))
 	
 	local buttons = {}
@@ -240,7 +241,8 @@ function shop_weaponButtonHover() -- najazd na przycisk wyboru broni
 	--clickSound()
 end
 
-function shop_weaponButtonLeave() -- odjazd z przycisku wyboru broni
+-- odjazd z przycisku wyboru broni
+function shop_weaponButtonLeave()
 	--shop_currentWeapon = false -- odkomentować jak chce się aby informacja o danej broni wyświetlała się tylko w przy trzymaniu kursora na przycisku
 end
 
@@ -351,11 +353,15 @@ function buyWeapon(cost, slot, weapon)
 	else
 		if gtaWepID == 16 or gtaWepID == 17 or gtaWepID == 18 then -- granaty
 			local maxGrenades = 1
-			if slot == 4 then maxGrenades = 2 end
+			if slot == 4 then
+				maxGrenades = 2
+			end
+
 			local clip = 0
 			if g_playerWeaponData[slot] then
 				clip = g_playerWeaponData[slot].clip
 			end
+
 			if clip >= maxGrenades then
 				advert.error("msg_tooMuchGrenades")
 				playSound(":csrw-sounds/sounds/buttons/weapon_cant_buy.wav")
@@ -365,6 +371,7 @@ function buyWeapon(cost, slot, weapon)
 
 		noserver = false
 		triggerServerEvent("buyWeapon", localPlayer, cost, slot, weapon)
+		
 		if CFirstPerson.enabled then
 			setControlState("aim_weapon", true)
 		end
