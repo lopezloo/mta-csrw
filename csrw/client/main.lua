@@ -112,6 +112,7 @@ addEventHandler("onClientPlayerSpawn", localPlayer,
 		showHUD(true)
 		setWindowFlashing(true, 3)
 		clearWorld()
+		localPlayer:setVoice("PED_TYPE_DISABLED")
 
 		local i = math.random(1, 3)
 		if i == 1 then s = "letsgo"
@@ -235,3 +236,10 @@ bindKey(getKeyBoundToCommand("screenshot"), "down",
 	end
 )
 
+addEventHandler("onClientElementStreamIn", root,
+	function()
+		if source.type == "player" or source.type == "ped" then
+			source:setVoice("PED_TYPE_DISABLED")
+		end
+	end
+)
