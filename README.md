@@ -41,3 +41,4 @@ This game mode is not being actively developed anymore. However, pull requests a
 
 
 This repository consist of code and configuration files only. Assets are not included. Please use MTA:SA community site for download.
+Special thanks to [Ren712](https://community.multitheftauto.com/?p=profile&id=320386) for [wall shader](https://community.multitheftauto.com/index.php?p=resources&s=details&id=7615).
