@@ -32,8 +32,12 @@ CS:RW
 ## Download
 * [Multi Theft Auto community page](https://community.multitheftauto.com/index.php?p=resources&s=details&id=10487)
 
+## Development
+This game mode is not being actively developed anymore. However, pull requests are welcome. New features should be reported as issue first.
+
 ## Other
 * [Multi Theft Auto forum topic](https://forum.mtasa.com/topic/61129-rel-counter-strike-renderware-gamemode/)
 * [Videos on YouTube](https://www.youtube.com/playlist?list=PLlZJGl2Rc-B-GrX5Vn66DSsKI_K0q28Aj)
+
 
 This repository consist of code and configuration files only. Assets are not included. Please use MTA:SA community site for download.
