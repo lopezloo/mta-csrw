@@ -22,7 +22,7 @@
 
 		Weapon flags ("flags" parameter):
 			* BOMB - weapon is used as bomb in bomb defusal mode
-                        * KNIFE - weapon is used as knife (players will spawn with it)
+			* KNIFE - weapon is used as knife (players will spawn with it)
 			* NODM - weapon is restricted on DeathMatch mode
 			One weapon can use many flags, example: flags="NODM,ASD".
 			Flag names are case insensitive.
