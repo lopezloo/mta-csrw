@@ -16,14 +16,18 @@ CS:RW
 
 ## Features
 * interface inspired by Counter Strike: Source
-* full dynamic and easy customizable weapons including grenades as flashbang, decoy and stuff like nightvision goggles
-* custom damage system
-* weapons visible on player back, carrying C4 in the hands
-* spectator mode with free camera mode and "wallhacking" (like CS:GO) teammates and weapons laying on ground
-* weapon drop
 * bomb defusal mode
 * hostage rescue mode
-* server Message of The Day, <s>global news</s>, new version notification
+* full dynamic and easy customizable weapon system
+* grenades: HE grenade, smoke grenade, molotov, flashbang, decoy
+* equipment items: night vision goggles, thermal vision goggles, defuse kit, kevlar
+* custom damage system
+* weapons visible on player body
+* spectator mode with free camera mode and "wallhacking" (CS:GO alike) teammates and weapons laying on ground
+* ability to drop weapons on the ground
+* server Message of The Day
+* <s>global news</s>
+* new version notification
 * <s>internal master server list</s>
 * Rock The Vote feature and ability to nominate maps for next vote
 * locale system (by default: english and polish)
