@@ -148,12 +148,18 @@ function onDecoyExploded(grenade, slot, weapon)
 	local int = getElementInterior(grenade)
 
 	local groundZ = getGroundPosition(x, y, z)
-	groundZ = groundZ + 0.2
+	groundZ = groundZ + 0.1
 
+	-- Destroy projectile
 	destroyElement(grenade)
+
+	-- Recreate projectile as object
 	local obj = createObject(343, x, y, z, rx, ry, rz)
+	obj.collisions = false
+	obj.frozen = true
+	obj.interior = int
+
 	table.insert(grenades.decoys, obj)
-	setElementInterior(obj, int)
 	moveObject(obj, 100*(z - groundZ), x, y, groundZ)
 
 	local sound = ":csrw-sounds/sounds/weapons/ak47/ak47-1.wav"
@@ -168,19 +174,30 @@ function onDecoyExploded(grenade, slot, weapon)
 				local x, y, z = getElementPosition(obj)
 
 				if i == 20 then
-					createExplosion(x, y, z, 12) -- mała eksplozja
+					-- Create small explosion
+					createExplosion(x, y, z, 12)
+
+					-- Play explosion sound
 					local sound = playSound3D(":csrw-sounds/sounds/weapons/hegrenade/explode3.wav", x, y, z)
-					setSoundMaxDistance(sound, 75)
+					setSoundMaxDistance(sound, 150)
+
 					table.remove(grenades.decoys, table.find(grenades.decoys, obj))
+
+					-- Destroy grenade object
 					destroyElement(obj)
 				else
-					fxAddDebris(x, y, z, 255, 119, 0, 255, 0.1, 3)
+					-- Create FX effect
+					createSparks(Vector3(x, y, z))
+
+					-- Play two weapon shoot sounds
 					local s = playSound3D(sound, x, y, z)
-					setSoundMaxDistance(s, 50)
+					setSoundMaxDistance(s, 100)
+
 					setTimer(
 						function()
 							local s = playSound3D(sound, x, y, z)
-							setSoundMaxDistance(s, 50)
+							setSoundMaxDistance(s, 100)
+							createSparks(Vector3(x, y, z))
 						end, 250, 1)
 				end
 			end, 2000*i, 1)
@@ -189,6 +206,7 @@ end
 
 function onSmokeGrenadeExploded(grenade)
 	if not isElement(grenade) then return end
+
 	local x, y, z = getElementPosition(grenade)
 	local particle = createObject(915, x, y, z-2)
 	setElementCollisionsEnabled(particle, false)
@@ -239,6 +257,7 @@ function onSmokeGrenadeDestroy()
 	if source then
 		destroyElement(getElementData(source, "particle"))
 	end
+
 	if g_misc.smokeUpdate and #smokeGrenades == 1 then
 		g_misc.smokeUpdate = false
 		removeEventHandler("onClientPreRender", root, updateSmokeGrenadeParticles)
@@ -265,4 +284,18 @@ function destroyGrenades()
 			destroyElement(v)
 		end
 	end
+end
+
+function createSparks(position)
+	local fx = Effect("prt_spark", position, -90, 0, 0, 100, false)
+	fx.density = 0.2
+
+	setTimer(function()
+		fx.density = 0
+		
+		setTimer(function()
+			fx:destroy()
+		end, 400, 1)
+
+	end, 150, 1)
 end
