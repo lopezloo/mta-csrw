@@ -197,7 +197,7 @@ function onDecoyExploded(grenade, slot, weapon)
 	for i=1, 20 do
 		setTimer(
 			function()
-				if not obj then return end
+				if not obj or not isElement(obj) then return end
 				local x, y, z = getElementPosition(obj)
 
 				if i == 20 then
