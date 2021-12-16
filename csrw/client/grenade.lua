@@ -167,31 +167,32 @@ function onDecoyExploded(grenade, slot, weapon)
 		sound = ":csrw-sounds/sounds/weapons/" .. g_weapon[slot][weapon]["shotSound"]
 	end
 
-
 	-- Calculate time between decoy shots
 	local timeBetweenShots = 250
-	local gtaWeaponID = g_weapon[slot][weapon]["weaponID"]
-	local gtaSkillName
-	local csSkillName = g_weapon[slot][weapon]["skill"]
-	if csSkillName == "low" then
-		gtaSkillName = "poor"
-	elseif csSkillName == "medium" then
-		gtaSkillName = "std"
-	elseif csSkillName == "pro" then
-		gtaSkillName = "pro"
-	end
-	
-	if gtaSkillName then
-		anim_loop_stop = getWeaponProperty(gtaWeaponID, gtaSkillName, "anim_loop_stop")
-		anim_loop_start = getWeaponProperty(gtaWeaponID, gtaSkillName, "anim_loop_start")
-		anim_loop_time = anim_loop_stop - anim_loop_start
-		timeBetweenShots = 50 + 1000 * anim_loop_time
-	end
+	if weapon then
+		local gtaWeaponID = g_weapon[slot][weapon]["weaponID"]
+		local gtaSkillName
+		local csSkillName = g_weapon[slot][weapon]["skill"]
+		if csSkillName == "low" then
+			gtaSkillName = "poor"
+		elseif csSkillName == "medium" then
+			gtaSkillName = "std"
+		elseif csSkillName == "pro" then
+			gtaSkillName = "pro"
+		end
+		
+		if gtaSkillName then
+			anim_loop_stop = getWeaponProperty(gtaWeaponID, gtaSkillName, "anim_loop_stop")
+			anim_loop_start = getWeaponProperty(gtaWeaponID, gtaSkillName, "anim_loop_start")
+			anim_loop_time = anim_loop_stop - anim_loop_start
+			timeBetweenShots = 50 + 1000 * anim_loop_time
+		end
 
-	-- Add extra reload time if weapon has only one bullet in the clip
-	local clip = tonumber(g_weapon[slot][weapon]["clip"])
-	if clip == 1 then
-		timeBetweenShots = timeBetweenShots + 1700
+		-- Add extra reload time if weapon has only one bullet in the clip
+		local clip = tonumber(g_weapon[slot][weapon]["clip"])
+		if clip == 1 then
+			timeBetweenShots = timeBetweenShots + 1700
+		end
 	end
 
 	for i=1, 20 do
