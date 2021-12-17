@@ -4,12 +4,6 @@ local hostage = {
 	renderedHostages = {}
 }
 
---[[
-	TODO:
-		* zrobić aby tylko 1 gracz mógł brać tego samego hosta w jednym czasie [100%]
-		* optymalizacja
-]]
-
 function pickHostage(key, keyState)
 	if not getElementData(localPlayer, "alive") or getPlayerTeam(localPlayer) == g_team[1] then return end
 
@@ -54,7 +48,6 @@ function onHostagePicked(progressName)
 		hostage.picked = hostage.tryingToPick
 		hostage.tryingToPick = nil
 		removeEventHandler("onProgressBarEnd", resourceRoot, onHostagePicked)
-
 		-- nie ma sensu resetowania daty "picking" tutaj (reset dopiero po stronie serwera przy upadku hosta)		
 	end
 end
@@ -102,7 +95,7 @@ addEventHandler("onClientElementDestroy", root,
 )
 
 function renderHostages()
-	for k, v in pairs( hostage.renderedHostages ) do
+	for k, v in pairs(hostage.renderedHostages) do
 		setPedAnimationProgress(v, "gym_bike_fast", 0.7)
 	end
 end
