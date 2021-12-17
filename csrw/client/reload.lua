@@ -1,6 +1,3 @@
-csReloading_clipAmmoTemp = 0
-csReloading_totalAmmoTemp = 0
-
 local reloadAnimation = {
 	-- zbiór, animacja normalna, animacja podczas kucania
 	[2] = {"COLT45", "colt45_reload", "colt45_crouchreload"}, -- pistolety
