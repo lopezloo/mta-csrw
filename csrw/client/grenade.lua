@@ -1,8 +1,13 @@
 local smokeGrenades = {}
 
 local timer_updateProjectileLines
-local lineProjectiles = {} -- lista projecttile z linami
-local projectileLines = {} -- liny projectile
+
+-- table of projectiles with lines to be rendered
+local lineProjectiles = {}
+
+-- table of projectile lines
+local projectileLines = {}
+
 local grenades = {
 	smokes = {},
 	decoys = {}
@@ -10,7 +15,8 @@ local grenades = {
 
 addEventHandler("onClientProjectileCreation", root,
 	function(creator)
-		if getProjectileType(source) == 16 then -- grenade
+		if getProjectileType(source) == 16 then -- 16 = grenade
+			-- HE grenade
 			addEventHandler("onClientElementDestroy", source, onHEGrenadeExploded)
 		end
 
@@ -19,19 +25,26 @@ addEventHandler("onClientProjectileCreation", root,
 			if slot then
 				local weapon = getElementData(creator, "wSlot" .. slot)
 				if weapon then
-					if g_weapon[slot][weapon]["objectID"] == "-2" then -- flashbang
-						setProjectileCounter(source, 99999) -- żeby przypadkiem ten granat nie jebnął przed timerem
-						setTimer(onFlashBangExploded, 2000, 1, source) -- 2000 to czas wybuchu flasha od jego wyrzucenia z ręki					
-					elseif g_weapon[slot][weapon]["objectID"] == "-3" then -- decoy
+					if g_weapon[slot][weapon]["objectID"] == "-2" then
+						-- Flashbang grenade
+						-- Set projectile counter high to avoid grenade explosion
 						setProjectileCounter(source, 99999)
-						-- Pobieranie najlepszej broni gracza
+						setTimer(onFlashBangExploded, 2000, 1, source) -- 2000 to czas wybuchu flasha od jego wyrzucenia z ręki					
+					
+					elseif g_weapon[slot][weapon]["objectID"] == "-3" then
+						-- Decoy grenade
+						setProjectileCounter(source, 99999)
+
+						-- Get best player weapon to use it as decoy
 						local weapon = {1, getElementData(creator, "wSlot1")}
 						if not weapon[2] then
 							weapon = {2, getElementData(creator, "wSlot2")}
 						end
 						setTimer(onDecoyExploded, 2000, 1, source, weapon[1], weapon[2])
+					
 					else
-						setTimer(onSmokeGrenadeExploded, 3000, 1, source) -- prawdziwy smoke
+						-- Smoke grenade
+						setTimer(onSmokeGrenadeExploded, 3000, 1, source)
 					end
 				end
 			end
@@ -39,6 +52,7 @@ addEventHandler("onClientProjectileCreation", root,
 
 		--outputChatBox("onClientProjectileCreation; creator: " .. tostring(creator) .. " (element " .. getElementType(creator) .. ")")
 		if g_player.spectating and creator and getElementType(creator) == "player" then -- + getElementData(source, "spectator")
+			-- Draw projectile lines in spectator
 			projectileLines[source] = {}
 			table.insert(lineProjectiles, source)
 			if not isTimer(timer_updateProjectileLines) then
@@ -99,7 +113,8 @@ function onFlashBangExploded(grenade)
 	local x, y, z = getElementPosition(grenade)
 	local x2, y2, z2 = getElementPosition(localPlayer)
 	
-	if not isLineOfSightClear(x, y, z, x2, y2, z2, true, true, false, true, true, false, false, grenade) then -- jeśli flashbang jest za jakimś obiektem
+	if not isLineOfSightClear(x, y, z, x2, y2, z2, true, true, false, true, true, false, false, grenade) then
+		-- If flashbang projectile is behind some object
 		setSoundMaxDistance(playSound3D(":csrw-sounds/sounds/weapons/flashbang/flashbang_explode2.wav", x, y, z), 50)
 		destroyElement(grenade)
 		return
@@ -107,8 +122,10 @@ function onFlashBangExploded(grenade)
 
 	local distance = getDistanceBetweenPoints3D(x, y, z, x2, y2, z2)
 	local exploded
-	if isElementOnScreen(grenade) then -- jeśli patrzy na tego flasha
-		if distance <= 50 then -- jeśli gracz jest w zasięgu flasha
+	if isElementOnScreen(grenade) then
+		-- If player is looking at flashbang projectile
+		if distance <= 50 then
+			-- If player is close to it
 			exploded = true
 			showRadar(false)
 			fadeCamera(false, 0.1, 255, 255, 255)
@@ -120,7 +137,9 @@ function onFlashBangExploded(grenade)
 					g_player.flashed = false
 				end, 30000 / distance, 1)		
 		end
-	elseif distance <= 12 then -- jeśli nie patrzy (np. obrócił sie) i jest w odległości 7 metrów od flasha
+
+	elseif distance <= 12 then
+		-- If player is not looking at flashbang projectile but is close
 		exploded = true
 		fadeCamera(false, 0.1, 255, 255, 255)
 		setTimer(
@@ -130,8 +149,13 @@ function onFlashBangExploded(grenade)
 				g_player.flashed = false
 			end, 5000 / distance, 1)
 	end
-	destroyElement(grenade) -- usuwanie prawdziwego granata
-	createEffect("camflash", x, y, z)
+
+	-- Destroy projectile
+	destroyElement(grenade)
+
+	-- Create FX
+	local fx = Effect("camflash", x, y, z)
+	setTimer(destroyElement, 1000, 1, fx)
 
 	if exploded then
 		playSound(":csrw-sounds/sounds/weapons/flashbang/flash.ogg")
@@ -149,6 +173,9 @@ function onDecoyExploded(grenade, slot, weapon)
 
 	local groundZ = getGroundPosition(x, y, z)
 	groundZ = groundZ + 0.1
+	if groundZ > z then
+		groundZ = z
+	end
 
 	-- Destroy projectile
 	destroyElement(grenade)
@@ -167,16 +194,24 @@ function onDecoyExploded(grenade, slot, weapon)
 		slot, weapon = defweapons[1][1], defweapons[1][2]
 	end
 
+	local shotSound = g_weapon[slot][weapon]["shotSound"]
+	if not shotSound then
+		return
+	end
+
+	sound = ":csrw-sounds/sounds/weapons/" .. shotSound
+
 	-- Recreate projectile as object
-	local obj = createObject(343, x, y, z, rx, ry, rz)
+	local obj = Object(343, x, y, z, rx, ry, rz)
 	obj.collisions = false
 	obj.frozen = true
 	obj.interior = int
 
 	table.insert(grenades.decoys, obj)
-	moveObject(obj, 100*(z - groundZ), x, y, groundZ)
-
-	sound = ":csrw-sounds/sounds/weapons/" .. g_weapon[slot][weapon]["shotSound"]
+	
+	if z > groundZ then
+		moveObject(obj, 100*(z - groundZ), x, y, groundZ)
+	end
 
 	-- Calculate time between decoy shots
 	local timeBetweenShots = 250
@@ -192,10 +227,10 @@ function onDecoyExploded(grenade, slot, weapon)
 			gtaSkillName = "pro"
 		end
 		
-		if gtaSkillName then
-			anim_loop_stop = getWeaponProperty(gtaWeaponID, gtaSkillName, "anim_loop_stop")
-			anim_loop_start = getWeaponProperty(gtaWeaponID, gtaSkillName, "anim_loop_start")
-			anim_loop_time = anim_loop_stop - anim_loop_start
+		if gtaWeaponID and gtaSkillName then
+			local anim_loop_stop = getWeaponProperty(gtaWeaponID, gtaSkillName, "anim_loop_stop")
+			local anim_loop_start = getWeaponProperty(gtaWeaponID, gtaSkillName, "anim_loop_start")
+			local anim_loop_time = anim_loop_stop - anim_loop_start
 			timeBetweenShots = 50 + 1000 * anim_loop_time
 		end
 
@@ -260,8 +295,9 @@ function onSmokeGrenadeExploded(grenade)
 	table.insert(smokeGrenades, grenade)
 
 	local groundZ = getGroundPosition(x, y, z)
-	if getDistanceBetweenPoints3D(x, y, z, x, y, groundZ) <= 1 then -- leży już na ziemi, można go usuwać aby zwolnić limit
-		-- smoke już leży na ziemi nieruchomo, więc nie trzeba aktualizować pozycji dymu
+	if getDistanceBetweenPoints3D(x, y, z, x, y, groundZ) <= 1 then
+		-- Smoke is already lying on the ground, we can delete it to easy projectile limits
+		-- we don't need to update smoke FX position per frame anymore too
 		table.remove(smokeGrenades, table.find(smokeGrenades, grenade))
 		destroyElement(grenade)	
 		
@@ -276,8 +312,7 @@ function onSmokeGrenadeExploded(grenade)
 	else
 		if not g_misc.smokeUpdate and #smokeGrenades == 1 then
 			g_misc.smokeUpdate = true
-
-			-- włączanie tego eventu tylko na czas gdy są stworzone smokesy
+			-- Enabling this event only when there are smoke grenades created
 			addEventHandler("onClientPreRender", root, updateSmokeGrenadeParticles)
 		end
 
@@ -317,9 +352,9 @@ function destroyGrenades()
 	grenades.smokes = {}
 	grenades.decoys = {}
 
+	-- Deleting all projectiles except HE grenades
 	for k, v in pairs(getElementsByType("projectile")) do
 		if getProjectileType(v) ~= 16 then
-			-- usuwanie wszystkich projectile oprocz normalnych granatów odłamkowych
 			destroyElement(v)
 		end
 	end
