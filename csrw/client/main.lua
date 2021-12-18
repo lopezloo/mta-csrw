@@ -141,6 +141,8 @@ addEventHandler("onClientPlayerSpawn", localPlayer,
 		clearWorld()
 		localPlayer:setVoice("PED_TYPE_DISABLED")
 
+		resetFlashedState()
+
 		local i = math.random(1, 3)
 		if i == 1 then s = "letsgo"
 		elseif i == 2 then s = "locknload"

@@ -1,17 +1,48 @@
-local smokeGrenades = {}
+local gl_timer_updateProjectileLines
+local gl_timer_flyingSmokeGrenadesUpdate
 
-local timer_updateProjectileLines
+local gl_flashedSound
 
 -- table of projectiles with lines to be rendered
-local lineProjectiles = {}
+local gl_lineProjectiles = {}
 
 -- table of projectile lines
-local projectileLines = {}
+local gl_projectileLines = {}
 
-local grenades = {
+local gl_grenades = {
+	-- Table of all smoke grenade projectiles
 	smokes = {},
+
+	-- Table of smoke grenade projectiles in air
+	smokesFlying = {},
+
+	-- Table of smoke grenade smoke particles
+	smokeParticles = {},
+
+	smokeSounds = {},
+
+	-- Table of smoke grenades recreated as objects
+	smokeObjects = {},
+
 	decoys = {}
 }
+
+-- Time until smoke grenade disappears
+local SMOKE_GRENADE_LIFETIME = 20000
+
+-- Time until smoke grenade explodes
+local SMOKE_GRENADE_EXPLOSION_TIMEOUT = 3000
+
+-- Time until decoy grenade explodes
+local DECOY_GRENADE_EXPLOSION_TIMEOUT = 2000
+
+-- Time until flashbang grenade explodes
+local FLASHBANG_GRENADE_EXPLOSION_TIMEOUT = 2000
+
+local DECOY_GRENADE_GROUND_OBJECT_ID = 343
+local SMOKE_GRENADE_GROUND_OBJECT_ID = 343
+
+local SMOKE_GRENADE_PARTICLE_EFFECT_NAME = "carwashspray"
 
 addEventHandler("onClientProjectileCreation", root,
 	function(creator)
@@ -29,7 +60,7 @@ addEventHandler("onClientProjectileCreation", root,
 						-- Flashbang grenade
 						-- Set projectile counter high to avoid grenade explosion
 						setProjectileCounter(source, 99999)
-						setTimer(onFlashBangExploded, 2000, 1, source) -- 2000 to czas wybuchu flasha od jego wyrzucenia z ręki					
+						setTimer(onFlashBangExploded, FLASHBANG_GRENADE_EXPLOSION_TIMEOUT, 1, source)				
 					
 					elseif g_weapon[slot][weapon]["objectID"] == "-3" then
 						-- Decoy grenade
@@ -40,11 +71,11 @@ addEventHandler("onClientProjectileCreation", root,
 						if not weapon[2] then
 							weapon = {2, getElementData(creator, "wSlot2")}
 						end
-						setTimer(onDecoyExploded, 2000, 1, source, weapon[1], weapon[2])
+						setTimer(onDecoyExploded, DECOY_GRENADE_EXPLOSION_TIMEOUT, 1, source, weapon[1], weapon[2])
 					
 					else
 						-- Smoke grenade
-						setTimer(onSmokeGrenadeExploded, 3000, 1, source)
+						setTimer(onSmokeGrenadeExploded, SMOKE_GRENADE_EXPLOSION_TIMEOUT, 1, source)
 					end
 				end
 			end
@@ -53,9 +84,9 @@ addEventHandler("onClientProjectileCreation", root,
 		--outputChatBox("onClientProjectileCreation; creator: " .. tostring(creator) .. " (element " .. getElementType(creator) .. ")")
 		if g_player.spectating and creator and getElementType(creator) == "player" then -- + getElementData(source, "spectator")
 			-- Draw projectile lines in spectator
-			projectileLines[source] = {}
-			table.insert(lineProjectiles, source)
-			if not isTimer(timer_updateProjectileLines) then
+			gl_projectileLines[source] = {}
+			table.insert(gl_lineProjectiles, source)
+			if not isTimer(gl_timer_updateProjectileLines) then
 				setTimer(updateProjectileLines, 50, 0)
 			end
 			
@@ -69,7 +100,7 @@ addEventHandler("onClientProjectileCreation", root,
 )
 
 function updateProjectileLines()
-	for k, v in pairs(lineProjectiles) do
+	for k, v in pairs(gl_lineProjectiles) do
 		local o = getElementData(v, "oldPos")
 		local x, y, z = getElementPosition(v)
 		local color = getElementData(v, "color")
@@ -83,7 +114,7 @@ function updateProjectileLines()
 			--dxDrawLine3D(o[1], o[2], o[3], x, y, z, tocolor(color[1], color[2], color[3]), 2, true)
 		end
 		addEventHandler("onClientRender", root, drawProjectileLine)
-		table.insert(projectileLines[v], drawProjectileLine)
+		table.insert(gl_projectileLines[v], drawProjectileLine)
 		setElementData(v, "oldPos", {x, y, z}, false)
 	end
 end
@@ -93,18 +124,18 @@ function onProjectileWithLineDestroy()
 	local color = getElementData(source, "color")
 	local point = createMarker(x, y, z, "corona", 0.25, color[1], color[2], color[3])
 	setElementInterior(point, getElementInterior(source))
-	table.remove(lineProjectiles, table.find(lineProjectiles, source))
-	if #lineProjectiles == 0 and isTimer(timer_updateProjectileLines) then
-		killTimer(timer_updateProjectileLines)
+	table.remove(gl_lineProjectiles, table.find(gl_lineProjectiles, source))
+	if #gl_lineProjectiles == 0 and isTimer(gl_timer_updateProjectileLines) then
+		killTimer(gl_timer_updateProjectileLines)
 	end
 
 	setTimer(
 			function(proj)
 				destroyElement(point)
-				for k, v in pairs(projectileLines[proj]) do
+				for k, v in pairs(gl_projectileLines[proj]) do
 					removeEventHandler("onClientRender", root, v)
 				end
-				projectileLines[proj] = nil
+				gl_projectileLines[proj] = nil
 			end, 3000, 1, source)
 end
 
@@ -112,16 +143,26 @@ function onFlashBangExploded(grenade)
 	if not isElement(grenade) then return end
 	local x, y, z = getElementPosition(grenade)
 	local x2, y2, z2 = getElementPosition(localPlayer)
+
+	-- Create FX
+	Effect("camflash", x, y, z)
+
+	if g_player.flashed then
+		-- Already flashed by another flashbang
+		destroyElement(grenade)
+		return
+	end
 	
 	if not isLineOfSightClear(x, y, z, x2, y2, z2, true, true, false, true, true, false, false, grenade) then
 		-- If flashbang projectile is behind some object
-		setSoundMaxDistance(playSound3D(":csrw-sounds/sounds/weapons/flashbang/flashbang_explode2.wav", x, y, z), 50)
+		Sound3D(":csrw-sounds/sounds/weapons/flashbang/flashbang_explode2.wav", x, y, z).maxDistance = 50
 		destroyElement(grenade)
 		return
 	end
 
 	local distance = getDistanceBetweenPoints3D(x, y, z, x2, y2, z2)
-	local exploded
+	local exploded = false
+	
 	if isElementOnScreen(grenade) then
 		-- If player is looking at flashbang projectile
 		if distance <= 50 then
@@ -130,8 +171,11 @@ function onFlashBangExploded(grenade)
 			showRadar(false)
 			fadeCamera(false, 0.1, 255, 255, 255)
 			g_player.flashed = true
+			
 			setTimer(
 				function()
+					if not g_player.flashed then return end
+
 					fadeCamera(true, 1)
 					showRadar(true)
 					g_player.flashed = false
@@ -142,8 +186,12 @@ function onFlashBangExploded(grenade)
 		-- If player is not looking at flashbang projectile but is close
 		exploded = true
 		fadeCamera(false, 0.1, 255, 255, 255)
+		g_player.flashed = true
+		
 		setTimer(
 			function()
+				if not g_player.flashed then return end
+
 				fadeCamera(true, 1) 
 				showRadar(true)
 				g_player.flashed = false
@@ -153,14 +201,20 @@ function onFlashBangExploded(grenade)
 	-- Destroy projectile
 	destroyElement(grenade)
 
-	-- Create FX
-	local fx = Effect("camflash", x, y, z)
-	setTimer(destroyElement, 1000, 1, fx)
-
 	if exploded then
-		playSound(":csrw-sounds/sounds/weapons/flashbang/flash.ogg")
+		gl_flashedSound = playSound(":csrw-sounds/sounds/weapons/flashbang/flash.ogg")
 	else
 		setSoundMaxDistance(playSound3D(":csrw-sounds/sounds/weapons/flashbang/flashbang_explode2.wav", x, y, z), 50)
+	end
+end
+
+function resetFlashedState()
+	g_player.flashed = false
+	fadeCamera(true, 0)
+
+	-- Stop flashed sound
+	if gl_flashedSound and isElement(gl_flashedSound) then
+		gl_flashedSound:destroy()
 	end
 end
 
@@ -202,12 +256,12 @@ function onDecoyExploded(grenade, slot, weapon)
 	sound = ":csrw-sounds/sounds/weapons/" .. shotSound
 
 	-- Recreate projectile as object
-	local obj = Object(343, x, y, z, rx, ry, rz)
+	local obj = Object(DECOY_GRENADE_GROUND_OBJECT_ID, x, y, z, -rx, -ry, -rz)
 	obj.collisions = false
 	obj.frozen = true
 	obj.interior = int
 
-	table.insert(grenades.decoys, obj)
+	table.insert(gl_grenades.decoys, obj)
 	
 	if z > groundZ then
 		moveObject(obj, 100*(z - groundZ), x, y, groundZ)
@@ -255,7 +309,7 @@ function onDecoyExploded(grenade, slot, weapon)
 					local sound = playSound3D(":csrw-sounds/sounds/weapons/hegrenade/explode3.wav", x, y, z)
 					setSoundMaxDistance(sound, 150)
 
-					table.remove(grenades.decoys, table.find(grenades.decoys, obj))
+					table.remove(gl_grenades.decoys, table.find(gl_grenades.decoys, obj))
 
 					-- Destroy grenade object
 					destroyElement(obj)
@@ -278,53 +332,115 @@ function onDecoyExploded(grenade, slot, weapon)
 	end
 end
 
-function onSmokeGrenadeExploded(grenade)
-	if not isElement(grenade) then return end
+function onSmokeGrenadeExploded(projectile)
+	if not isElement(projectile) then return end
 
-	local x, y, z = getElementPosition(grenade)
-	local particle = createObject(915, x, y, z-2)
-	setElementCollisionsEnabled(particle, false)
-	setElementInterior(particle, getElementInterior(grenade))
-	setObjectScale(particle, 0.8)
-	table.insert(grenades.smokes, particle)
+	table.insert(gl_grenades.smokes, projectile)
 
-	local sound = playSound3D(":csrw-sounds/sounds/weapons/smokegrenade/sg_explode.wav", x, y, z)
-	setSoundMaxDistance(sound, 60)
-
-	setElementData(grenade, "particle", particle, false)
-	table.insert(smokeGrenades, grenade)
-
+	local x, y, z = getElementPosition(projectile)
 	local groundZ = getGroundPosition(x, y, z)
 	if getDistanceBetweenPoints3D(x, y, z, x, y, groundZ) <= 1 then
-		-- Smoke is already lying on the ground, we can delete it to easy projectile limits
-		-- we don't need to update smoke FX position per frame anymore too
-		table.remove(smokeGrenades, table.find(smokeGrenades, grenade))
-		destroyElement(grenade)	
-		
-		setTimer(
-			function()
-				if particle then
-					table.remove(grenades.smokes, table.find(grenades.smokes, particle))
-					destroyElement(particle)
-				end
-			end, 20000, 1)
+		createSmokeGrenadeParticleEffect(projectile)
 		
 	else
-		if not g_misc.smokeUpdate and #smokeGrenades == 1 then
+		table.insert(gl_grenades.smokesFlying, projectile)
+
+		-- Smoke projectile is still flying, we need to update smoke particle position per frame
+		if not g_misc.smokeUpdate and #gl_grenades.smokes > 0 then
 			g_misc.smokeUpdate = true
-			-- Enabling this event only when there are smoke grenades created
-			addEventHandler("onClientPreRender", root, updateSmokeGrenadeParticles)
+			gl_timer_flyingSmokeGrenadesUpdate = setTimer(updateFlyingSmokeGrenades, 50, 0)
 		end
 
-		addEventHandler("onClientElementDestroy", grenade, onSmokeGrenadeDestroy)
+		addEventHandler("onClientElementDestroy", projectile, onSmokeGrenadeDestroy)
 	end
 end
 
-function updateSmokeGrenadeParticles()
-	for k, v in pairs(smokeGrenades) do
-		local x, y, z = getElementPosition(v)
-		setElementPosition(getElementData(v, "particle"), x, y, z-2)
+function updateFlyingSmokeGrenades()
+	local smokesFlyingCopy = {}
+	for k, v in pairs(gl_grenades.smokesFlying) do
+		local groundZ = getGroundPosition(x, y, z)
+		if getDistanceBetweenPoints3D(x, y, z, x, y, groundZ) <= 1 then
+			createSmokeGrenadeParticleEffect(v)
+		
+		else
+			table.insert(smokesFlyingCopy, v)
+		end
 	end
+	gl_grenades.smokesFlying = smokesFlyingCopy
+end
+
+function destroySmokeParticle()
+
+end
+
+function createSmokeGrenadeParticleEffect(projectile)
+	local x, y, z = getElementPosition(projectile)
+	local rx, ry, rz = getElementRotation(projectile)
+	local interior = projectile.interior
+
+	local particle = Effect(SMOKE_GRENADE_PARTICLE_EFFECT_NAME, x, y, z-2, -90, 0, 0)
+	particle.speed = 1
+	particle.density = 2
+
+	setTimer(function()
+		if particle and isElement(particle) then
+			particle.speed = 0.25
+		end
+	end, 2000, 1)
+
+	particle.collisions = false
+	table.insert(gl_grenades.smokeParticles, particle)
+
+	local sound = Sound3D(":csrw-sounds/sounds/weapons/smokegrenade/sg_explode.wav", x, y, z)
+	sound.maxDistance = 50
+	table.insert(gl_grenades.smokeSounds, sound)
+
+	-- Smoke is already lying on the ground, we can delete it to easy projectile limits
+	table.remove(gl_grenades.smokes, table.find(gl_grenades.smokes, projectile))
+	destroyElement(projectile)
+
+	-- Recreate projectile as object
+	local groundZ = getGroundPosition(x, y, z)
+	local obj = Object(SMOKE_GRENADE_GROUND_OBJECT_ID, x, y, z, -rx, -ry, -rz)
+	obj.collisions = false
+	obj.frozen = true
+	obj.interior = interior
+	table.insert(gl_grenades.smokeObjects, obj)
+	
+	if z > groundZ then
+		moveObject(obj, 100*(z - groundZ), x, y, groundZ)
+	end
+	
+	setTimer(
+		function()
+			if obj and isElement(obj) then
+				obj:destroy()
+			end
+
+			if sound and isElement(sound) then
+				sound:destroy()
+			end
+
+			if not particle or not isElement(particle) then
+				return
+			end
+
+			local tPos = table.find(gl_grenades.smokeParticles, particle)
+			if tPos then
+				table.remove(gl_grenades.smokeParticles, tPos)
+			end
+
+			-- Let particle smoothly fade away
+			particle.speed = 0.5
+			particle.density = 0
+
+			-- Delete particle
+			setTimer(function()
+				if particle and isElement(particle) then
+					particle:destroy()
+				end
+			end, 10000, 1)
+		end, SMOKE_GRENADE_LIFETIME, 1)
 end
 
 function onSmokeGrenadeDestroy()
@@ -332,31 +448,48 @@ function onSmokeGrenadeDestroy()
 		destroyElement(getElementData(source, "particle"))
 	end
 
-	if g_misc.smokeUpdate and #smokeGrenades == 1 then
-		g_misc.smokeUpdate = false
-		removeEventHandler("onClientPreRender", root, updateSmokeGrenadeParticles)
+	local tPos = table.find(gl_grenades.smokesFlying, source)
+	if tPos then
+		table.remove(gl_grenades.smokesFlying, source)
 	end
-	table.remove(smokeGrenades, table.find(smokeGrenades, source))
+
+	if g_misc.smokeUpdate and #gl_grenades.smokesFlying == 0 then
+		g_misc.smokeUpdate = false
+		killTimer(gl_timer_flyingSmokeGrenadesUpdate)
+	end
+	table.remove(gl_grenades.smokes, table.find(gl_grenades.smokes, source))
 end
 
 function onHEGrenadeExploded()
-	local x, y, z = getElementPosition(source)
-	local sound = playSound3D(":csrw-sounds/sounds/weapons/hegrenade/explode3.wav", x, y, z)
-	setSoundMaxDistance(sound, 100)
+	Sound3D(":csrw-sounds/sounds/weapons/hegrenade/explode3.wav", source.position).maxDistance = 100
 end
 
+-- Remove all projectiles
 function destroyGrenades()
-	for k, v in pairs(grenades.smokes) do destroyElement(v) end
-	for k, v in pairs(grenades.decoys) do destroyElement(v) end
+	if g_misc.smokeUpdate then
+		g_misc.smokeUpdate = false
+		killTimer(gl_timer_flyingSmokeGrenadesUpdate)
+	end
 
-	grenades.smokes = {}
-	grenades.decoys = {}
+	for k, v in pairs(gl_grenades.smokeObjects) do destroyElement(v) end
+	for k, v in pairs(gl_grenades.smokeParticles) do destroyElement(v) end
+	for k, v in pairs(gl_grenades.smokes) do destroyElement(v) end
+	for k, v in pairs(gl_grenades.decoys) do destroyElement(v) end
 
-	-- Deleting all projectiles except HE grenades
-	for k, v in pairs(getElementsByType("projectile")) do
-		if getProjectileType(v) ~= 16 then
+	for k, v in pairs(gl_grenades.smokeSounds) do
+		if(isElement(v)) then
 			destroyElement(v)
 		end
+	end
+
+	gl_grenades.smokeObjects = {}
+	gl_grenades.smokeParticles = {}
+	gl_grenades.smokeSounds = {}
+	gl_grenades.decoys = {}
+	gl_grenades.smokes = {}
+
+	for k, v in pairs(getElementsByType("projectile")) do
+		destroyElement(v)
 	end
 end
 
