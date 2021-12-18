@@ -27,11 +27,11 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 
 	-- Jeśli atakujący w momencie zadania obrażenia będzie miał inną broń (np. wyrzuci granat i zmieni slot) to calcDamage() pobierze zabierze złą ilość HP
 
-	if attacker and getElementType(attacker) == "player" and not g_config["friendlyfire"] and getPlayerTeam(attacker) == getPlayerTeam(source) then
+	if attacker and getElementType(attacker) == "player" and not g_config["friendlyfire"] and getPlayerTeam(attacker) == getPlayerTeam(source) and source ~= attacker then
 		return
 	end
 
-	if weapon ~= 51 and weapon ~= 54 and weapon ~= 59 and weapon ~= 16 and weapon ~= 18 and weapon ~= 19 and weapon ~= 20 and weapon ~= 39 and weapon ~= 37 then -- 51 = eksplozja; 54 = upadek; 37 = flamethrower (i ogień)
+	if weapon ~= 51 and weapon ~= 54 and weapon ~= 59 and weapon ~= 16 and weapon ~= 18 and weapon ~= 19 and weapon ~= 20 and weapon ~= 39 and weapon ~= 37 then -- 51 = explosion; 54 = falling down; 37 = fire/flamethrower
 		if source == localPlayer or (getElementType(source) == "ped" and attacker == localPlayer) then
 			calcDamage(source, attacker, bodypart, loss, weapon)
 		end
