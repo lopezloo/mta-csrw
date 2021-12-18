@@ -1,8 +1,8 @@
-DEF_BOMB = getWeaponsWithFlag("BOMB")
-if DEF_BOMB then
-	DEF_BOMB = { DEF_BOMB[1][1], DEF_BOMB[1][2] }
+local bombs = getWeaponsWithFlag("BOMB")
+DEF_BOMB = {-1, -1}
+if #bombs > 0 then
+	DEF_BOMB = {bombs[1][1], bombs[1][2]}
 else
-	DEF_BOMB = { -1, -1 }
 	outputDebugString("WARNING: Can't find weapon with the BOMB flag.")
 end
 

@@ -81,14 +81,16 @@ function spawn(player) -- spawn
 		setPlayerChannelByTeam(player)
 		
 		if not g_player[player].surviveLastRound then
-			--if g_match.mode == "cs" then csGiveWeapon(player, 34, 1) end
-
-			--csGiveWeapon(player, 3, 1, 1, 1, true) -- nóż
 			csGiveWeapon(player, DEF_KNIFE[1], DEF_KNIFE[2], 1, 1, true)
-			csGiveWeapon(player, 2, 1, tonumber(g_weapon[2][1]["ammo"]), tonumber(g_weapon[2][1]["clip"])) -- pistol
-			--elseif g_match.mode == "cs" then
+
+			-- Give player a start pistol
+			local startPistols = getWeaponsWithFlag("STARTPISTOL")
+			if #startPistols > 0 then
+				csGiveWeapon(player, startPistols[1][1], startPistols[1][2], tonumber(g_weapon[2][1]["ammo"]), tonumber(g_weapon[2][1]["clip"]))
+			end
 		else
-			csGiveWeapon(player, 3, 1, 1, 1, false) -- dajemy mu nóż bo przecież inne bronie i tak ma w dacie i po zmianie slota je dostanie
+		 	-- dajemy mu nóż bo przecież inne bronie i tak ma w dacie i po zmianie slota je dostanie
+			csGiveWeapon(player, DEF_KNIFE[1], DEF_KNIFE[2], 1, 1, false)
 		end
 
 		if g_config["freekevlar"] then -- darmowy kevlar
@@ -117,9 +119,14 @@ function randomizeBomberMan()
 	if #terrorists < 1 then
 		return false
 	end
+
+	if DEF_BOMB[1] == -1 then
+		outputChatBox("SERVER: ERROR: There is no weapon with BOMB flag.")
+		return false
+	end
 	
 	local randomTerro = terrorists[math.random(1, #terrorists)]
-	csGiveWeapon(randomTerro, 8, 1, false, false, true)
+	csGiveWeapon(randomTerro, DEF_BOMB[1], DEF_BOMB[2], false, false, true)
 	advert.ok("msg_bomberman", randomTerro)
 	outputServerLog(getPlayerName(randomTerro) .. " got bomb.")
 	return true

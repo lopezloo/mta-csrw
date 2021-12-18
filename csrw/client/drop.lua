@@ -1,7 +1,5 @@
 -- Wyrzucanie broni z wykorzystaniem fizyki GTA
 
-local DEF_BOMB = { getWeaponsWithFlag("BOMB")[1][1], getWeaponsWithFlag("BOMB")[1][2] } -- slot, csweaponid
-
 local physicFixer = createProjectile(localPlayer, 16, 0, 0, -4) -- obiekty broni zapadają się pod ziemie jeśli nie ma wcześniej stworzonego projectile
 destroyElement(physicFixer)
 

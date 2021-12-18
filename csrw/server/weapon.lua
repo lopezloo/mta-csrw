@@ -1,6 +1,6 @@
 -- globalne definicje broni o danych flagach
 DEF_BOMB = getWeaponsWithFlag("BOMB")
-if DEF_BOMB then
+if #DEF_BOMB > 0 then
 	DEF_BOMB = { DEF_BOMB[1][1], DEF_BOMB[1][2] }
 else
 	DEF_BOMB = { -1, -1 }
@@ -8,7 +8,7 @@ else
 end
 
 DEF_KNIFE = getWeaponsWithFlag("KNIFE")
-if DEF_KNIFE then
+if #DEF_KNIFE > 0 then
 	DEF_KNIFE = { DEF_KNIFE[1][1], DEF_KNIFE[1][2] } -- slot, csweaponid
 else
 	DEF_KNIFE = { -1, -1 }

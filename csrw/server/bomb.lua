@@ -5,7 +5,7 @@ function onBombPlanted(player)
 	csTakeWeapon(player)
 
 	local x, y, z = getElementPosition(player)
-	bomb = createObject(g_weapon[DEF_BOMB[1]][DEF_BOMB[2]]["objectID"] or 1654, x, y, z - 0.7, -90, 90, 0)
+	bomb = createObject(g_weapon[DEF_BOMB[1]][DEF_BOMB[2]]["objectID"], x, y, z - 0.7, -90, 90, 0)
 	setElementInterior(bomb, getElementInterior(player))
 	setElementCollisionsEnabled(bomb, false)
 	setElementData(bomb, "bomb", true)

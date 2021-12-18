@@ -61,10 +61,6 @@ function getWeaponsWithFlag(wantedFlag)
 			end
 		end
 	end
-
-	if #results == 0 then
-		return nil
-	end
 	return results
 end
 
