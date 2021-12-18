@@ -153,6 +153,20 @@ function onDecoyExploded(grenade, slot, weapon)
 	-- Destroy projectile
 	destroyElement(grenade)
 
+	if not weapon then
+		-- Get default weapon for decoy if none specified
+		local defweapons = getWeaponsWithFlag("DECOY_DEFAULT")
+		if #defweapons == 0 then
+			defweapons = getWeaponsWithFlag("STARTPISTOL")
+		end
+		
+		if #defweapons == 0 then
+			return
+		end
+
+		slot, weapon = defweapons[1][1], defweapons[1][2]
+	end
+
 	-- Recreate projectile as object
 	local obj = createObject(343, x, y, z, rx, ry, rz)
 	obj.collisions = false
@@ -162,10 +176,7 @@ function onDecoyExploded(grenade, slot, weapon)
 	table.insert(grenades.decoys, obj)
 	moveObject(obj, 100*(z - groundZ), x, y, groundZ)
 
-	local sound = ":csrw-sounds/sounds/weapons/ak47/ak47-1.wav"
-	if weapon then
-		sound = ":csrw-sounds/sounds/weapons/" .. g_weapon[slot][weapon]["shotSound"]
-	end
+	sound = ":csrw-sounds/sounds/weapons/" .. g_weapon[slot][weapon]["shotSound"]
 
 	-- Calculate time between decoy shots
 	local timeBetweenShots = 250
