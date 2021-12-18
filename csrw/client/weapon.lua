@@ -314,11 +314,6 @@ function onSomeoneShot()
 			if getPedWeapon(localPlayer) == 34 then -- sniper
 				onClientAim("induced", "up") -- ponowne pokazywanie obiektów przyczepionych do gracza (bo po strzale niekoniecznie musi skończyć celowanie)
 			end
-		
-		elseif getPedWeapon(localPlayer) == 34 then
-			-- Shake camera
-			local x, y, z = getPositionFromElementOffset(localPlayer, 0, -2, 0)
-			createExplosion(x, y, z + 7, 8, false, 1, false)
 		end
 	end
 end
