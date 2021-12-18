@@ -65,7 +65,7 @@
 	</slot>
 
 	<slot id="2"> <!-- guns -->
-		<weapon name="9X19MM SIDEARM" weaponID="22" objectID="346" clip="20" ammo="120" skill="low" headDamage="98" headDamageArmor="61" torsoDamage="24" torsoDamageArmor="12" stomachDamage="30" stomachDamageArmor="16" legsDamage="18" legsDamageArmor="18" shotSound="glock/glock18-1.wav" image="pistols/9x19mm_sidearm.png" flags="STARTPISTOL" /> <!-- 1 -->
+		<weapon name="9X19MM SIDEARM" weaponID="22" objectID="346" clip="20" ammo="120" skill="low" headDamage="98" headDamageArmor="61" torsoDamage="24" torsoDamageArmor="12" stomachDamage="30" stomachDamageArmor="16" legsDamage="18" legsDamageArmor="18" shotSound="glock/glock18-1.wav" image="pistols/9x19mm_sidearm.png" flags="STARTPISTOL,DECOY_DEFAULT" /> <!-- 1 -->
 		<weapon name="KM .45 TACTICAL" weaponID="22" objectID="346" clip="12" ammo="100" skill="medium" headDamage="132" headDamageArmor="66" torsoDamage="32" torsoDamageArmor="16" stomachDamage="41" stomachDamageArmor="21" legsDamage="24" legsDamageArmor="24" shotSound="usp/usp_unsil-1.wav" image="pistols/45_tactical.png" /> <!-- 2 -->
 		<weapon name="228 COMPACT" weaponID="22" objectID="346" clip="13" ammo="52" skill="pro" headDamage="157" headDamageArmor="98" torsoDamage="39" torsoDamageArmor="24" stomachDamage="48" stomachDamageArmor="30" legsDamage="29" legsDamageArmor="29" shotSound="p228/p228-1.wav" image="pistols/228compact.png" /> <!-- 3 -->
 		<weapon name="NIGHT HAWK .50C" weaponID="24" objectID="348" clip="7" ammo="35" skill="pro" headDamage="212" headDamageArmor="159" torsoDamage="52" torsoDamageArmor="39" stomachDamage="66" stomachDamageArmor="50" legsDamage="39" legsDamageArmor="39" shotSound="deagle/deagle-1.wav" image="pistols/night_hawk.png" /> <!-- 4 -->
