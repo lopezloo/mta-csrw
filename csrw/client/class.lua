@@ -4,22 +4,6 @@ local btnSpace = 0.065
 
 local classData = {}
 
-local classes = {
-	-- @todo: localize this
-	[1] = {
-		{"Phoenix Conexxion", "Having established a reputation for killing anyone that gets in their way, the Phoenix Connexion is one of the most feared terrorist groups in Eastern Europe. Formed shortly after the breakup of the USSR."},
-		{"Elite Crew", "Middle Eastern fundamentalist group bent on world domination."},
-		{"Arctic Avengers", "Swedish terrorist faction founded in 1977. Famous for their bombing of the Canadian embassy in 1990."},
-		{"Guerilla Warfare", "A terrorist faction founded in the Middle East, this group has a reputation for ruthlessness. Their disgust for the American lifestyle was demonstrated in their 1982 bombing of a school bus full of Rock and Roll musicians."}
-	},
-	[2] = {
-		{"Seal Team 6", "ST-6 (to be known later as DEVGRU) was founded in 1980. Under the command of Lieutenant-Commander Richard Marcincko. ST-6 was placed on permanent alert to respond Terrorist attacks against American targets worldwide."},
-		{"GSG-9", "The GSG-9 was born out of the tragic events that led to the death of several Israeli athletes during the 1972 Olympics in Munich."},
-		{"SAS", "The world-renowned British SAS was founded in the Second World War by a man named David Stirling. Their role during World War II (WW2) involved gathering intelligence behind enemy lines and executing sabotage strikes and assassinations against key targets."},
-		{"GIGN", "France's elite Counter-Terrorist unit, the GIGN, was designed to be a fast response force that could decisively react to any large-scale terrorist incident. Consisting of no more than 100 men, the GIGN has earned its reputation through a history of successful ops."}
-	}
-}
-
 local classes = {}
 for team = 1, 2 do
 	classes[team] = {}
