@@ -3,7 +3,7 @@ if DEF_BOMB then
 	DEF_BOMB = { DEF_BOMB[1][1], DEF_BOMB[1][2] }
 else
 	DEF_BOMB = { -1, -1 }
-	outputDebugString("Warning: Can find weapon flagged as BOMB.")
+	outputDebugString("WARNING: Can't find weapon with the BOMB flag.")
 end
 
 local delay
@@ -44,23 +44,42 @@ for i=1, 9 do
 end
 
 function switchWeaponSlot(state, baseSlot, slot, ignoreDelay, noSound, deleteHerToo) -- baseSlot - slot od ktorego zaczyna sie rekurencja
-	if delay and not ignoreDelay then return end
+	if delay and not ignoreDelay then
+		return
+	end
 
 	--outputChatBox("switchWeaponSlot(" .. tostring(state) .. ", " .. tostring(baseSlot) .. ", " .. tostring(slot))
-	if not baseSlot and slot then return end -- error
-	if not baseSlot then baseSlot = getElementData(localPlayer, "currentSlot") end
-	if not baseSlot then return end
+	if not baseSlot and slot then
+		-- error
+		return
+	end
 
-	if not slot then slot = baseSlot end
+	if not baseSlot then
+		baseSlot = getElementData(localPlayer, "currentSlot")
+	end
+
+	if not baseSlot then
+		return
+	end
+
+	if not slot then
+		slot = baseSlot
+	end
 
 	local newSlot
 	if state == "up" then
 		newSlot = slot + 1
-		if newSlot > #g_weapon then newSlot = 1 end
+		if newSlot > #g_weapon then
+			newSlot = 1
+		end
+
 	elseif state == "down" then
 		newSlot = slot - 1
-		if newSlot <= 0 then newSlot = #g_weapon end
+		if newSlot <= 0 then
+			newSlot = #g_weapon
+		end
 	end
+	
 	if newSlot == baseSlot then -- algorytm zapętla się (gracz ma tylko 1 broń)
 		--outputChatBox("c: switchWeaponSlot: Algorym sie zapetla")
 		return
@@ -74,15 +93,20 @@ function switchWeaponSlot(state, baseSlot, slot, ignoreDelay, noSound, deleteHer
 		end
 		delay = true
 		setTimer(function() delay = false end, 100, 1)
+	
 	else
 		switchWeaponSlot(state, baseSlot, newSlot, nil, noSound, deleteHerToo)
 	end
 end
 
 function changeWeaponSlot(slot, oldSlot, deleteWeapon)
-	if not g_playerWeaponData[slot] then return end
-	if not oldSlot then oldSlot = getElementData(localPlayer, "currentSlot") end
-	--outputDebugString("changeWeaponSlot slot " .. slot .. " oldSlot " .. oldSlot)
+	if not g_playerWeaponData[slot] then
+		return
+	end
+
+	if not oldSlot then
+		oldSlot = getElementData(localPlayer, "currentSlot")
+	end
 
 	for k, v in pairs(getElementsByType("colshape")) do
 		if isElementWithinColShape(localPlayer, v) then
@@ -90,12 +114,15 @@ function changeWeaponSlot(slot, oldSlot, deleteWeapon)
 			if w then
 				w = split(w, ":")
 				w[2], w[3] = tonumber(w[2]), tonumber(w[3])
-				--outputChatBox("Slot " .. w[2] .. " == " .. tostring(slot) .. " ?")
 				if w[2] == slot then
 					setElementData(localPlayer, "currentColshape", v)
 					startDrawingWeapon(w[2], w[3]) -- ta broń, którą wyrzuca a nie którą podnosi (w[3])!
 					break
-				else stopDrawingWeapon() break end
+				
+				else
+					stopDrawingWeapon()
+					break
+				end
 			end
 		end
 	end
@@ -132,7 +159,8 @@ function changeWeaponSlot(slot, oldSlot, deleteWeapon)
 		end
 
 		if gtaWeapon > 0 and getSlotFromWeapon(gtaWeapon) == 1 then
-			toggleControl("sprint", true) -- bieganie z bronią białą
+			-- Enable sprinting with melee weapons
+			toggleControl("sprint", true)
 			toggleControl("fire", true)
 		else
 			toggleControl("sprint", false)
@@ -166,53 +194,65 @@ local sprintAimableWeapons = {
 }
 local timer_updateWeaponAimMovingSkill
 function onClientAim(key, keyState)
-	if getElementData(localPlayer, "alive") then
-		local gtaWep = getPedWeapon(localPlayer)
-		if getSlotFromWeapon(gtaWep) == 1 or getSlotFromWeapon(gtaWep) == 8 or (g_player.reloading and key ~= "induced") then return end -- blokowanie celowania tylko z bronią palną i przy przeładowywyaniu
+	if not getElementData(localPlayer, "alive") then
+		return
+	end
 
-		if keyState == "down" and getElementData(localPlayer, "alive") then
-			local slot = getElementData(localPlayer, "currentSlot")
-			if not slot then return end
-			if g_weapon[slot][g_playerWeaponData[slot].weapon]["weaponID"] ~= "-6" then -- inne niż c4
-				toggleControl("fire", true)
+	local gtaWep = getPedWeapon(localPlayer)
+	if getSlotFromWeapon(gtaWep) == 1 or getSlotFromWeapon(gtaWep) == 8 or (g_player.reloading and key ~= "induced") then
+		-- blokowanie celowania tylko z bronią palną i przy przeładowywyaniu
+		return
+	end
 
-				--[[if not isPedDucked(localPlayer) then
-					for k, v in pairs(sprintAimableWeapons) do
-						if getWeaponIDFromName(v) == getPedWeapon(localPlayer) then
-							timer_updateWeaponAimMovingSkill = setTimer(updateWeaponAimMovingSkill, 5000, 0)
-							break
-						end
+	if keyState == "down" and getElementData(localPlayer, "alive") then
+		local slot = getElementData(localPlayer, "currentSlot")
+		if not slot then
+			return
+		end
+
+		if g_weapon[slot][g_playerWeaponData[slot].weapon]["weaponID"] ~= "-6" then -- inne niż c4
+			toggleControl("fire", true)
+
+			--[[if not isPedDucked(localPlayer) then
+				for k, v in pairs(sprintAimableWeapons) do
+					if getWeaponIDFromName(v) == getPedWeapon(localPlayer) then
+						timer_updateWeaponAimMovingSkill = setTimer(updateWeaponAimMovingSkill, 5000, 0)
+						break
 					end
-				end]]--
-
-				if getPedWeapon(localPlayer) == 34 and getPedSimplestTask(localPlayer) == "TASK_SIMPLE_PLAYER_ON_FOOT" then -- gta id snajperki
-					playSound(":csrw-sounds/sounds/weapons/zoom.wav")
-					for k, v in pairs(getElementsByType("object")) do
-						if getElementData(v, "attachedPlayer") == localPlayer then
-							setElementAlpha(v, 0)
-						end
-					end
-					-- ^ będą niewidoczne dopóki gracz nie puści przycisku, nawet jeśli przestanie celować
 				end
-			end
-		else
-			--[[if isTimer(timer_updateWeaponAimMovingSkill) then killTimer(timer_updateWeaponAimMovingSkill) end
-
-			local skillName = getWeaponSkillID( getPedWeapon(localPlayer) )
-			if skillName and getPedStat(localPlayer, skillName) == 1 then
-				triggerServerEvent("switchWeaponAimMovingSkill", resourceRoot, false) -- przywracanie właściwego skilla
 			end]]--
 
-			toggleControl("fire", false)
+			if getPedWeapon(localPlayer) == 34 and getPedSimplestTask(localPlayer) == "TASK_SIMPLE_PLAYER_ON_FOOT" then
+				-- Player is zooming sniper
+				-- Play sniper zoom sound
+				playSound(":csrw-sounds/sounds/weapons/zoom.wav")
 
-			if gtaWep == 34 then -- gta id snajperki
+				-- Hide objects attached to player
 				for k, v in pairs(getElementsByType("object")) do
 					if getElementData(v, "attachedPlayer") == localPlayer then
-						setElementAlpha(v, 255)
+						setElementAlpha(v, 0)
 					end
 				end
-			end		
+				-- ^ będą niewidoczne dopóki gracz nie puści przycisku, nawet jeśli przestanie celować
+			end
 		end
+	else
+		--[[if isTimer(timer_updateWeaponAimMovingSkill) then killTimer(timer_updateWeaponAimMovingSkill) end
+
+		local skillName = getWeaponSkillID( getPedWeapon(localPlayer) )
+		if skillName and getPedStat(localPlayer, skillName) == 1 then
+			triggerServerEvent("switchWeaponAimMovingSkill", resourceRoot, false) -- przywracanie właściwego skilla
+		end]]--
+
+		toggleControl("fire", false)
+
+		if gtaWep == 34 then -- gta id snajperki
+			for k, v in pairs(getElementsByType("object")) do
+				if getElementData(v, "attachedPlayer") == localPlayer then
+					setElementAlpha(v, 255)
+				end
+			end
+		end		
 	end
 end
 
@@ -228,52 +268,57 @@ end]]--
 
 function onSomeoneShot()
 	local slot = getElementData(source, "currentSlot")
-	if slot then
-		--local weapon = g_playerWeaponData[slot].weapon
-		local weapon = getElementData(source, "wSlot" .. slot)
-		if weapon then
-			if not g_player.flashed then
-				local sound = g_weapon[slot][weapon]["shotSound"]
-				if sound then
-					playSound3D(":csrw-sounds/sounds/weapons/" .. g_weapon[slot][weapon]["shotSound"], getElementPosition(source))
+	if not slot then
+		return
+	end
+
+	local weapon = getElementData(source, "wSlot" .. slot)
+	if not weapon then
+		return
+	end
+
+	if not g_player.flashed then
+		local sound = g_weapon[slot][weapon]["shotSound"]
+		if sound then
+			playSound3D(":csrw-sounds/sounds/weapons/" .. g_weapon[slot][weapon]["shotSound"], getElementPosition(source))
+		end
+	end
+
+	if source == localPlayer then
+		g_playerWeaponData[slot].clip = g_playerWeaponData[slot].clip - 1
+
+		if g_playerWeaponData[slot].clip == 0 then
+			if g_playerWeaponData[slot].ammo == 0 then -- broń się skończyła
+				outputDebugString("No ammo in weapon, deleting.")
+				setTimer(
+					function()
+						if getPedTotalAmmo(localPlayer) > 0 then
+							switchWeaponSlot("up", nil, nil, nil, nil, true) -- zmiana slota + usuwanie broni
+						else
+							switchWeaponSlot("up") -- tylko zmiana slota (broń się sama usunęła)
+						end
+					end, 50, 1)
+			else
+				-- broń wymaga przeładowania
+				if getPedWeapon(localPlayer) == 16 or getPedWeapon(localPlayer) == 17 or getPedWeapon(localPlayer) == 18 or getPedWeapon(localPlayer) == 39 then
+					-- nie przeładowywanie granatów
+					--setElementData(localPlayer, "wSlot" .. slot .. "Ammo", getPedAmmoInClip(localPlayer) - 1)
+					-- jaki jest sens aktualizacji liczby granatów do zmiennej ?
+				else
+					--onClientPlayerReloading(false) -- przeładowanie wywołane w połowie naturalnie (bo GTA też wtedy zmienia ammo)
+					-- bez timera ostatni strzał u gracza nielokalnego jest ucinany przez wystartowanie animacji
+					onClientPlayerReloading(slot)
 				end
 			end
 
-			if source == localPlayer then
-				g_playerWeaponData[slot].clip = g_playerWeaponData[slot].clip - 1
-
-				if g_playerWeaponData[slot].clip == 0 then
-					if g_playerWeaponData[slot].ammo == 0 then -- broń się skończyła
-						outputDebugString("No ammo in weapon, deleting.")
-						setTimer(
-							function()
-								if getPedTotalAmmo(localPlayer) > 0 then
-									switchWeaponSlot("up", nil, nil, nil, nil, true) -- zmiana slota + usuwanie broni
-								else
-									switchWeaponSlot("up") -- tylko zmiana slota (broń się sama usunęła)
-								end
-							end, 50, 1)
-					else
-						-- broń wymaga przeładowania
-						if getPedWeapon(localPlayer) == 16 or getPedWeapon(localPlayer) == 17 or getPedWeapon(localPlayer) == 18 or getPedWeapon(localPlayer) == 39 then
-							-- nie przeładowywanie granatów
-							--setElementData(localPlayer, "wSlot" .. slot .. "Ammo", getPedAmmoInClip(localPlayer) - 1)
-							-- jaki jest sens aktualizacji liczby granatów do zmiennej ?
-						else
-							--onClientPlayerReloading(false) -- przeładowanie wywołane w połowie naturalnie (bo GTA też wtedy zmienia ammo)
-							-- bez timera ostatni strzał u gracza nielokalnego jest ucinany przez wystartowanie animacji
-							onClientPlayerReloading(slot)
-						end
-					end
-
-					if getPedWeapon(localPlayer) == 34 then -- snajperka
-						onClientAim("induced", "up") -- ponowne pokazywanie obiektów przyczepionych do gracza (bo po strzale niekoniecznie musi skończyć celowanie)
-					end
-				elseif getPedWeapon(localPlayer) == 34 then
-					local x, y, z = getPositionFromElementOffset(localPlayer, 0, -2, 0)
-					createExplosion(x, y, z + 7, 8, false, 1, false)
-				end
-			end			
+			if getPedWeapon(localPlayer) == 34 then -- sniper
+				onClientAim("induced", "up") -- ponowne pokazywanie obiektów przyczepionych do gracza (bo po strzale niekoniecznie musi skończyć celowanie)
+			end
+		
+		elseif getPedWeapon(localPlayer) == 34 then
+			-- Shake camera
+			local x, y, z = getPositionFromElementOffset(localPlayer, 0, -2, 0)
+			createExplosion(x, y, z + 7, 8, false, 1, false)
 		end
 	end
 end
@@ -283,26 +328,35 @@ addEventHandler("onClientPlayerWeaponFire", root, onSomeoneShot)
 addEvent("updateWeaponData", true)
 addEventHandler("updateWeaponData", root,
 	function(slot, weapon, ammo, clip, hideHer)
-		if slot then
-			if slot == "clearAll" then
-				g_playerWeaponData = {}
-				return
-			end
-			
-			--outputChatBox("updateWeaponData " .. tostring(slot) .. ", " .. tostring(weapon) .. ", " .. tostring(ammo) .. ", " .. tostring(clip))
+		if not slot then
+			return
+		end
 
-			if not weapon then g_playerWeaponData[slot] = nil return end -- usuwanie danych o slocie
-			if not g_playerWeaponData[slot] then g_playerWeaponData[slot] = {} end
-			g_playerWeaponData[slot].weapon = weapon
-			if ammo and clip then
-				g_playerWeaponData[slot].ammo = ammo
-				g_playerWeaponData[slot].clip = clip
-			end
-			
-			if not hideHer then
-				-- broń nie została schowana do ekwipunku
-				g_playerWeaponData.current = weapon
-			end
+		if slot == "clearAll" then
+			g_playerWeaponData = {}
+			return
+		end
+
+		if not weapon then
+			-- usuwanie danych o slocie
+			g_playerWeaponData[slot] = nil
+			return
+		end
+
+		if not g_playerWeaponData[slot]
+			then g_playerWeaponData[slot] = {}
+		end
+
+		g_playerWeaponData[slot].weapon = weapon
+
+		if ammo and clip then
+			g_playerWeaponData[slot].ammo = ammo
+			g_playerWeaponData[slot].clip = clip
+		end
+		
+		if not hideHer then
+			-- broń nie została schowana do ekwipunku
+			g_playerWeaponData.current = weapon
 		end
 	end
 )

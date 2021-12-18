@@ -34,9 +34,13 @@ function syncPedAnimation(ped)
 			local distance = 60
 			if getPlayerTeam(ped) == g_team[1] then
 				sound = "weapons/c4/c4_plant"
+			
 			elseif getPlayerTeam(ped) == g_team[2] then
 				if #getElementsByType("hostage") > 0 then
-					local hostSounds = {"letsdoit", "letshurry", "okletsgo"}
+					local hostSounds = {
+						"letsdoit", "letshurry", "okletsgo"
+					}
+
 					sound = "hostage/huse/" .. hostSounds[math.random(1, 3)]
 					distance = 10
 				else
@@ -44,6 +48,7 @@ function syncPedAnimation(ped)
 					distance = 50
 				end
 			end
+
 			local x, y, z = getElementPosition(ped)
 			setSoundMaxDistance( playSound3D(":csrw-sounds/sounds/" .. sound .. ".wav", x, y, z), distance)
 		end
