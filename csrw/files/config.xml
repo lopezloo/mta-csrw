@@ -2,7 +2,7 @@
 	<matchrounds>30</matchrounds>
 	<startmoney>800</startmoney>
 	<maxmoney>10000</maxmoney>
-	<everything_is_free>true</everything_is_free>
+	<everything_is_free>false</everything_is_free>
 	<friendlyfire>false</friendlyfire>
 	<friendlycollisions>true</friendlycollisions>
 	<free_defusing_kit>false</free_defusing_kit>
