@@ -5,12 +5,20 @@ g_team = {
 }
 
 g_player = {
+	-- if is currently flashed by flashbang
 	flashed = false,
+
 	goggleState = false,
-	canChangeSlot = true, -- czy może zmienić slot / wyrzucić broń
+
+	-- if can change slot or drop weapon
+	canChangeSlot = true,
 	reloading = false,
-	skin = false, -- skin w formie 1 - 4
-	surviveLastRound = false, -- czy przeżył ostatnią runde
+
+	-- current player skin in format 1 - 4
+	skin = false,
+
+	-- if survived last round
+	surviveLastRound = false,
 	spectating = false,
 
 	items = {
@@ -39,7 +47,8 @@ addEventHandler("onClientResourceStart", resourceRoot,
 	end
 )
 
-function preInit() -- wykonuje sie na starcie skryptu oraz przy zmianie mapy
+-- Called at resource start and on map change
+function preInit()
 	showPlayerHudComponent("all", false)
 	showPlayerHudComponent("crosshair", true)
 	toggleControl("next_weapon", false)
@@ -55,22 +64,24 @@ function preInit() -- wykonuje sie na starcie skryptu oraz przy zmianie mapy
 	setTime(12, 0)
 	clearWorld()
 
-	local enableSounds = {55, 51, 55, 66, 69, 70, 71, 72, 84, 85, 31, 32, 88}
-	for i=1, 100 do -- wyłączanie dźwięków broni
+	dealWithGTASounds()
+end
+
+function dealWithGTASounds()
+	resetWorldSounds()
+
+	local enableSounds = {
+		55, 51, 55, 66, 69, 70, 71, 72, 84, 85, 31, 32, 88
+	}
+	for i=1, 100 do
+		-- Disable weapon sounds
 		if not table.find(enableSounds, i) then
-			setWorldSoundEnabled(5, i, false)
+			setWorldSoundEnabled(5, i, false, true)
 		end
 	end
 
-	-- strange CJ breathing sound
-	setWorldSoundEnabled(25, false)
-	setWorldSoundEnabled(0, false)
-
-	-- explosions
-	setWorldSoundEnabled(4, false)
-
 	--[[
-		Dźwięki przeładowania broni:
+		Weapon reloading sounds:
 			deagle: 55, 51
 			pistol/silenced: 55, 66
 			sawn-off: 69, 70
@@ -80,21 +91,37 @@ function preInit() -- wykonuje sie na starcie skryptu oraz przy zmianie mapy
 			m4/ak: 31, 32
 			snajperka: 32
 
-		88 - dźwięk noża
-		odgłosy krztuszenia od gazu łzawiącego: grupa 21 - 24?
+		88 - knife sound
+		teargas choking sounds: group 21 - 24?
 	]]
 
-	setWorldSoundEnabled(21, false)
-	setWorldSoundEnabled(22, false)
-	setWorldSoundEnabled(23, false)
-	setWorldSoundEnabled(24, false)		
+	setWorldSoundEnabled(21, -1, false, true)
+	setWorldSoundEnabled(22, -1, false, true)
+	setWorldSoundEnabled(23, -1, false, true)
+	setWorldSoundEnabled(24, -1, false, true)
+
+	-- Disable strange CJ breathing sound
+	setWorldSoundEnabled(25, -1, false, true)
+
+	-- Disable explosion sounds
+	-- (disable everything in group except index 0 which is fire)
+	for i=1, 999 do
+		setWorldSoundEnabled(4, i, false, true)
+	end
+
+	-- Disable wind sounds
+	setWorldSoundEnabled(0, 29, false, true)
+	setWorldSoundEnabled(0, 30, false, true)
+
+	-- Enable jetpack sounds
+	setWorldSoundEnabled(5, 10, true, true)
+	setWorldSoundEnabled(19, 26, true, true)
 end
 
 -- wykonuje sie przy starcie skryptu oraz po zmianie mapy
 function init()
 	loadClassSelection()
 	changeViewToRandomCamera()
-	--showClassSelection()
 	showMOTD()
 end
 
