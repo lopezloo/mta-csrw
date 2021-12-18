@@ -1,6 +1,11 @@
 function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 	cancelEvent()
 
+	if weapon == 17 then
+		-- tear gas
+		return
+	end
+
 	if getElementType(source) == "ped" then
 		if weapon == 37 then
 			-- Do not let hostages catch fire
@@ -21,11 +26,6 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 	end
 
 	-- Jeśli atakujący w momencie zadania obrażenia będzie miał inną broń (np. wyrzuci granat i zmieni slot) to calcDamage() pobierze zabierze złą ilość HP
-	
-	if weapon == 17 then
-		-- tear gas
-		return
-	end
 
 	if attacker and getElementType(attacker) == "player" and not g_config["friendlyfire"] and getPlayerTeam(attacker) == getPlayerTeam(source) then
 		return
