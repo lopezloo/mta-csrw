@@ -103,20 +103,6 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 
 	setTimer(
 		function()
-			local objProp1 = getObjectProperty(wepObj, "mass")
-			local objProp2 = getObjectProperty(wepObj, "turn_mass")
-			local objProp3 = getObjectProperty(wepObj, "air_resistance")
-			local objProp4 = getObjectProperty(wepObj, "elasticity")
-			local objProp5 = getObjectProperty(wepObj, "center_of_mass")
-			local objProp6 = getObjectProperty(wepObj, "buoyancy")
-
-			outputChatBox(objProp1)
-			outputChatBox(objProp2)
-			outputChatBox(objProp3)
-			outputChatBox(objProp4)
-			outputChatBox(objProp5)
-			outputChatBox(objProp6)
-
 			if not wepObj or not isElement(wepObj) then return end
 
 			if isElementStreamedIn(wepObj) then
