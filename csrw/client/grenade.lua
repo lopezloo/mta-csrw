@@ -84,7 +84,7 @@ function onFlashBangExploded(grenade)
 	-- Create FX
 	Effect("camflash", x, y, z)
 
-	if g_player.flashed or (g_player.team ~= g_team[1] and g_player.team ~= g_team[2]) then
+	if g_player.flashed or (localPlayer.team ~= g_team[1] and localPlayer.team ~= g_team[2]) then
 		-- Already flashed by another flashbang
 		-- Or in spectator
 		destroyElement(grenade)

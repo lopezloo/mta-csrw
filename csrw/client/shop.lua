@@ -6,10 +6,13 @@ local currentCategory
 
 local shopInformation = {}
 
+local DEBUG_SKIP_GRENADE_LIMIT = true
+
 addCommandHandler("Shop",
 	function()
 		if getActiveBoxWindow() == "shop" then
 			setBoxVisible(false)
+		
 		else
 			showShop()
 		end
@@ -42,6 +45,7 @@ function showShop()
 					plus = plus + 1
 				end
 			end
+		
 		elseif getPlayerTeam(localPlayer) == g_team[2] then
 			spawnsCT = getElementsByType("spawnct")
 			for i, spawn in pairs(spawnsCT) do
@@ -358,7 +362,7 @@ function buyWeapon(cost, slot, weapon)
 				clip = g_playerWeaponData[slot].clip
 			end
 
-			if clip >= maxGrenades and 0 then
+			if clip >= maxGrenades and not DEBUG_SKIP_GRENADE_LIMIT then
 				advert.error("msg_tooMuchGrenades")
 				playSound(":csrw-sounds/sounds/buttons/weapon_cant_buy.wav")
 				return

@@ -91,10 +91,8 @@ function onProjectileWithLineDestroy()
 			end
 			gl_projectileLines[linesIndex].marker = nil
 
-			if gl_projectileLines[linesIndex] then
-				for k, v in pairs(gl_projectileLines[linesIndex].lines) do
-					removeEventHandler("onClientRender", root, v)
-				end
+			for k, v in pairs(gl_projectileLines[linesIndex].lines) do
+				removeEventHandler("onClientRender", root, v)
 			end
 			gl_projectileLines[linesIndex] = nil
 		end,
@@ -103,6 +101,7 @@ end
 
 -- Remove all projectile lines
 function destroyProjectileLines()
+	outputChatBox("destroyProjectileLines")
 	if gl_timer_updateProjectileLines and isTimer(gl_timer_updateProjectileLines) then
 		killTimer(gl_timer_updateProjectileLines)
 	end
@@ -111,11 +110,14 @@ function destroyProjectileLines()
 	for k, v in pairs(gl_projectileLines) do
 		if v.marker and isElement(v.marker) then
 			v.marker:destroy()
+			v.marker = nil
 		end
 
 		for k, v2 in pairs(v.lines) do
+			outputChatBox("destroyProjectileLines: remove handler")
 			removeEventHandler("onClientRender", root, v2)
 		end
+		v.lines = {}
 	end
 
 	gl_lineProjectiles = {}

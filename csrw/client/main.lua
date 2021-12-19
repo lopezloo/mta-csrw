@@ -35,6 +35,8 @@ g_misc = {
 
 sX, sY = guiGetScreenSize()
 
+local gl_goggleDelay
+
 addEventHandler("onClientResourceStart", resourceRoot,
 	function()
 		preInit()
@@ -240,20 +242,14 @@ addEventHandler("cPlaySound", root,
 )
 
 -- GOGGLE
-local gl_goggleDelay
 function enableGoggles()
-	outputChatBox("enableGoggles")
 	if gl_goggleDelay or not getElementData(localPlayer, "alive") then return end
 	
-	outputChatBox("enableGoggles2")
 	if g_player.goggleState then
-		outputChatBox("enableGoggles3")
 		turnGogglesOff()
 	
 	else
-		outputChatBox("enableGoggles4")
 		if g_player.items.goggles > 0 then
-			outputChatBox("enableGoggles5")
 			if g_player.items.goggles == 1 then
 				setCameraGoggleEffect("nightvision")
 			else

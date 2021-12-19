@@ -1,7 +1,15 @@
--- Wyrzucanie broni z wykorzystaniem fizyki GTA
+-- Weapon drop
 
-local physicFixer = createProjectile(localPlayer, 16, 0, 0, -4) -- obiekty broni zapadają się pod ziemie jeśli nie ma wcześniej stworzonego projectile
+-- Same physical property group is used for projectiles and weapon objects
+local DROPPED_OBJECT_PHYSICAL_PROPERTY_GROUP = 122
+
+-- Obiekty broni zapadają się pod ziemie jeśli nie ma wcześniej stworzonego projectile
+local physicFixer = createProjectile(localPlayer, 16, 0, 0, -4)
 destroyElement(physicFixer)
+
+-- Disable camera collisions for dropped weapon objects
+engineRestoreObjectGroupPhysicalProperties(DROPPED_OBJECT_PHYSICAL_PROPERTY_GROUP)
+engineSetObjectGroupPhysicalProperty(DROPPED_OBJECT_PHYSICAL_PROPERTY_GROUP, "avoid_camera", false)
 
 function dropWeapon(forced, slot)
 	if not g_config["weapon_drop"] then
@@ -61,10 +69,16 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 	end
 
 	local model = g_weapon[slot][weapon]["objectID"]
+	engineSetModelPhysicalPropertiesGroup(model, DROPPED_OBJECT_PHYSICAL_PROPERTY_GROUP)
+
 	-- obiekt o modelu broni zapada się pod ziemie jeśli nie ma wcześniej stworzonego projectile
 	local wepObj = createObject(model, x, y, z, 90, 0, rotz)
-	
+
 	for k, v in pairs(getElementsByType("player")) do
+		setElementCollidableWith(wepObj, v, false)
+	end
+	
+	for k, v in pairs(getElementsByType("ped")) do
 		setElementCollidableWith(wepObj, v, false)
 	end
 	
@@ -77,9 +91,32 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 
 	wepObj.interior = int
 	wepObj.dimension = dimension
+	wepObj.breakable = false
+
+	-- Set object physical properties
+	wepObj:setProperty("mass", 1500)
+	wepObj:setProperty("turn_mass", 99999)
+	wepObj:setProperty("air_resistance", 0.99)
+	wepObj:setProperty("elasticity", 0.01)
+	wepObj:setProperty("center_of_mass", Vector3(0, 0, 0))
+	wepObj:setProperty("buoyancy", 0.99)
 
 	setTimer(
 		function()
+			local objProp1 = getObjectProperty(wepObj, "mass")
+			local objProp2 = getObjectProperty(wepObj, "turn_mass")
+			local objProp3 = getObjectProperty(wepObj, "air_resistance")
+			local objProp4 = getObjectProperty(wepObj, "elasticity")
+			local objProp5 = getObjectProperty(wepObj, "center_of_mass")
+			local objProp6 = getObjectProperty(wepObj, "buoyancy")
+
+			outputChatBox(objProp1)
+			outputChatBox(objProp2)
+			outputChatBox(objProp3)
+			outputChatBox(objProp4)
+			outputChatBox(objProp5)
+			outputChatBox(objProp6)
+
 			if not wepObj or not isElement(wepObj) then return end
 
 			if isElementStreamedIn(wepObj) then
@@ -165,8 +202,11 @@ addEvent("syncGroundWeapons", true)
 addEventHandler("syncGroundWeapons", root,
 	function(weapons)
 		for k, v in pairs(weapons) do
+			local modelID =g_weapon[v.slot][v.weapon]["objectID"]
+			engineSetModelPhysicalPropertiesGroup(modelID, DROPPED_OBJECT_PHYSICAL_PROPERTY_GROUP)
+
 			local pos = split(v.xyzString, ",")
-			local wepObj = createObject(g_weapon[v.slot][v.weapon]["objectID"], pos[1], pos[2], pos[3], 90, 0, v.rotz)
+			local wepObj = createObject(modelID, pos[1], pos[2], pos[3], 90, 0, v.rotz)
 			setElementInterior(wepObj, v.int)
 			setElementFrozen(wepObj, true)
 			setElementCollisionsEnabled(wepObj, false)

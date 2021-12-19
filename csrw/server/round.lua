@@ -95,10 +95,8 @@ function spawn(player) -- spawn
 		else
 			local csWeaponSlot = player:getData("currentSlot")
 			csGiveWeapon(player, DEF_KNIFE[1], DEF_KNIFE[2], 1, 1, false)
-			changePlayerSlot(player, player:getData("currentSlot"), csWeaponSlot)
+			changePlayerSlot(player, csWeaponSlot, csWeaponSlot)
 		end
-
-		-- @todo: restore weapon slot
 
 		if g_config["freekevlar"] then -- darmowy kevlar
 			setElementData(player, "armor", 100)
@@ -369,6 +367,7 @@ function startRound()
 			csTakeWeapon(v, DEF_BOMB[1])
 		end
 	end
+	destroyBomb()
 
 	respawnHostages()
 
