@@ -52,6 +52,18 @@
 	<nametags_hostage>
 		Hostage
 	</nametags_hostage>
+
+	<nametags_hostage_rescued>
+		Rescued
+	</nametags_hostage_rescued>
+
+	<nametags_hostage_protect>
+		Protect him
+	</nametags_hostage_protect>
+
+	<nametags_hostage_rescue>
+		Rescue him
+	</nametags_hostage_rescue>
 	
 	<!-- class selection -->
 	<class_chose1>

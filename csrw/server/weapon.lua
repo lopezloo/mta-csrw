@@ -215,6 +215,7 @@ function csGiveWeapon(player, csSlot, csWeaponID, ammo, ammoInClip, hideHer)
 			stopAnimationWithWalking(player)
 			attachWeaponToBody(player, csWeaponID, csSlot, "body")
 		end
+	
 	else
 		attachWeaponToBody(player)
 		--outputChatBox("[S DEBUG SLOTCHANGE] currentSlot: " .. tostring(getElementData(player, "currentSlot")) .. " new: " .. csSlot)
@@ -253,6 +254,7 @@ function csGiveWeapon(player, csSlot, csWeaponID, ammo, ammoInClip, hideHer)
 			if not ammo then
 				ammo = g_playerWeaponData[player][csSlot].ammo or tonumber(g_weapon[csSlot][csWeaponID]["ammo"])
 			end
+			
 			if not ammoInClip then
 				ammoInClip = g_playerWeaponData[player][csSlot].clip or tonumber(g_weapon[csSlot][csWeaponID]["clip"])
 			end
@@ -401,16 +403,8 @@ function csResetWeapons(player, quit)
 
 	if not quit then
 		setElementData(player, "currentSlot", false)
-		--setPedArmorEx(player, 0)
-		csResetItems(player)
 		triggerClientEvent(player, "updateWeaponData", resourceRoot, "clearAll")
 	end
-end
-
-function csResetItems(player)
-	setElementData(player, "item_helmet", false)
-	setElementData(player, "item_goggles", false)
-	setElementData(player, "item_defusingkit", false)
 end
 
 addEventHandler("onPlayerStealthKill", root, function() cancelEvent(true) end)

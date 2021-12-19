@@ -233,6 +233,11 @@ function onClientAim(key, keyState)
 						setElementAlpha(v, 0)
 					end
 				end
+
+				local hostage = getPickedHostage()
+				if hostage then
+					hostage.alpha = 0
+				end
 				-- ^ będą niewidoczne dopóki gracz nie puści przycisku, nawet jeśli przestanie celować
 			end
 		end
@@ -246,11 +251,16 @@ function onClientAim(key, keyState)
 
 		toggleControl("fire", false)
 
-		if gtaWep == 34 then -- gta id snajperki
+		if gtaWep == 34 then -- sniper gta id
 			for k, v in pairs(getElementsByType("object")) do
 				if getElementData(v, "attachedPlayer") == localPlayer then
 					setElementAlpha(v, 255)
 				end
+			end
+
+			local hostage = getPickedHostage()
+			if hostage then
+				hostage.alpha = 255
 			end
 		end		
 	end

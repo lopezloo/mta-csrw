@@ -81,7 +81,8 @@ function renderHUD()
 		end
 
 		if target == localPlayer then
-			if getPedWeaponSlot(target) >= 2 and getPedWeaponSlot(target) <= 7 then
+			local gtaWeaponSlot = getPedWeaponSlot(target)
+			if gtaWeaponSlot >= 2 and gtaWeaponSlot <= 7 then
 				local slot = getElementData(target, "currentSlot")
 				if g_playerWeaponData[slot] then
 					dxDrawText(g_playerWeaponData[ slot ].clip, render.ammoClip[1], render.height[1], render.ammoClip[2], render.height[2], color, csFontSize, csFont, "right", "top", false, false, false, false, false)
@@ -89,28 +90,33 @@ function renderHUD()
 					dxDrawText(g_playerWeaponData[ slot ].ammo, render.ammoTotal[1], render.height[1], render.ammoTotal[2], render.height[2], color, csFontSize, csFont, "left", "top", false, false, false, false, false)
 				end
 			
-			elseif getPedWeaponSlot(target) == 1 then
+			elseif gtaWeaponSlot == 1 then
 				dxDrawText("J", render.ammoLine[1], render.height[1], render.ammoLine[2], render.height[2], color, csFontSize, csFont, "center", "top", false, false, false, false, false)
 			
-			elseif getPedWeaponSlot(target) == 8 then
+			elseif gtaWeaponSlot == 8 then
 				local slot = getElementData(target, "currentSlot")
 				if g_playerWeaponData[slot] then
 					local icon = "G" -- smoke
 
-					if getPedWeapon(target) == 16 then -- grenade
+					if getPedWeapon(target) == 16 then
+						-- grenade
 						icon = "H"
-					elseif getPedWeapon(target) == 18 then -- molotov
-						icon = "M"
-					elseif g_weapon[slot][ g_playerWeaponData.current ]["objectID"] == "-2" then -- flashbang
+					elseif getPedWeapon(target) == 18 then
+						-- molotov
+						icon = "P"
+					elseif g_weapon[slot][ g_playerWeaponData.current ]["objectID"] == "-2" then
+						-- flashbang
 						icon = "P"
 					end
 					
 					dxDrawText(g_playerWeaponData[ slot ].clip .. icon, render.ammoLine[1], render.height[1], render.ammoLine[2], render.height[2], color, csFontSize, csFont, "center", "top", false, false, false, false, false)
 				end
 
-			elseif getPedWeaponSlot(target) == 0 and g_playerWeaponData.current then
-				if g_weapon [getElementData(target, "currentSlot") ][ g_playerWeaponData.current ]["flag"] == "BOMB" then
-					dxDrawText("j", render.ammoLine[1], render.height[1], render.ammoLine[2], render.height[2], color, csFontSize, csFont, "center", "top", false, false, false, false, false)
+			-- Render bomb icon
+			elseif gtaWeaponSlot == 0 and g_playerWeaponData.current then
+				local cSlot = tonumber(getElementData(target, "currentSlot"))
+				if cSlot and DEF_BOMB[1] ~= -1 and DEF_BOMB[2] ~= -1 and cSlot == DEF_BOMB[1] and g_playerWeaponData.current == DEF_BOMB[2] then
+					dxDrawText("\\", render.ammoLine[1], render.height[1], render.ammoLine[2], render.height[2], color, csFontSize, csFont, "center", "top", false, false, false, false, false)
 				end
 			end
 		end

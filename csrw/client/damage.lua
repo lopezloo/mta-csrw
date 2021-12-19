@@ -1,12 +1,14 @@
+local HOSTAGE_PAIN_SOUND_TIMEOUT = 2000
+
 function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 	cancelEvent()
 
 	if weapon == 17 then
-		-- tear gas
+		-- Disable tear gas damage
 		return
 	end
 
-	if getElementType(source) == "ped" then
+	if getElementType(source) == "ped" and source:getData("isHostage") then
 		if weapon == 37 then
 			-- Do not let hostages catch fire
 			setPedOnFire(source, false)
@@ -16,7 +18,7 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 		-- Play hostage pain sounds
 		-- Rate limit it to max once per 2s
 		local ts = getElementData(source, "lastPainSoundTime")
-		if ts and getTickCount() - ts < 2000 then
+		if ts and getTickCount() - ts < HOSTAGE_PAIN_SOUND_TIMEOUT then
 			return
 		end
 
@@ -27,7 +29,7 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 
 	-- Jeśli atakujący w momencie zadania obrażenia będzie miał inną broń (np. wyrzuci granat i zmieni slot) to calcDamage() pobierze zabierze złą ilość HP
 
-	if attacker and getElementType(attacker) == "player" and not g_config["friendlyfire"] and getPlayerTeam(attacker) == getPlayerTeam(source) and source ~= attacker then
+	if attacker and source ~= attacker and getElementType(attacker) == "player" and not g_config["friendlyfire"] and getPlayerTeam(attacker) == getPlayerTeam(source) then
 		return
 	end
 
@@ -49,7 +51,7 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 
 			playSound3D(":csrw-sounds/sounds/player/damage" .. math.random(1, 3) .. ".wav", getElementPosition(source))
 
-			-- podwójne obrażenia od upadku
+			-- Double falling down damage
 			loss = loss * 2
 		end
 		

@@ -1,26 +1,30 @@
-local bomb
-local bombBeepTimer
+-- Bomb object
+local gl_bomb
+
+-- Bomb update timer
+local gl_bombBeepTimer
 
 function onBombPlanted(player)
+	g_roundData.bomb = true
 	csTakeWeapon(player)
 
 	local x, y, z = getElementPosition(player)
-	bomb = createObject(g_weapon[DEF_BOMB[1]][DEF_BOMB[2]]["objectID"], x, y, z - 0.7, -90, 90, 0)
-	setElementInterior(bomb, getElementInterior(player))
-	setElementCollisionsEnabled(bomb, false)
-	setElementData(bomb, "bomb", true)
+	gl_bomb = createObject(g_weapon[DEF_BOMB[1]][DEF_BOMB[2]]["objectID"], x, y, z - 0.7, -90, 90, 0)
+	gl_bomb.interior = player.interior
+	gl_bomb.dimension = player.dimension
+	gl_bomb.collisions = false
+	gl_bomb:setData("bomb", true)
 
-	bombBeepTimer = setTimer(bombBeep, 2000, 1, 2000)
+	gl_bombBeepTimer = setTimer(bombBeep, 2000, 1, 2000)
 	triggerClientEvent("cPlaySound", root, "radio/bombpl.wav")
-	g_roundData.bomb = true
 end
 addEvent("plantBomb", true)
 addEventHandler("plantBomb", root, onBombPlanted)
 
 function bombBeep(interval)
-	local x, y, z = getElementPosition(bomb)
+	local x, y, z = getElementPosition(gl_bomb)
 	local light = createMarker(x, y, z, "corona", 0.5, 255, 0, 0)
-	setElementInterior(light, getElementInterior(bomb))
+	setElementInterior(light, getElementInterior(gl_bomb))
 	setTimer(destroyElement, 50, 1, light)
 	triggerClientEvent("cPlaySound", root, "weapons/c4/c4_beep1.wav", x, y, z, 50)
 
@@ -28,12 +32,12 @@ function bombBeep(interval)
 	if interval <= 0 then
 		onBombExploded()
 	else
-		bombBeepTimer = setTimer(bombBeep, interval, 1, interval)
+		gl_bombBeepTimer = setTimer(bombBeep, interval, 1, interval)
 	end
 end
 
 function onBombExploded()
-	local x, y, z = getElementPosition(bomb)
+	local x, y, z = getElementPosition(gl_bomb)
 	createExplosion(x, y, z, 6)
 	triggerClientEvent("cPlaySound", root, "weapons/c4/c4_explode1.wav", x, y, z, 100)
 
@@ -45,11 +49,12 @@ function onBombExploded()
 end
 
 function destroyBomb()
-	if bomb and isElement(bomb) then
-		destroyElement(bomb)
-		if isTimer(bombBeepTimer) then
-			killTimer(bombBeepTimer)
-		end
+	if gl_bombBeepTimer and isTimer(gl_bombBeepTimer) then
+		killTimer(gl_bombBeepTimer)
+	end
+
+	if gl_bomb and isElement(gl_bomb) then
+		gl_bomb:destroy()
 	end
 	g_roundData.bomb = false
 end
@@ -57,6 +62,7 @@ end
 function onBombDefused(player)
 	triggerClientEvent("cPlaySound", root, "radio/bombdef.wav")
 	destroyBomb()
+	
 	setTimer(
 		function()
 			if countPlayersInTeam(g_team[1]) > 0 then

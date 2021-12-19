@@ -40,7 +40,8 @@ end
 function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 	local x, y, z = getElementPosition(player)
 	local rotx, roty, rotz = getElementRotation(player)
-	local int = getElementInterior(player)
+	local int = player.interior
+	local dimension = player.dimension
 
 	local x2, y2, z2 = getPositionFromElementOffset(player, 0, 1.5, 0)
 	local velocity
@@ -74,9 +75,13 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 		end
 	end	
 
-	setElementInterior(wepObj, int)
+	wepObj.interior = int
+	wepObj.dimension = dimension
+
 	setTimer(
 		function()
+			if not wepObj or not isElement(wepObj) then return end
+
 			if isElementStreamedIn(wepObj) then
 				setElementVelocity(wepObj, velocity[1], velocity[2], velocity[3])
 			else
@@ -89,9 +94,16 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 
 	if wepObj then
 		local col = createColSphere(x, y, z, 1)
+		col.dimension = dimension
 		attachElements(col, wepObj)
 
-		setElementData(col, "weapon", {slot = slot, weapon = weapon, totalAmmo = totalAmmo, clipAmmo = clipAmmo}, false)
+		setElementData(col, "weapon", {
+			slot = slot,
+			weapon = weapon,
+			totalAmmo = totalAmmo,
+			clipAmmo = clipAmmo
+		}, false)
+
 		setElementData(col, "related", wepObj) -- colshape należy do projectile
 		setElementData(wepObj, "uniqueID", uniqueID)
 
@@ -101,18 +113,20 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 
 		setTimer(
 			function()
-				if wepObj and isElement(wepObj) then
-					setElementFrozen(wepObj, true)
-					setElementCollisionsEnabled(wepObj, false)
+				if not wepObj or not isElement(wepObj) then
+					return
+				end
 
-					if isElementStreamedIn(wepObj) then
-						local x, y, z = getElementPosition(wepObj)
-						local groundZ = getGroundPosition(x, y, z) + 0.1
-						moveObject(wepObj, 100*(z - groundZ), x, y, groundZ)
+				wepObj.frozen = true
+				wepObj.collisions = false
 
-						if player == localPlayer then
-							triggerServerEvent("syncThrowedWeapon", localPlayer, uniqueID, x .. ";" .. y .. ";" .. groundZ, slot, weapon, totalAmmo, clipAmmo, rotz, int)
-						end
+				if isElementStreamedIn(wepObj) then
+					local x, y, z = getElementPosition(wepObj)
+					local groundZ = getGroundPosition(x, y, z) + 0.1
+					moveObject(wepObj, 100*(z - groundZ), x, y, groundZ)
+
+					if player == localPlayer then
+						triggerServerEvent("syncThrowedWeapon", localPlayer, uniqueID, x .. ";" .. y .. ";" .. groundZ, slot, weapon, totalAmmo, clipAmmo, rotz, int)
 					end
 				end
 			end, 7000, 1)
@@ -188,9 +202,10 @@ function getWeaponFromGround(player, colshape)
 
 		if player == localPlayer then
 			stopDrawingWeapon()
+			playSound(":csrw-sounds/sounds/items/itempickup.wav")
+			
 			-- opóźnienie ze względu na innych graczy, którzy 'mogą myśleć', że gracz nadal trzyma starą broń na slocie
 			setTimer(triggerServerEvent, 200, 1, "onPhysicWeaponTaken", localPlayer, weapon.slot, weapon.weapon, weapon.totalAmmo, weapon.clipAmmo)
-			playSound(":csrw-sounds/sounds/items/itempickup.wav")
 		end
 	else
 		-- Gracz nie może podnieść broni bo ma już coś na tym slocie

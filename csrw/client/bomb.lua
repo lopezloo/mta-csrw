@@ -3,12 +3,21 @@
 local progressTimer
 local progress = 0
 local progressX = 0
+local gl_lastPlantTryTime
+local gl_lastDefuseTryTime
 
 -- podkładanie C4
 function plantBomb(key, keyState)
-	if not getElementData(localPlayer, "alive") then return end
+	if not g_misc.roundStarted or not getElementData(localPlayer, "alive") then return end
 
-	if keyState == "down" and not isCursorShowing() and getCurrentProgressBar() == "" then
+	if keyState == "down" and getCurrentProgressBar() == "" then
+		if not g_player.canChangeSlot then return end
+		if isPedInVehicle(localPlayer) then return end
+		if isCursorShowing() then return end
+		if g_player.reloading then return end
+		if getControlState("fire") or getControlState("aim_weapon") then return end
+		if localPlayer.team ~= g_team[1] then return end
+
 		local inBombsite = false
 		for k, v in pairs(getElementsByType("marker")) do
 			if isElementWithinMarker(localPlayer, v) then
@@ -24,6 +33,13 @@ function plantBomb(key, keyState)
 			local currentSlot = getElementData(localPlayer, "currentSlot")
 			if not currentSlot or not g_playerWeaponData.current then return end
 			if g_weapon[currentSlot][g_playerWeaponData.current]["weaponID"] == "-6" then
+
+				if gl_lastPlantTryTime and getTickCount() - gl_lastPlantTryTime < 2000 then
+					-- Rate limit bomb planting
+					return
+				end
+				gl_lastPlantTryTime = getTickCount()
+
 				setProgressBar("planting", 0.02)
 				addEventHandler("onProgressBarEnd", resourceRoot, onBombPlanted)
 
@@ -32,6 +48,7 @@ function plantBomb(key, keyState)
 				g_player.canChangeSlot = false
 			end
 		end
+	
 	elseif getCurrentProgressBar() == "planting" then
 		cancelPlant()
 	end
@@ -66,14 +83,26 @@ end
 
 -- rozbrajanie C4
 function defuseBomb(key, keyState)
-	if not getElementData(localPlayer, "alive") or g_player.reloading or getPlayerTeam(localPlayer) ~= g_team[2] then return end
+	if not getElementData(localPlayer, "alive") or g_player.reloading or localPlayer.team ~= g_team[2] then return end
 
 	if keyState == "down" and getElementData(resourceRoot, "defusingBomb") == false then
+		if not g_player.canChangeSlot then return end
+		if isPedInVehicle(localPlayer) then return end
+		if isCursorShowing() then return end
+		if g_player.reloading then return end
+		if getControlState("fire") or getControlState("aim_weapon") then return end
+
 		local x, y, z = getElementPosition(localPlayer)
 		for k, v in pairs(getElementsByType("object")) do
 			if getElementData(v, "bomb") then
 				local x2, y2, z2 = getElementPosition(v)
 				if getDistanceBetweenPoints3D(x, y, z, x2, y2, z2) <= 1.4 then
+					if gl_lastDefuseTryTime and getTickCount() - gl_lastDefuseTryTime < 2000 then
+						-- Rate limit bomb defusing
+						return
+					end
+					gl_lastDefuseTryTime = getTickCount()
+
 					if g_player.items.defuser then
 						setProgressBar("defusing", 0.012, true)
 					else
@@ -91,8 +120,9 @@ function defuseBomb(key, keyState)
 				end
 			end
 		end
+	
 	else
-		cancelDefuse()	
+		cancelDefuse()
 	end
 end
 bindKey("E", "both", defuseBomb)

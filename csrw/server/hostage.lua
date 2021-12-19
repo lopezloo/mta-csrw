@@ -1,3 +1,6 @@
+local HOSTAGE_DEFAULT_SKIN_ID = 50
+local HOSTAGE_DEFAULT_INTERIOR_ID = 0
+
 function createHostages()
 	local hostageSites = getElementsByType("hostagesite")
 	if #hostageSites == 0 then
@@ -5,18 +8,9 @@ function createHostages()
 	end
 
 	outputServerLog("Hostage sites count: " .. #hostageSites)
+	respawnHostages()
 
 	local hostages = getElementsByType("hostage")
-	for k, hostage in pairs(getElementsByType("hostage")) do
-		local ped = createPed(50, getElementData(hostage, "posX"), getElementData(hostage, "posY"), getElementData(hostage, "posZ"), (getElementData(hostage, "rotZ") or 0) - 90)
-		setElementData(hostage, "ped", ped)
-		setElementData(ped, "health", 100)
-
-		playAnimationWithWalking("CRACK", "crckidle3", ped)
-		setElementFrozen(ped, true)
-		setElementInterior(ped, getElementData(hostage, "interior") or 0)
-	end
-
 	if #hostages > 0 then
 		for k, v in pairs(hostageSites) do
 			local marker = createMarker(getElementData(v, "posX"), getElementData(v, "posY"), getElementData(v, "posZ"), "cylinder", getElementData(v, "size"), 255, 255, 255, 0, nil)
@@ -41,31 +35,35 @@ function respawnHostages()
 
 	local hostages = getElementsByType("hostage")
 	for k, hostage in pairs(getElementsByType("hostage")) do
-		local ped = createPed(50, getElementData(hostage, "posX"), getElementData(hostage, "posY"), getElementData(hostage, "posZ"), (getElementData(hostage, "rotZ") or 0) - 90)
-		setElementData(hostage, "ped", ped)
-		setElementData(ped, "health", 100)
+		local skin = hostage:getData("skin") or HOSTAGE_DEFAULT_SKIN_ID
+		local ped = createPed(skin, getElementData(hostage, "posX"), getElementData(hostage, "posY"), getElementData(hostage, "posZ"), (getElementData(hostage, "rotZ") or 0) - 90)
+		
+		hostage:setData("ped", ped)
+		ped:setData("health", 100)
+		ped:setData("isHostage", true)
 
 		playAnimationWithWalking("CRACK", "crckidle3", ped)
-		setElementFrozen(ped, true)
-		setElementInterior(ped, getElementData(hostage, "interior") or 0)
+		ped.frozen = true
+		ped.interior = hostage:getData("interior") or HOSTAGE_DEFAULT_INTERIOR_ID
 	end
 end
 
 addEventHandler("onElementDataChange", root,
 	function(data, oldValue)
-		if data == "carryBy" and getElementType(source) == "ped" then
-			local player = getElementData(source, "carryBy")
+		if data == "carryBy" and source.type == "ped" then
+			local player = source:getData("carryBy")
 			if player then
 				-- safety check
 				if ((client and player ~= client) or getPlayerTeam(player) ~= g_team[2] or
 					not isElementInRangeOfPoint(player, source.position.x, source.position.y, source.position.z, 5)) then
-					setElementData(source, data, oldValue)
+					source:setData(data, oldValue)
 					return
 				end
 
 				g_player[player].carryingHost = source
 				playAnimationWithWalking("GYMNASIUM", "gym_bike_fast", source)
-				--setElementPosition(source, getElementPosition(player)) -- fix oświetlenia elementu
+				--setElementPosition(source, getElementPosition(player)) -- fix lighting
+				
 				setTimer(
 					function(ped)
 						exports.bone_attach:attachElementToBone(ped, getElementData(ped, "carryBy"), 3, -0.52, -0.5, -0.2, 0, 0, 0)
@@ -81,26 +79,37 @@ function detachCarriedHostage(player)
 		return
 	end
 
-	exports.bone_attach:detachElementFromBone(g_player[player].carryingHost)
-	setElementPosition(g_player[player].carryingHost, getElementPosition(player))
-	setElementRotation(g_player[player].carryingHost, getElementRotation(player))
-	playAnimationWithWalking("CRACK", "crckidle3", g_player[player].carryingHost)
+	if isElement(g_player[player].carryingHost) then
+		exports.bone_attach:detachElementFromBone(g_player[player].carryingHost)
+		setElementPosition(g_player[player].carryingHost, getElementPosition(player))
+		setElementRotation(g_player[player].carryingHost, getElementRotation(player))
+		playAnimationWithWalking("CRACK", "crckidle3", g_player[player].carryingHost)
 
-	setElementData(g_player[player].carryingHost, "carryBy", false)
-	setElementData(g_player[player].carryingHost, "picking", false)
+		setElementData(g_player[player].carryingHost, "carryBy", false)
+		setElementData(g_player[player].carryingHost, "picking", false)
+	end
 
 	g_player[player].carryingHost = nil
 end
-addEventHandler("onPlayerWasted", root, function() detachCarriedHostage(source) end)
+
+addEventHandler("onPlayerWasted", root,
+	function()
+		detachCarriedHostage(source)
+	end
+)
 
 function onHostageDelivered(element, matchingDimensions)
-	if getElementType(element) == "player" and matchingDimensions and g_player[element].carryingHost then
+	if g_roundData.state ~= "started" then
+		return
+	end
+
+	if element.type == "player" and matchingDimensions and g_player[element].carryingHost then
 		-- nagroda pieniężna za doniesienie zakładnika
 		givePlayerMoneyEx(element, 300)
 		advert.ok(getText("msg_moneyAward", element) .. 300, v, true)
 
-		destroyElement(g_player[element].carryingHost)
-		g_player[element].carryingHost = nil
+		g_player[element].carryingHost:setData("rescued", true)
+		detachCarriedHostage(element)
 		onRoundEnd(2, 5)
 	end
 end

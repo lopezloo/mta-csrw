@@ -97,6 +97,7 @@ function onClientPlayerReloadingEnd(slot)
 					if getControlState("aim_weapon") then
 						-- jeśli celuje
 						toggleControl("fire", true)
+						onClientAim("induced", "down")
 					end
 				end, 100, 1)
 

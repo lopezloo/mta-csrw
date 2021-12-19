@@ -47,6 +47,8 @@ addEvent("updateClassInfos", true)
 addEventHandler("updateClassInfos", root, updateClassInfos, skin, theTeam)
 
 function spawn(player) -- spawn
+	detachCarriedHostage(player)
+
 	local theTeam = getPlayerTeam(player)
 	if theTeam == g_team[1] or theTeam == g_team[2] then
 		local spawns
@@ -86,12 +88,17 @@ function spawn(player) -- spawn
 			-- Give player a start pistol
 			local startPistols = getWeaponsWithFlag("STARTPISTOL")
 			if #startPistols > 0 then
-				csGiveWeapon(player, startPistols[1][1], startPistols[1][2], tonumber(g_weapon[2][1]["ammo"]), tonumber(g_weapon[2][1]["clip"]))
+				local startPistolAmmo = tonumber(g_weapon[ startPistols[1][1] ][ startPistols[1][2] ]["ammo"])
+				local startPistolClip = tonumber(g_weapon[ startPistols[1][1] ][ startPistols[1][2] ]["clip"])
+				csGiveWeapon(player, startPistols[1][1], startPistols[1][2], startPistolAmmo, startPistolClip, false)
 			end
 		else
-		 	-- dajemy mu nóż bo przecież inne bronie i tak ma w dacie i po zmianie slota je dostanie
+			local csWeaponSlot = player:getData("currentSlot")
 			csGiveWeapon(player, DEF_KNIFE[1], DEF_KNIFE[2], 1, 1, false)
+			changePlayerSlot(player, player:getData("currentSlot"), csWeaponSlot)
 		end
+
+		-- @todo: restore weapon slot
 
 		if g_config["freekevlar"] then -- darmowy kevlar
 			setElementData(player, "armor", 100)
@@ -159,56 +166,63 @@ end
 addEventHandler("onPlayerSpawn", root, onPlayerSpawn)
 
 function onPlayerWasted(ammo, killer, weapon, bodypart)
-	if isRoundStarted() and getElementData(source, "alive") then
-		local team = getPlayerTeam(source)
-		if team == g_team[1] then g_roundData.aliveTT = g_roundData.aliveTT - 1
-		elseif team == g_team[2] then g_roundData.aliveCT = g_roundData.aliveCT - 1 end
-		
-		if g_roundData.aliveTT < 0 or g_roundData.aliveCT < 0 then
-			outputChatBox("SERVER: ERROR: A fatal error has occurred, the number of TT or CT players is negative.", root, 204, 0, 0)
-			outputServerLog("ERROR: A fatal error has occurred, the number of TT or CT players is negative.")
-		end
-		
-		setElementData(source, "alive", false)
-		
-		if killer and source ~= killer then
-			if getPlayerTeam(source) == getPlayerTeam(killer) then -- teamkill
-				takePlayerMoneyEx(killer, 1000) -- kara pieniężna za zabicie gracza ze swojej drużyny (możliwe tylko jeśli friendly fire jest włączone)
-				setElementData(killer, "score", (getElementData(killer, "score") or 0) - 1)
-				setPlayerAnnounceValue(killer, "score", (getElementData(killer, "score") or 0) - 1)
-				advert.Error("Team kill! -$1000", killer, true)
-			else
-				givePlayerMoneyEx(killer, 300) -- bonus pieniężny za zabicie gracza
-				setElementData(killer, "score", (getElementData(killer, "score") or 0) + 1)
-				setPlayerAnnounceValue(killer, "score", (getElementData(killer, "score") or 0) + 1)
-			end
-		end
-		setElementData(source, "deaths", (getElementData(source, "deaths") or 0) + 1)
-		g_player[source].surviveLastRound = false
-		setPlayerChannelByTeam(source)
-		
-		stopAnimationWithWalking(source)
-		csResetWeapons(source)
-		setElementData(source, "armor", 0)
-		-- @todo: weapon drop after death
-		
-		-- bonus (zapomoga po śmierci) za podłożenie bomby (niezależnie czy wygrano tą runde czy nie)
-		if getElementData(source, "hePlantedBomb") then
-			-- @todo: zamienić na zmienną ^
-			setElementData(source, "hePlantedBomb", false)
-			givePlayerMoneyEx(source, 800)
-			advert.ok(getText("msg_moneyAward", source) .. 800, source, true)
-		end
+	-- Disable dead bodies collisions
+	source.collisions = false
 
-		-- brak kolizji ciał; @todo: powinno być poza warunkiem isRoundStart() ?
-		setElementCollisionsEnabled(source, false)
-
-		-- sprawdza ile jest żywych graczy, w razie potrzeby kończy rundę
-		if checkPlayers() then
-			joinSpectatorsTemporary(source)
-		end
-		-- @todo: czy gracz może (i powinien) ginąć gdy nie jest w żadnym teamie?
+	if not isRoundStarted() or not source:getData("alive") then
+		return
 	end
+
+	local team = getPlayerTeam(source)
+	if team == g_team[1] then
+		g_roundData.aliveTT = g_roundData.aliveTT - 1
+	
+	elseif team == g_team[2] then
+		g_roundData.aliveCT = g_roundData.aliveCT - 1
+	end
+	
+	if g_roundData.aliveTT < 0 or g_roundData.aliveCT < 0 then
+		outputChatBox("SERVER: ERROR: A fatal error has occurred, the number of TT or CT players is negative.", root, 204, 0, 0)
+		outputServerLog("ERROR: A fatal error has occurred, the number of TT or CT players is negative.")
+	end
+	
+	source:setData("alive", false)
+	
+	if killer and source ~= killer then
+		if source.team == killer.team then -- teamkill
+			takePlayerMoneyEx(killer, 1000) -- kara pieniężna za zabicie gracza ze swojej drużyny (możliwe tylko jeśli friendly fire jest włączone)
+			setElementData(killer, "score", (getElementData(killer, "score") or 0) - 1)
+			setPlayerAnnounceValue(killer, "score", (getElementData(killer, "score") or 0) - 1)
+			advert.Error("Team kill! -$1000", killer, true)
+		
+		else
+			givePlayerMoneyEx(killer, 300) -- bonus pieniężny za zabicie gracza
+			setElementData(killer, "score", (getElementData(killer, "score") or 0) + 1)
+			setPlayerAnnounceValue(killer, "score", (getElementData(killer, "score") or 0) + 1)
+		end
+	end
+	setElementData(source, "deaths", (getElementData(source, "deaths") or 0) + 1)
+	g_player[source].surviveLastRound = false
+	setPlayerChannelByTeam(source)
+	
+	stopAnimationWithWalking(source)
+	csResetWeapons(source)
+	setElementData(source, "armor", 0)
+	-- @todo: weapon drop after death
+	
+	-- bonus (zapomoga po śmierci) za podłożenie bomby (niezależnie czy wygrano tą runde czy nie)
+	if getElementData(source, "hePlantedBomb") then
+		-- @todo: zamienić na zmienną ^
+		setElementData(source, "hePlantedBomb", false)
+		givePlayerMoneyEx(source, 800)
+		advert.ok(getText("msg_moneyAward", source) .. 800, source, true)
+	end
+
+	-- sprawdza ile jest żywych graczy, w razie potrzeby kończy rundę
+	if checkPlayers() then
+		joinSpectatorsTemporary(source)
+	end
+	-- @todo: czy gracz może (i powinien) ginąć gdy nie jest w żadnym teamie?
 end
 addEventHandler("onPlayerWasted", root, onPlayerWasted)
 
@@ -335,12 +349,6 @@ function onRoundEnd(winTeam, reason)
 		setTimer(startRound, 5000, 1)
 	end
 	
-	for k, v in pairs( getPlayersInTeam(g_team[1]) ) do
-		if getElementData(v, "wSlot" .. DEF_BOMB[1]) == DEF_BOMB[2] then
-			csTakeWeapon(v, DEF_BOMB[1])
-		end
-	end
-	
 	balanceTeams()
 	destroyBomb()
 	destroyGroundWeapons()
@@ -354,6 +362,15 @@ function startRound()
 	if isRoundStarted() then
 		return
 	end
+
+	-- Take bomb away
+	for k, v in pairs( getPlayersInTeam(g_team[1]) ) do
+		if getElementData(v, "wSlot" .. DEF_BOMB[1]) == DEF_BOMB[2] then
+			csTakeWeapon(v, DEF_BOMB[1])
+		end
+	end
+
+	respawnHostages()
 
 	local spawnedTT = 0
 	local spawnedCT = 0
@@ -384,7 +401,6 @@ function startRound()
 			end
 		end
 	end
-	respawnHostages()
 
 	if spawnedTT == 0 and spawnedCT == 0 then
 		outputText("msg_roundCantStartEmptyTeams", 255, 102, 102, root)

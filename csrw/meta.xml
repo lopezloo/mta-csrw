@@ -38,6 +38,7 @@
 	<script type="client" src="client/damage.lua" />
 	<script type="client" src="client/drop.lua" />
 	<script type="client" src="client/grenade.lua" />
+	<script type="client" src="client/grenade_lines.lua" />
 	<script type="client" src="client/nominate.lua" />
 	<script type="client" src="client/wallshader.lua" />
 	<script type="client" src="client/reload.lua" />

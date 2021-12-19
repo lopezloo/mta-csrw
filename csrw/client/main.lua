@@ -29,7 +29,8 @@ g_player = {
 }
 
 g_misc = {
-	smokeUpdate = false
+	smokeUpdate = false,
+	roundStarted = false
 }
 
 sX, sY = guiGetScreenSize()
@@ -73,6 +74,7 @@ function dealWithGTASounds()
 	local enableSounds = {
 		55, 51, 55, 66, 69, 70, 71, 72, 84, 85, 31, 32, 88
 	}
+
 	for i=1, 100 do
 		-- Disable weapon sounds
 		if not table.find(enableSounds, i) then
@@ -128,12 +130,15 @@ end
 function clearWorld()
 	destroyGroundWeapons()
 	destroyGrenades()
+	destroyProjectileLines()
 	extinguishFire(0, 0, 0, 999999)
 end
 
 addEventHandler("onClientPlayerSpawn", localPlayer,
 	function()
 		-- Round started
+		g_misc.roundStarted = true
+
 		spectator.exit()
 		showRadar(true)
 		showHUD(true)
@@ -141,6 +146,7 @@ addEventHandler("onClientPlayerSpawn", localPlayer,
 		clearWorld()
 		localPlayer:setVoice("PED_TYPE_DISABLED")
 
+		setGogglesOff()
 		resetFlashedState()
 
 		local i = math.random(1, 3)
@@ -150,7 +156,7 @@ addEventHandler("onClientPlayerSpawn", localPlayer,
 		playSound(":csrw-sounds/sounds/radio/" .. s .. ".wav")
 
 		-- Give CT free defusing kit if enabled
-		if g_config["free_defusing_kit"] and getPlayerTeam(localPlayer) == g_team[2] then
+		if g_config["free_defusing_kit"] and localPlayer.team == g_team[2] then
 			g_player.items.defuser = true
 		end
 	end
@@ -167,7 +173,6 @@ addEventHandler("onClientPlayerWasted", localPlayer,
 
 		setCameraGoggleEffect("normal")
 
-		g_player.goggleState = false
 		g_player.reloading = false
 		--g_player.flashed = false
 		--g_player.canChangeSlot = true
@@ -183,6 +188,7 @@ addEventHandler("onClientPlayerWasted", localPlayer,
 					aliveTT = aliveTT + 1
 				end
 			end
+
 			if aliveTT > 0 then
 				dropWeapon(true, DEF_BOMB[1])
 			end
@@ -193,6 +199,8 @@ addEventHandler("onClientPlayerWasted", localPlayer,
 addEvent("onClientRoundEnd", true)
 addEventHandler("onClientRoundEnd", root,
 	function(winTeam, reason)
+		g_misc.roundStarted = false
+
 		if winTeam == 1 then
 			playSound(":csrw-sounds/sounds/radio/terwin.wav")
 		elseif winTeam == 2 then
@@ -232,32 +240,50 @@ addEventHandler("cPlaySound", root,
 )
 
 -- GOGGLE
-local goggleDelay
+local gl_goggleDelay
 function enableGoggles()
-	if goggleDelay or not getElementData(localPlayer, "alive") then return end
-	if g_player.goggles then
-		setCameraGoggleEffect("normal")
-		g_player.goggles = false
-		playSound(":csrw-sounds/sounds/items/nvg_off.wav")
-		triggerServerEvent("detachWeaponFromBody", localPlayer, localPlayer, "goggle")
+	outputChatBox("enableGoggles")
+	if gl_goggleDelay or not getElementData(localPlayer, "alive") then return end
+	
+	outputChatBox("enableGoggles2")
+	if g_player.goggleState then
+		outputChatBox("enableGoggles3")
+		turnGogglesOff()
+	
 	else
-		local goggle = getElementData(localPlayer, "item_goggles")
-		if goggle then
-			if goggle == 1 then
+		outputChatBox("enableGoggles4")
+		if g_player.items.goggles > 0 then
+			outputChatBox("enableGoggles5")
+			if g_player.items.goggles == 1 then
 				setCameraGoggleEffect("nightvision")
 			else
 				setCameraGoggleEffect("thermalvision")
 			end
-			g_player.goggles = true
+			g_player.goggleState = true
 			playSound(":csrw-sounds/sounds/items/nvg_on.wav")
 			triggerServerEvent("attachWeaponToBody", localPlayer, localPlayer, nil, "goggle")
 		end
 	end
-	goggleDelay = true
-	setTimer(function() goggleDelay = false end, 1000, 1)
+	gl_goggleDelay = true
+	setTimer(function() gl_goggleDelay = false end, 1000, 1)
 end
 addCommandHandler("goggles", enableGoggles)
 bindKey("N", "down", "goggles")
+
+function turnGogglesOff()
+	if not g_player.goggleState then return end
+
+	playSound(":csrw-sounds/sounds/items/nvg_off.wav")
+	setGogglesOff()
+end
+
+function setGogglesOff()
+	if not g_player.goggleState then return end
+
+	g_player.goggleState = false
+	setCameraGoggleEffect("normal")
+	triggerServerEvent("detachWeaponFromBody", localPlayer, localPlayer, "goggle")
+end
 
 bindKey(getKeyBoundToCommand("screenshot"), "down", 
 	function()

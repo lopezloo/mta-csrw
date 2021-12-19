@@ -1,17 +1,26 @@
 local hostage = {
 	tryingToPick = nil,
 	picked = nil,
-	renderedHostages = {}
+	renderedHostages = {},
+
+	lastPickTryTime = nil
 }
 
 function pickHostage(key, keyState)
-	if not getElementData(localPlayer, "alive") or getPlayerTeam(localPlayer) == g_team[1] then return end
+	if not g_misc.roundStarted or not localPlayer:getData("alive") or localPlayer.team ~= g_team[2] then return end
 
 	if keyState == "down" and not isCursorShowing() and getCurrentProgressBar() == "" and not hostage.tryingToPick and not hostage.picked then
+		if not g_player.canChangeSlot then return end
+		if isPedInVehicle(localPlayer) then return end
+		if isCursorShowing() then return end
+		if g_player.reloading then return end
+		if getControlState("fire") or getControlState("aim_weapon") then return end
+		if g_player.team ~= g_team[2] then return end
+
 		local nearHost
 		for k, v in pairs(getElementsByType("hostage")) do
 			local ped = getElementData(v, "ped")
-			if isElement(ped) and not getElementData(ped, "carryBy") and not getElementData(ped, "picking") then
+			if isElement(ped) and not ped:getData("carryBy") and not ped:getData("picking") and not ped:getData("rescued") then
 				local x, y, z = getElementPosition(ped)
 				local x2, y2, z2 = getElementPosition(localPlayer)
 				if getDistanceBetweenPoints3D(x, y, z, x2, y2, z2) <= 1 then
@@ -22,6 +31,12 @@ function pickHostage(key, keyState)
 		end
 
 		if nearHost then
+			if hostage.lastPickTryTime and getTickCount() - hostage.lastPickTryTime < 2000 then
+				-- Rate limit hostage picking
+				return
+			end
+
+			hostage.lastPickTryTime = getTickCount()
 			hostage.tryingToPick = nearHost
 			setProgressBar("host", 0.015)
 			addEventHandler("onProgressBarEnd", resourceRoot, onHostagePicked)
@@ -29,6 +44,7 @@ function pickHostage(key, keyState)
 			playAnimationWithWalking("BOMBER", "BOM_Plant_Loop")
 			setElementData(nearHost, "picking", true)
 		end
+	
 	elseif getCurrentProgressBar() == "host" then
 		stopAnimationWithWalking()
 		setElementFrozen(localPlayer, false)
@@ -54,27 +70,28 @@ end
 
 addEventHandler("onClientElementDataChange", root,
 	function(data, oldValue)
-		if getElementType(source) == "ped" then
-			if data == "carryBy" and isElementStreamedIn(source) then
-				if getElementData(source, data) then
-					--setElementPosition(source, getElementPosition(getElementData(source, "carryBy")))
-					table.insert(hostage.renderedHostages, source)
-					if #hostage.renderedHostages == 1 then
-						addEventHandler("onClientPreRender", root, renderHostages)
-					end
-				else
-					for k, v in pairs(hostage.renderedHostages) do
-						if v == source then
-							table.remove(hostage.renderedHostages, k)
-							if #hostage.renderedHostages == 0 then
-								removeEventHandler("onClientPreRender", root, renderHostages)
-							end
-							break
+		if source.type ~= "ped" then
+			return
+		end
+
+		if data == "carryBy" and isElementStreamedIn(source) then
+			if source:getData(data) then
+				--setElementPosition(source, getElementPosition(getElementData(source, "carryBy")))
+				table.insert(hostage.renderedHostages, source)
+				if #hostage.renderedHostages == 1 then
+					addEventHandler("onClientPreRender", root, renderCarriedHostages)
+				end
+			
+			else
+				for k, v in pairs(hostage.renderedHostages) do
+					if v == source then
+						table.remove(hostage.renderedHostages, k)
+						if #hostage.renderedHostages == 0 then
+							removeEventHandler("onClientPreRender", root, renderCarriedHostages)
 						end
+						break
 					end
 				end
-			elseif data == "health" and getElementData(source, data) ~= 100 then
-				playSound3D(":csrw-sounds/sounds/hostage/hpain/hpain" .. math.random(1, 6) .. ".wav", getElementPosition(source))
 			end
 		end
 	end
@@ -82,19 +99,19 @@ addEventHandler("onClientElementDataChange", root,
 
 addEventHandler("onClientElementDestroy", root,
 	function()
-		if getElementType(source) == "ped" then
+		if source.type == "ped" then
 			local k = table.find(hostage.renderedHostages, source)
 			if k then
 				table.remove(hostage.renderedHostages, k)
 				if #hostage.renderedHostages == 0 then
-					removeEventHandler("onClientPreRender", root, renderHostages)
+					removeEventHandler("onClientPreRender", root, renderCarriedHostages)
 				end
 			end
 		end
 	end
 )
 
-function renderHostages()
+function renderCarriedHostages()
 	for k, v in pairs(hostage.renderedHostages) do
 		setPedAnimationProgress(v, "gym_bike_fast", 0.7)
 	end
@@ -104,5 +121,50 @@ addEventHandler("onClientRoundEnd", root,
 	function()
 		hostage.picked = nil
 		hostage.tryingToPick = nil
+	end
+)
+
+addEventHandler("onClientPedHitByWaterCannon", root,
+	function()
+		if source.type == "ped" and source:getData("isHostage") then
+			cancelEvent()
+		end
+	end
+)
+
+addEventHandler("onClientPedHeliKilled", root,
+	function()
+		if source.type == "ped" and source:getData("isHostage") then
+			cancelEvent()
+		end
+	end
+)
+
+function fixPedLighting(ped)
+	-- Hacky way to fix ped lighting (rendering as dark)
+	local obj = Object(1224, ped.position)
+	obj.dimension = ped.dimension
+	obj.interior = 77
+	obj.frozen = true
+	obj.breakable = false
+
+	for k, v in pairs(getElementsByType("player")) do
+		obj:setCollidableWith(v, false)
+	end
+
+	setTimer(function()
+		obj:destroy()
+	end, 50, 1)
+end
+
+function getPickedHostage()
+	return hostage.picked
+end
+
+addEventHandler("onClientElementStreamIn", root,
+	function()
+		if source.type == "ped" and source:getData("isHostage") then
+			fixPedLighting(source)
+		end
 	end
 )

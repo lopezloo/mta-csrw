@@ -340,11 +340,7 @@ function buyWeapon(cost, slot, weapon)
 		local g = 1
 		if gtaWepID == -4 then g = 2 end
 		g_player.items.goggles = g
-		if goggleState then
-			setCameraGoggleEffect("normal")
-			goggleState = false
-			triggerServerEvent("detachWeaponFromBody", localPlayer, localPlayer, "goggle")
-		end
+		turnGogglesOff()
 
 	elseif gtaWepID == -5 then
 		-- defusing kit
@@ -362,7 +358,7 @@ function buyWeapon(cost, slot, weapon)
 				clip = g_playerWeaponData[slot].clip
 			end
 
-			if clip >= maxGrenades then
+			if clip >= maxGrenades and 0 then
 				advert.error("msg_tooMuchGrenades")
 				playSound(":csrw-sounds/sounds/buttons/weapon_cant_buy.wav")
 				return

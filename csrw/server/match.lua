@@ -3,7 +3,6 @@ g_match = {
 	rounds = 0, -- liczba wystartowanych rund na obecnej mapie
 	nextMap = nil,
 
-	-- zmienne ze starego g_currentMap
 	bombsites = false,
 	hostages = false,
 	wantsRTV = 0

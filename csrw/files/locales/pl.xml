@@ -52,7 +52,19 @@
 	<nametags_hostage>
 		Zakładnik
 	</nametags_hostage>
-	
+
+	<nametags_hostage_rescued>
+		Uratowany
+	</nametags_hostage_rescued>
+
+	<nametags_hostage_protect>
+		Pilnuj go
+	</nametags_hostage_protect>
+
+	<nametags_hostage_rescue>
+		Uratuj go
+	</nametags_hostage_rescue>
+
 	<!-- class selection -->
 	<class_chose1>
 		Wybierz druzyne
