@@ -83,14 +83,34 @@ function spawn(player) -- spawn
 		setPlayerChannelByTeam(player)
 		
 		if not g_player[player].surviveLastRound then
-			csGiveWeapon(player, DEF_KNIFE[1], DEF_KNIFE[2], 1, 1, true)
+			-- Give player start weapons
+			local wepFlag = "START_WEAPON_TEAM_1"
+			local wepFlag2 = "START_ACTIVE_WEAPON_TEAM_1"
+			if theTeam == g_team[2] then
+				wepFlag = "START_WEAPON_TEAM_2"
+				wepFlag2 = "START_ACTIVE_WEAPON_TEAM_2"
+			end
 
-			-- Give player a start pistol
-			local startPistols = getWeaponsWithFlag("STARTPISTOL")
-			if #startPistols > 0 then
-				local startPistolAmmo = tonumber(g_weapon[ startPistols[1][1] ][ startPistols[1][2] ]["ammo"])
-				local startPistolClip = tonumber(g_weapon[ startPistols[1][1] ][ startPistols[1][2] ]["clip"])
-				csGiveWeapon(player, startPistols[1][1], startPistols[1][2], startPistolAmmo, startPistolClip, false)
+			local startWeapons = getWeaponsWithFlag(wepFlag)
+			if #startWeapons > 0 then
+				for i in pairs(startWeapons) do
+					outputChatBox("startWep " .. i)
+					local startWeapon = g_weapon[ startWeapons[i][1] ][ startWeapons[i][2] ]
+					local startPistolAmmo = tonumber(startWeapon["ammo"])
+					local startPistolClip = tonumber(startWeapon["clip"])
+					csGiveWeapon(player, startWeapons[i][1], startWeapons[i][2], startPistolAmmo, startPistolClip, true)
+				end
+			end
+
+			local startWeapons = getWeaponsWithFlag(wepFlag2)
+			if #startWeapons > 0 then
+				for i in pairs(startWeapons) do
+					outputChatBox("startWep " .. i)
+					local startWeapon = g_weapon[ startWeapons[i][1] ][ startWeapons[i][2] ]
+					local startPistolAmmo = tonumber(startWeapon["ammo"])
+					local startPistolClip = tonumber(startWeapon["clip"])
+					csGiveWeapon(player, startWeapons[i][1], startWeapons[i][2], startPistolAmmo, startPistolClip, false)
+				end
 			end
 		else
 			local csWeaponSlot = player:getData("currentSlot")
@@ -536,14 +556,4 @@ function isRoundStarted() return g_roundData.state == "started" end
 function getPlayerByID(id)
 	local players = getElementsByType("player")
 	return players[id]
-end
-
-function getTeamSkinValue(team)
-	if team == g_team[1] then
-		return 100
-	elseif team == g_team[2] then
-		return 104
-	else
-		return 0
-	end
 end
