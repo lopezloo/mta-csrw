@@ -6,6 +6,7 @@ local gl_projectileLines = {}
 
 local gl_projectileLines_lastIndex = 0
 
+local PROJECTILE_LINES_RENDER_HANDLER = "onClientPreRender"
 local DEBUG_ALWAYS_RENDER_PROJECTILE_LINES = true
 local GRENADE_LINE_TIMEOUT = 7000
 local MARKER_SCALE = 0.25
@@ -13,7 +14,7 @@ local MARKER_SCALE = 0.25
 addEventHandler("onClientProjectileCreation", root,
 	function(creator)
 		--outputChatBox("onClientProjectileCreation; creator: " .. tostring(creator) .. " (element " .. creator.type .. ")")
-		if DEBUG_ALWAYS_RENDER_PROJECTILE_LINES or (g_player.spectating and creator and creator.type == "player") then
+		if (g_player.spectating and creator and creator.type == "player") or DEBUG_ALWAYS_RENDER_PROJECTILE_LINES then
 			-- Draw projectile lines in spectator
 			local linesIndex = gl_projectileLines_lastIndex
 			gl_projectileLines_lastIndex = gl_projectileLines_lastIndex + 1
@@ -29,7 +30,7 @@ addEventHandler("onClientProjectileCreation", root,
 			end
 			
 			local x, y, z = getElementPosition(source)
-			local r, g, b = getTeamColor(getPlayerTeam(creator))
+			local r, g, b = creator.team:getColor()
 			setElementData(source, "oldPos", {x, y, z}, false)
 			setElementData(source, "color", {r, g, b}, false)
 
@@ -53,15 +54,13 @@ function updateProjectileLines()
 			end
 			--dxDrawLine3D(o[1], o[2], o[3], x, y, z, tocolor(color[1], color[2], color[3]), 2, true)
 		end
-		addEventHandler("onClientPreRender", root, drawProjectileLine)
+		addEventHandler(PROJECTILE_LINES_RENDER_HANDLER, root, drawProjectileLine)
 		table.insert(gl_projectileLines[linesIndex].lines, drawProjectileLine)
 		setElementData(v, "oldPos", {x, y, z}, false)
 	end
 end
 
 function onProjectileWithLineDestroy()
-	outputChatBox("onProjectileWithLineDestroy")
-
 	local tPos = table.find(gl_lineProjectiles, source)
 	if not tPos then
 		return
@@ -92,7 +91,7 @@ function onProjectileWithLineDestroy()
 			gl_projectileLines[linesIndex].marker = nil
 
 			for k, v in pairs(gl_projectileLines[linesIndex].lines) do
-				removeEventHandler("onClientRender", root, v)
+				removeEventHandler(PROJECTILE_LINES_RENDER_HANDLER, root, v)
 			end
 			gl_projectileLines[linesIndex] = nil
 		end,
@@ -101,7 +100,6 @@ end
 
 -- Remove all projectile lines
 function destroyProjectileLines()
-	outputChatBox("destroyProjectileLines")
 	if gl_timer_updateProjectileLines and isTimer(gl_timer_updateProjectileLines) then
 		killTimer(gl_timer_updateProjectileLines)
 	end
@@ -114,8 +112,7 @@ function destroyProjectileLines()
 		end
 
 		for k, v2 in pairs(v.lines) do
-			outputChatBox("destroyProjectileLines: remove handler")
-			removeEventHandler("onClientRender", root, v2)
+			removeEventHandler(PROJECTILE_LINES_RENDER_HANDLER, root, v2)
 		end
 		v.lines = {}
 	end
@@ -123,7 +120,7 @@ function destroyProjectileLines()
 	gl_lineProjectiles = {}
 end
 
-function cmd_destroyProjectileLines(cmdName)
+--[[function cmd_destroyProjectileLines(cmdName)
 	destroyProjectileLines()
 end    
-addCommandHandler("delprojlines", cmd_destroyProjectileLines)
+addCommandHandler("delprojlines", cmd_destroyProjectileLines)]]--
