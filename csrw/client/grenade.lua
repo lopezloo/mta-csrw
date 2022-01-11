@@ -84,6 +84,19 @@ function onFlashBangExploded(grenade)
 	-- Create FX
 	Effect("camflash", x, y, z)
 
+	-- Create light
+	local startRadius = 6
+	local endRadius = 22
+	local light = Light(0, x, y, z, startRadius, 255, 255, 255, 0, 0, 0, true)
+	setTimer(
+		function()
+			light.radius = light.radius + 2
+			if light.radius >= endRadius then
+				light:destroy()
+			end
+		end, 50, (endRadius-startRadius) * 1/2
+	)
+
 	if g_player.flashed or (localPlayer.team ~= g_team[1] and localPlayer.team ~= g_team[2]) then
 		-- Already flashed by another flashbang
 		-- Or in spectator
@@ -117,7 +130,8 @@ function onFlashBangExploded(grenade)
 					fadeCamera(true, 1)
 					showRadar(true)
 					g_player.flashed = false
-				end, 30000 / distance, 1)		
+				end, 30000 / distance, 1
+			)
 		end
 
 	elseif distance <= 12 then
@@ -175,10 +189,6 @@ function onDecoyExploded(grenade, slot, weapon)
 	if not weapon then
 		-- Get default weapon for decoy if none specified
 		local defweapons = getWeaponsWithFlag("DECOY_DEFAULT")
-		if #defweapons == 0 then
-			defweapons = getWeaponsWithFlag("STARTPISTOL")
-		end
-		
 		if #defweapons == 0 then
 			return
 		end
