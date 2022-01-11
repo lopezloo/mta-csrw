@@ -64,6 +64,7 @@ function preInit()
 	setPedTargetingMarkerEnabled(false)
 	setAmbientSoundEnabled("general", false)
 	setAmbientSoundEnabled("gunfire", false)
+	setPedsLODDistance(100)
 	setTime(12, 0)
 	clearWorld()
 
@@ -294,3 +295,20 @@ addEventHandler("onClientElementStreamIn", root,
 		end
 	end
 )
+
+function fixPedLighting(ped)
+	-- Hacky way to fix ped lighting (rendering as dark)
+	local obj = Object(1224, ped.position)
+	obj.dimension = ped.dimension
+	obj.interior = 77
+	obj.frozen = true
+	obj.breakable = false
+
+	for k, v in pairs(getElementsByType("player")) do
+		obj:setCollidableWith(v, false)
+	end
+
+	setTimer(function()
+		obj:destroy()
+	end, 50, 1)
+end

@@ -27,12 +27,9 @@ function setBoxVisible(draw, name, window, renderHandlers, elements)
 	if draw then
 		if not window then return false end
 		
-		if isBoxVisible() then -- jeśli inne okno jest otwarte
+		if isBoxVisible() then
 			setBoxVisible(false)
 		end
-	
-		--clearBoxElements()
-		--clearBoxRenderHandlers()
 	
 		box["label"] = name or ""
 		box["window"] = window	

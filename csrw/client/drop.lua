@@ -188,7 +188,7 @@ addEvent("syncGroundWeapons", true)
 addEventHandler("syncGroundWeapons", root,
 	function(weapons)
 		for k, v in pairs(weapons) do
-			local modelID =g_weapon[v.slot][v.weapon]["objectID"]
+			local modelID = g_weapon[v.slot][v.weapon]["objectID"]
 			engineSetModelPhysicalPropertiesGroup(modelID, DROPPED_OBJECT_PHYSICAL_PROPERTY_GROUP)
 
 			local pos = split(v.xyzString, ",")
@@ -204,14 +204,14 @@ addEventHandler("syncGroundWeapons", root,
 function onWeaponHitted(element, matchingDimension)
 	-- Projectile / obiekt musi być dopiero usuwany gdy gracz KTÓRY W NIEGO WEJDZIE go podniesie (bo przecież może nie mieć miejsca na slocie)
 
-	if getElementType(element) == "player" and matchingDimension then
+	if element.type == "player" and matchingDimension then
 		getWeaponFromGround(element, source)
 	end
 end
 
 function onWeaponLeave(element, matchingDimension)
 	if element == localPlayer then
-		if getElementData(source, "weapon") ~= false then
+		if source:getData("weapon") ~= false then
 			stopDrawingWeapon()
 		end
 	end
@@ -241,17 +241,6 @@ function getWeaponFromGround(player, colshape)
 		end
 	end
 end
-
---[[addEventHandler("onClientElementStreamIn", root,
-    function()
-    	if getElementType(source) == "object" and getElementData(source, "neededVelocity") ~= false then
-    		local vel = getElementData(source, "neededVelocity")
-    		setElementVelocity(source, vel[1], vel[2], vel[3])
-    		setElementData(source, "neededVelocity", false)
-    		outputChatBox("C_DEBUG: Phydrop: Broni o modelu " .. getElementModel(source) .. " została nadana prędkość.")
-    	end
-    end
-)]]--
 
 local render = { -- 1680x1050
 	["img"] = {0.822*sX, 0.743*sY, 0.130*sX, 0.076*sY}, -- 1381, 781, 220, 80

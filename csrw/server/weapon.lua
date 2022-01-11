@@ -12,7 +12,7 @@ if #DEF_KNIFE > 0 then
 	DEF_KNIFE = { DEF_KNIFE[1][1], DEF_KNIFE[1][2] } -- slot, csweaponid
 else
 	DEF_KNIFE = { -1, -1 }
-	outputServerLog("Warning: Can find weapon flagged as KNIFE.")
+	outputServerLog("Warning: Can find weapon with KNIFE flag.")
 end
 --outputServerLog( "DEF_BOMB: " .. getWeaponsWithFlag("BOMB")[1][1] .. ", " .. getWeaponsWithFlag("BOMB")[1][2] )
 --

@@ -195,3 +195,13 @@ end
 function strip()
 	return string.gsub(strval, "^%s*(.-)%s*$", "%1")
 end
+
+function getTeamSkinValue(team)
+	if team == g_team[1] then
+		return 100
+	elseif team == g_team[2] then
+		return 104
+	end
+	
+	return 0
+end
