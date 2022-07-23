@@ -9,13 +9,12 @@ local hostage = {
 function pickHostage(key, keyState)
 	if not g_misc.roundStarted or not localPlayer:getData("alive") or localPlayer.team ~= g_team[2] then return end
 
-	if keyState == "down" and not isCursorShowing() and getCurrentProgressBar() == "" and not hostage.tryingToPick and not hostage.picked then
+	if keyState == "down" and getCurrentProgressBar() == "" and not hostage.tryingToPick and not hostage.picked then
 		if not g_player.canChangeSlot then return end
 		if isPedInVehicle(localPlayer) then return end
 		if isCursorShowing() then return end
 		if g_player.reloading then return end
 		if getControlState("fire") or getControlState("aim_weapon") then return end
-		if g_player.team ~= g_team[2] then return end
 
 		local nearHost
 		for k, v in pairs(getElementsByType("hostage")) do
@@ -40,15 +39,15 @@ function pickHostage(key, keyState)
 			hostage.tryingToPick = nearHost
 			setProgressBar("host", 0.015)
 			addEventHandler("onProgressBarEnd", resourceRoot, onHostagePicked)
-			setElementFrozen(localPlayer, true)
+			localPlayer.frozen = true
 			playAnimationWithWalking("BOMBER", "BOM_Plant_Loop")
-			setElementData(nearHost, "picking", true)
+			nearHost:setData("picking", true)
 		end
 	
 	elseif getCurrentProgressBar() == "host" then
 		stopAnimationWithWalking()
-		setElementFrozen(localPlayer, false)
-		setElementData(hostage.tryingToPick, "picking", false)
+		localPlayer.frozen = false
+		hostage.tryingToPick:setData("picking", false)
 		hostage.tryingToPick = nil
 		stopProgressBar()
 		removeEventHandler("onProgressBarEnd", resourceRoot, onHostagePicked)
@@ -112,7 +111,8 @@ addEventHandler("onClientElementDestroy", root,
 )
 
 function renderCarriedHostages()
-	for k, v in pairs(hostage.renderedHostages) do
+	for _, v in pairs(hostage.renderedHostages) do
+		-- @TODO: It can be done via setPedAnimationSpeed instead
 		setPedAnimationProgress(v, "gym_bike_fast", 0.7)
 	end
 end

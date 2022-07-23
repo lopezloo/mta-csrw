@@ -1,18 +1,38 @@
 local HOSTAGE_PAIN_SOUND_TIMEOUT = 2000
 
+local MELEE_WEAPONS = {
+	WEAPON_FIST,
+	WEAPON_BRASSKNUCKLE,
+	WEAPON_GOLFCLUB,
+	WEAPON_NIGHTSTICK,
+	WEAPON_KNIFE,
+	WEAPON_BAT,
+	WEAPON_SHOVEL,
+	WEAPON_POOLSTICK,
+	WEAPON_KATANA,
+	WEAPON_CHAINSAW
+}
+
 function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 	cancelEvent()
 
-	if weapon == 17 then
+	if weapon == WEAPON_TEARGAS then
 		-- Disable tear gas damage
 		return
 	end
 
-	if getElementType(source) == "ped" and source:getData("isHostage") then
-		if weapon == 37 then
+	if source.type == "ped" and source:getData("isHostage") then
+		if weapon == DAMAGE_BURNT then
 			-- Do not let hostages catch fire
 			setPedOnFire(source, false)
 			return
+		end
+
+		if table.find(MELEE_WEAPONS, weapon) then
+			-- Reset hostage animation
+			setPedAnimation(source, "CRACK", "crckidle3", 200, true, false, false, true)
+			setPedAnimationSpeed(source, "crckidle3", 0)
+			setPedAnimationProgress(source, "crckidle3", 1)
 		end
 
 		-- Play hostage pain sounds
@@ -29,7 +49,7 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 
 	-- Jeśli atakujący w momencie zadania obrażenia będzie miał inną broń (np. wyrzuci granat i zmieni slot) to calcDamage() pobierze zabierze złą ilość HP
 
-	if attacker and source ~= attacker and getElementType(attacker) == "player" and not g_config["friendlyfire"] and getPlayerTeam(attacker) == getPlayerTeam(source) then
+	if attacker and source ~= attacker and attacker.type == "player" and not g_config["friendlyfire"] and attacker.team == source.team then
 		return
 	end
 
@@ -38,20 +58,24 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 			calcDamage(source, attacker, bodypart, loss, weapon)
 		end
 	else
-		-- upadek
-		if weapon == 54 then
+		if weapon == DAMAGE_FALL then
+			-- Workaround fix for "Climbing over certain objects kills you, when you have high FPS"
+			-- https://github.com/multitheftauto/mtasa-blue/issues/602
 			if not attacker and bodypart == 3 then
-				-- blokowanie glitcha, który zabija przy wspinaniu się na niektóre obiekty
-		    	local task = {}
-		    	task[1], task[2], task[3] = getPedTask(localPlayer, "primary", 3)
-		    	if task[1] == "TASK_COMPLEX_JUMP" and task[2] == "TASK_COMPLEX_IN_AIR_AND_LAND" and task[3] == "TASK_SIMPLE_CLIMB" then
-		    		return
-		    	end
+				local task = {}
+				task[1], task[2], task[3] = getPedTask(localPlayer, "primary", 3)
+				if task[1] == "TASK_COMPLEX_JUMP" and task[2] == "TASK_SIMPLE_CLIMB" then
+					return
+				end
+
+				if task[1] == "TASK_COMPLEX_JUMP" and task[2] == "TASK_COMPLEX_IN_AIR_AND_LAND" and task[3] == "TASK_SIMPLE_CLIMB" then
+					return
+				end
 			end
 
 			playSound3D(":csrw-sounds/sounds/player/damage" .. math.random(1, 3) .. ".wav", getElementPosition(source))
 
-			-- Double falling down damage
+			-- double Falling Down damage
 			loss = loss * 2
 		end
 		
