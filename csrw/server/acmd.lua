@@ -33,7 +33,7 @@ addCommandHandler("givemoney",
 
 		local playerTo = getPlayerFromName(playerNameTo)
 		if not playerTo then
-			outputChatBox("ERROR: Player which such name not found.", player)
+			outputChatBox("ERROR: Player with such name not found.", player)
 			return
 		end
 
