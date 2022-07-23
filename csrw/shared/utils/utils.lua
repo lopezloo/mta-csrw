@@ -1,8 +1,11 @@
+local DEFAULT_CAMERA_POSITION = {0, 300.59533691406, 1836.1302490234, 6.973030090332, 393.78421020508, 1803.8177490234, 23.457494735718}
+
 function isElementInRangeOfPoint(ele, x, y, z, range)
 	if ele and x and y and z and range then
 		local x0, y0, z0 = getElementPosition(ele)
-		return getDistanceBetweenPoints3D(x0, y0, z0, x,y,z) <= range
+		return getDistanceBetweenPoints3D(x0, y0, z0, x, y, z) <= range
 	end
+	
 	return false
 end
 
@@ -11,19 +14,15 @@ function rgbToHex(r, g, b)
 end
 
 function math.round(num)
-    under = math.floor(num)
-    upper = math.floor(num) + 1
-    underV = -(under - num)
-    upperV = upper - num
-    if upperV > underV then
-        return under
-    end
-    
-    return upper
-end
+	local under = math.floor(num)
+	local upper = math.floor(num) + 1
+	local underV = -(under - num)
+	local upperV = upper - num
+	if upperV > underV then
+		return under
+	end
 
-function round(num)
-	return math.round(num)
+	return upper
 end
 
 function changeViewToRandomCamera(player)
@@ -31,14 +30,14 @@ function changeViewToRandomCamera(player)
 
 	local int, x, y, z, tX, tY, tZ, roll, fov = getRandomCameraPos()
 	setElementInterior(player or localPlayer, int)
+	
 	if localPlayer then
 		setCameraMatrix(x, y, z, tX, tY, tZ, roll, fov)
 		fadeCamera(true)
-		outputDebugString("Camera changed to " .. x .. ", " .. y .. ", " .. z)
+	
 	else
 		setCameraMatrix(player, x, y, z, tX, tY, tZ, roll, fov)
 		fadeCamera(player, true)
-		outputConsole("Camera changed to " .. x .. ", " .. y .. ", " .. z, player)
 	end
 end
 
@@ -72,39 +71,53 @@ function getRandomCameraPos(ifNoReturnSpawn)
 		return int, x2, y2, z2 + 5, 0, 0, 0, 0, 70
 	end
 
-	return 0, 300.59533691406, 1836.1302490234, 6.973030090332, 393.78421020508, 1803.8177490234, 23.457494735718
+	return unpack(DEFAULT_CAMERA_POSITION)
 end
 
+-- Returns weapon skill ID from weapon ID
 function getWeaponSkillID(gtaWeaponID)
 	if not gtaWeaponID then return false end
 	gtaWeaponID = tonumber(gtaWeaponID)
 
 	-- gtaSLOT 2 (handguns) csSlot 2
-	if gtaWeaponID == 22 then return 69 -- "WEAPONTYPE_PISTOL_SKILL"
-	elseif gtaWeaponID == 23 then return 70 -- "WEAPONTYPE_PISTOL_SILENCED_SKILL"
-	elseif gtaWeaponID == 24 then return 71 -- "WEAPONTYPE_DESERT_EAGLE_SKILL"
+	if gtaWeaponID == WEAPON_COLT45 then return STAT_PISTOL_SKILL
+	elseif gtaWeaponID == WEAPON_SILENCED then return STAT_PISTOL_SILENCED_SKILL
+	elseif gtaWeaponID == WEAPON_DEAGLE then return STAT_DEAGLE_SKILL
 
 	-- gtaSlot 3 (shotguns) csSlot 1
-	elseif gtaWeaponID == 25 then return 72 -- "WEAPONTYPE_SHOTGUN_SKILL"
-	elseif gtaWeaponID == 26 then return 73 -- "WEAPONTYPE_SAWNOFF_SHOTGUN_SKILL"
-	elseif gtaWeaponID == 27 then return 74 -- "WEAPONTYPE_SPAS12_SHOTGUN_SKILL"
+	elseif gtaWeaponID == WEAPON_SHOTGUN then return STAT_SHOTGUN_SKILL
+	elseif gtaWeaponID == WEAPON_SAWEDOFF then return STAT_SAWNOFF_SHOTGUN_SKILL
+	elseif gtaWeaponID == WEAPON_COMBAT_SHOTGUN then return STAT_COMBAT_SHOTGUN_SKILL
 
 	-- gtaSlot 4 (sub-machine guns) csSlot 1
-	elseif gtaWeaponID == 28 then return 75 -- "WEAPONTYPE_MICRO_UZI_SKILL"
-	elseif gtaWeaponID == 29 then return 76 -- "WEAPONTYPE_MP5_SKILL"
+	elseif gtaWeaponID == WEAPON_UZI then return STAT_MICRO_UZI_SKILL
+	elseif gtaWeaponID == WEAPON_MP5 then return STAT_MP5_SKILL
 
 	-- gtaSlot 5 (assault) csSlot 1
-	elseif gtaWeaponID == 30 then return 77 -- "WEAPONTYPE_AK47_SKILL"
-	elseif gtaWeaponID == 31 then return 78 -- "WEAPONTYPE_M4_SKILL"
-	elseif gtaWeaponID == 34 then return 79 -- "WEAPONTYPE_SNIPERRIFLE_SKILL"
-	else return false end
+	elseif gtaWeaponID == WEAPON_AK47 then return STAT_AK47_SKILL
+	elseif gtaWeaponID == WEAPON_M4 then return STAT_M4_SKILL
+	elseif gtaWeaponID == WEAPON_SNIPER then return STAT_SNIPER_SKILL end
+	
+	return false
 end
 
 function getWeaponSkillAmount(skillName)
-	if skillName == "medium" then return 600 -- wartość pośrednia
-	elseif skillName == "pro" then return 999
-	elseif skillName == "ultra" then return 1000 -- podwójne bronie
-	else return 0 end
+	if skillName == "poor" then
+		return 0
+
+	elseif skillName == "medium" then
+		return 600
+	
+	elseif skillName == "pro" then
+		return 999
+	
+	elseif skillName == "ultra" then
+		-- dual wield
+		return 1000
+	
+	else
+		return 0
+	end
 end
 
 function playAnimationWithWalking(block, anim, player)
@@ -119,7 +132,7 @@ function stopAnimationWithWalking(player)
 		setElementData(player, "anim", false)
 	end
 end
--- sync w c walkanim.lua
+-- sync in c walkanim.lua
 
 function getOppositeTeam(team)
 	if team == g_team[1] then return g_team[2]
@@ -139,10 +152,12 @@ end
 function setPlayerMoneyEx(player, money)
 	if money > g_config["maxmoney"] then
 		money = g_config["maxmoney"]
+	
 	elseif money < 0 then
 		money = 0
 	end
-	setElementData(player, "money", money)
+
+	player:setData("money", money)
 end
 
 function takePlayerMoneyEx(player, money)
@@ -154,15 +169,19 @@ function givePlayerMoneyEx(player, money)
 end
 
 function getPlayerMoneyEx(player)
-	return getElementData(player, "money")
+	return player:getData("money")
 end
 
-function getPositionFromElementOffset(element,offX,offY,offZ)
-	local m = getElementMatrix(element) -- Get the matrix
-	local x = offX * m[1][1] + offY * m[2][1] + offZ * m[3][1] + m[4][1] -- Apply transform
+function getPositionFromElementOffset(element, offX, offY, offZ)
+	-- Get the matrix
+	local m = getElementMatrix(element)
+
+	-- Apply transform
+	local x = offX * m[1][1] + offY * m[2][1] + offZ * m[3][1] + m[4][1]
 	local y = offX * m[1][2] + offY * m[2][2] + offZ * m[3][2] + m[4][2]
 	local z = offX * m[1][3] + offY * m[2][3] + offZ * m[3][3] + m[4][3]
-	return x, y, z -- Return the transformed point
+
+	return x, y, z
 end
 
 function getPointFromDistanceRotation(x, y, dist, angle)
@@ -199,9 +218,16 @@ end
 function getTeamSkinValue(team)
 	if team == g_team[1] then
 		return 100
+	
 	elseif team == g_team[2] then
 		return 104
 	end
 	
 	return 0
+end
+
+function findRotation(x1, y1, x2, y2)
+	local t = -math.deg(math.atan2(x2 - x1, y2 - y1))
+	if t < 0 then t = t + 360 end
+	return t
 end
