@@ -1,18 +1,5 @@
 local HOSTAGE_PAIN_SOUND_TIMEOUT = 2000
 
-local MELEE_WEAPONS = {
-	WEAPON_FIST,
-	WEAPON_BRASSKNUCKLE,
-	WEAPON_GOLFCLUB,
-	WEAPON_NIGHTSTICK,
-	WEAPON_KNIFE,
-	WEAPON_BAT,
-	WEAPON_SHOVEL,
-	WEAPON_POOLSTICK,
-	WEAPON_KATANA,
-	WEAPON_CHAINSAW
-}
-
 function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 	cancelEvent()
 
@@ -26,13 +13,6 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 			-- Do not let hostages catch fire
 			setPedOnFire(source, false)
 			return
-		end
-
-		if table.find(MELEE_WEAPONS, weapon) then
-			-- Reset hostage animation
-			setPedAnimation(source, "CRACK", "crckidle3", 200, true, false, false, true)
-			setPedAnimationSpeed(source, "crckidle3", 0)
-			setPedAnimationProgress(source, "crckidle3", 1)
 		end
 
 		-- Play hostage pain sounds

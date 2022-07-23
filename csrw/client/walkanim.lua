@@ -26,10 +26,18 @@ function syncPedAnimation(ped)
 		anim = split(a, ":")
 		--outputChatBox("c syncPedAnimation: " .. tostring(anim[1]))
 		
-		interruptable = ped.type == "player"
-		setPedAnimation(ped, anim[1], anim[2], 200, true, false, interruptable, true) -- 200ms - zamrożenie na ten czas (podnosi peda z kucaka na animacji bomby (wtf, tylko na niej))
+		local interruptable = true
+		
+		-- 200ms - zamrożenie na ten czas (podnosi peda z kucaka na animacji bomby (wtf, tylko na niej))
+		local time = 200
+		if ped.type == "ped" and ped:getData("isHostage") and anim[1] == "CRACK" and anim[2] == "crckidle3" then
+			time = -1
+			interruptable = false
+		end
+
+		setPedAnimation(ped, anim[1], anim[2], time, true, false, interruptable, true)
 	
-		if ped.type == "ped" and anim[2] == "crckidle3" then
+		if ped.type == "ped" and ped:getData("isHostage") and anim[1] == "CRACK" and anim[2] == "crckidle3" then
 			setTimer(
 				function()
 					setPedAnimationSpeed(ped, "crckidle3", 0)
