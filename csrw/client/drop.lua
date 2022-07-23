@@ -3,16 +3,17 @@
 -- Same physical property group is used for projectiles and weapon objects
 local DROPPED_OBJECT_PHYSICAL_PROPERTY_GROUP = 122
 
--- Obiekty broni zapadają się pod ziemie jeśli nie ma wcześniej stworzonego projectile
-local physicFixer = createProjectile(localPlayer, 16, 0, 0, -4)
-destroyElement(physicFixer)
-
 -- Disable camera collisions for dropped weapon objects
 engineRestoreObjectGroupPhysicalProperties(DROPPED_OBJECT_PHYSICAL_PROPERTY_GROUP)
 engineSetObjectGroupPhysicalProperty(DROPPED_OBJECT_PHYSICAL_PROPERTY_GROUP, "avoid_camera", false)
 
+-- Weapon objects doesn't have collisions if there wasn't created projectile before
+-- So create one
+Projectile(localPlayer, WEAPON_TEARGAS, BLACKHOLE):destroy()
+
 function dropWeapon(forced, slot)
 	if not g_config["weapon_drop"] then
+		-- Weapon drop is disabled in config
 		return
 	end
 
@@ -21,6 +22,7 @@ function dropWeapon(forced, slot)
 		if not slot then
 			slot = getElementData(localPlayer, "currentSlot")
 		end
+
 		if slot then
 			local weapon = g_playerWeaponData[slot].weapon
 			if weapon and g_weapon[slot][weapon]["droppable"] ~= "false" and g_weapon[slot][weapon]["objectID"] ~= nil and tonumber(g_weapon[slot][weapon]["objectID"]) > 0 then
@@ -56,6 +58,7 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 	
 	if not isLineOfSightClear(x, y, z + 0.05, x2, y2, z2 + 0.05, true, false, false) then
 		velocity = {0, 0, 0.05}
+	
 	else
 		local matrix = getElementMatrix(player) -- mam nadzieję, że to zwróci dobre wartości na niezestreamowanym graczu
 		local offX = 0 * matrix[1][1] + 1 * matrix[2][1] + 0 * matrix[3][1] + 1 * matrix[4][1]
@@ -71,7 +74,6 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 	local model = g_weapon[slot][weapon]["objectID"]
 	engineSetModelPhysicalPropertiesGroup(model, DROPPED_OBJECT_PHYSICAL_PROPERTY_GROUP)
 
-	-- obiekt o modelu broni zapada się pod ziemie jeśli nie ma wcześniej stworzonego projectile
 	local wepObj = createObject(model, x, y, z, 90, 0, rotz)
 
 	for k, v in pairs(getElementsByType("player")) do
@@ -111,9 +113,6 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 				setTimer(setElementVelocity, 200, 1, wepObj, velocity[1], velocity[2], velocity[3])
 			end
 		end, 50, 1)
-
-	-- jako creatora projectile można dać normalnego gracza co wyrzuca broń, ale u niego też to trzeba zsynchronizować i wtedy player == localPlayer
-	-- więc projectile się zdublują.. pojazd to jak narazie jedyne normalne wyjście
 
 	if wepObj then
 		local col = createColSphere(x, y, z, 1)
@@ -193,9 +192,9 @@ addEventHandler("syncGroundWeapons", root,
 
 			local pos = split(v.xyzString, ",")
 			local wepObj = createObject(modelID, pos[1], pos[2], pos[3], 90, 0, v.rotz)
-			setElementInterior(wepObj, v.int)
-			setElementFrozen(wepObj, true)
-			setElementCollisionsEnabled(wepObj, false)
+			wepObj.interior = v.int
+			wepObj.frozen = true
+			wepObj.collisions = false
 		end
 	end
 )
@@ -246,6 +245,7 @@ local render = { -- 1680x1050
 	["img"] = {0.822*sX, 0.743*sY, 0.130*sX, 0.076*sY}, -- 1381, 781, 220, 80
 	["txt"] = {0.824*sY, 0.953*sX, 0.845*sY} -- 1381, 866, 1602, 888
 }
+
 local text = getText("drop_text")
 function drawWeapon()
 	dxDrawImage(render["img"][1], render["img"][2], render["img"][3], render["img"][4], ":csrw-media/images/shop/" .. g_weapon[drop_currentWeapon[1]][drop_currentWeapon[2]]["image"], 0, 0, 0, tocolor(0, 0, 0, 145), true)

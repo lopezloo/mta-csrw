@@ -15,7 +15,7 @@ function updateClassInfos(skin, teamid) -- update teamu, skinu (z c class.lua)
 		local oldTeam = getPlayerTeam(client)
 		if oldTeam == g_team[1] then g_roundData.aliveTT = g_roundData.aliveTT - 1
 		elseif oldTeam == g_team[2] then aliveCT = g_roundData.aliveCT - 1 end
-		setElementData(client, "alive", false)
+		client:setData("alive", false)
 	end
 	
 	changePlayerTeam(client, g_team[teamid], skin)
@@ -46,7 +46,7 @@ end
 addEvent("updateClassInfos", true)
 addEventHandler("updateClassInfos", root, updateClassInfos, skin, theTeam)
 
-function spawn(player) -- spawn
+function spawn(player)
 	detachCarriedHostage(player)
 
 	local theTeam = getPlayerTeam(player)
@@ -94,7 +94,7 @@ function spawn(player) -- spawn
 			local startWeapons = getWeaponsWithFlag(wepFlag)
 			if #startWeapons > 0 then
 				for i in pairs(startWeapons) do
-					outputChatBox("startWep " .. i)
+					--outputChatBox("startWep " .. i)
 					local startWeapon = g_weapon[ startWeapons[i][1] ][ startWeapons[i][2] ]
 					local startPistolAmmo = tonumber(startWeapon["ammo"])
 					local startPistolClip = tonumber(startWeapon["clip"])
@@ -105,7 +105,7 @@ function spawn(player) -- spawn
 			local startWeapons = getWeaponsWithFlag(wepFlag2)
 			if #startWeapons > 0 then
 				for i in pairs(startWeapons) do
-					outputChatBox("startWep " .. i)
+					--outputChatBox("startWep " .. i)
 					local startWeapon = g_weapon[ startWeapons[i][1] ][ startWeapons[i][2] ]
 					local startPistolAmmo = tonumber(startWeapon["ammo"])
 					local startPistolClip = tonumber(startWeapon["clip"])
@@ -118,8 +118,8 @@ function spawn(player) -- spawn
 			changePlayerSlot(player, csWeaponSlot, csWeaponSlot)
 		end
 
-		if g_config["freekevlar"] then -- darmowy kevlar
-			setElementData(player, "armor", 100)
+		if g_config["freekevlar"] then
+			player:setData("armor", 100)
 		end
 	end
 end
@@ -158,15 +158,14 @@ function randomizeBomberMan()
 end
 
 function onPlayerSpawn(x, y, z, rot, theTeam, skin, int, dimension)
-	setElementCollisionsEnabled(source, true)
-	setElementData(source, "alive", true)
-	setElementData(source, "health", 100)
+	source.collisions = true
+	source:setData("alive", true)
+	source:setData("health", 100)
 	
-	-- "najmniejsza" animacja alt. bicia (CTRL + F; enter_exit)
-	setPedFightingStyle(source, 16)
-	
-	-- MOVE_PLAYER_M
-	setPedWalkingStyle(source, 56)
+	-- smallest fighting style animation (CTRL + F; enter_exit)
+	setPedFightingStyle(source, FIGHTING_STYLE_ELBOWS)
+
+	setPedWalkingStyle(source, MOVE_PLAYER_M)
 
 	setPedHeadless(source, false)
 
@@ -219,13 +218,13 @@ function onPlayerWasted(ammo, killer, weapon, bodypart)
 			setPlayerAnnounceValue(killer, "score", (getElementData(killer, "score") or 0) + 1)
 		end
 	end
-	setElementData(source, "deaths", (getElementData(source, "deaths") or 0) + 1)
+	source:setData("deaths", (getElementData(source, "deaths") or 0) + 1)
 	g_player[source].surviveLastRound = false
 	setPlayerChannelByTeam(source)
 	
 	stopAnimationWithWalking(source)
 	csResetWeapons(source)
-	setElementData(source, "armor", 0)
+	source:setData("armor", 0)
 	-- @todo: weapon drop after death
 	
 	-- bonus (zapomoga po śmierci) za podłożenie bomby (niezależnie czy wygrano tą runde czy nie)
@@ -371,7 +370,7 @@ function onRoundEnd(winTeam, reason)
 	destroyBomb()
 	destroyGroundWeapons()
 	triggerClientEvent("onClientRoundEnd", root, winTeam, reason)
-	setElementData(resourceRoot, "defusingBomb", false)
+	resourceRoot:setData("defusingBomb", false)
 end
 addEvent("onRoundEnd", false)
 addEventHandler("onRoundEnd", root, onRoundEnd, winTeam, reason)
@@ -407,8 +406,8 @@ function startRound()
 	end
 
 	for k, v in pairs( getPlayersInTeam(g_team[3]) ) do
-		-- ukrywanie martwych ciał spectatorów z mapy
-		setElementPosition(v, 0, 0, 4)
+		-- hide spectator dead bodies
+		v.position = BLACKHOLE
 	end
 	
 	for k, vehicle in pairs(getElementsByType("vehicle")) do
@@ -430,7 +429,7 @@ function startRound()
 		outputServerLog("Round started!")
 		g_roundData.state = "started"
 
-		setElementData(resourceRoot, "bombPlanted", false)
+		resourceRoot:setData("bombPlanted", false)
 
 		countdownRoundTime(5, 0)
 		if g_match.bombsites then
@@ -451,8 +450,8 @@ function countdownRoundTime(minutes, seconds)
 	end
 	
 	if isRoundStarted() and not g_roundData.bomb then
-		setElementData(resourceRoot, "roundTimeMinutes", minutes)
-		setElementData(resourceRoot, "roundTimeSeconds", seconds)
+		resourceRoot:setData("roundTimeMinutes", minutes)
+		resourceRoot:setData("roundTimeSeconds", seconds)
 		
 		if minutes == 0 and seconds == 0 then
 			-- ^ jeśli jest 00:00 i jest przynajmniej jeden gracz w TT i CT

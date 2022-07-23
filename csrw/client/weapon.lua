@@ -298,6 +298,8 @@ function onSomeoneShot()
 		g_playerWeaponData[slot].clip = g_playerWeaponData[slot].clip - 1
 
 		if g_playerWeaponData[slot].clip == 0 then
+			local gtaWeaponID = getPedWeapon(localPlayer)
+
 			if g_playerWeaponData[slot].ammo == 0 then -- broń się skończyła
 				outputDebugString("No ammo in weapon, deleting.")
 				setTimer(
@@ -309,9 +311,9 @@ function onSomeoneShot()
 						end
 					end, 50, 1)
 			else
-				-- broń wymaga przeładowania
-				if getPedWeapon(localPlayer) == 16 or getPedWeapon(localPlayer) == 17 or getPedWeapon(localPlayer) == 18 or getPedWeapon(localPlayer) == 39 then
-					-- nie przeładowywanie granatów
+				-- weapon require reloading
+				if gtaWeaponID == WEAPON_GRENADE or gtaWeaponID == WEAPON_TEARGAS or gtaWeaponID == WEAPON_MOLOTOV or gtaWeaponID == WEAPON_SATCHEL then
+					-- do not reload grenades
 					--setElementData(localPlayer, "wSlot" .. slot .. "Ammo", getPedAmmoInClip(localPlayer) - 1)
 					-- jaki jest sens aktualizacji liczby granatów do zmiennej ?
 				else
@@ -321,7 +323,7 @@ function onSomeoneShot()
 				end
 			end
 
-			if getPedWeapon(localPlayer) == 34 then -- sniper
+			if gtaWeaponID == WEAPON_SNIPER then -- sniper
 				onClientAim("induced", "up") -- ponowne pokazywanie obiektów przyczepionych do gracza (bo po strzale niekoniecznie musi skończyć celowanie)
 			end
 		end

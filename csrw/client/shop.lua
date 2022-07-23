@@ -351,7 +351,7 @@ function buyWeapon(cost, slot, weapon)
 		g_player.items.defuser = true
 
 	else
-		if gtaWepID == 16 or gtaWepID == 17 or gtaWepID == 18 then -- granaty
+		if gtaWepID == WEAPON_GRENADE or gtaWepID == WEAPON_TEARGAS or gtaWepID == WEAPON_MOLOTOV then
 			local maxGrenades = 1
 			if slot == 4 then
 				maxGrenades = 2

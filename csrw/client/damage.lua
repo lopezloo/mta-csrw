@@ -33,7 +33,7 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 		return
 	end
 
-	if weapon ~= 51 and weapon ~= 54 and weapon ~= 59 and weapon ~= 16 and weapon ~= 18 and weapon ~= 19 and weapon ~= 20 and weapon ~= 39 and weapon ~= 37 then -- 51 = explosion; 54 = falling down; 37 = fire/flamethrower
+	if weapon ~= DAMAGE_EXPLOSION and weapon ~= DAMAGE_FALL and weapon ~= DAMAGE_TANK_GRENADE and weapon ~= WEAPON_GRENADE and weapon ~= WEAPON_MOLOTOV and weapon ~= DAMAGE_ROCKET and weapon ~= 20 and weapon ~= WEAPON_SATCHEL and weapon ~= DAMAGE_BURNT then
 		if source == localPlayer or (getElementType(source) == "ped" and attacker == localPlayer) then
 			calcDamage(source, attacker, bodypart, loss, weapon)
 		end

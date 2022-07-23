@@ -10,6 +10,8 @@
 
 	<script type="shared" src="shared/utils/advert.lua" />
 	<script type="shared" src="shared/utils/utils.lua" />
+	<script type="shared" src="shared/utils/definitions.lua" />
+	<script type="shared" src="shared/utils/definitions2.lua" />
 
 	<script type="shared" src="shared/config.lua" />
 	<script type="shared" src="shared/language.lua" />
@@ -28,7 +30,6 @@
 	<script type="server" src="server/security.lua" />
 	<script type="server" src="server/voice.lua" />
 	<script type="server" src="server/weapon.lua" />
-	<!--<script type="server" src="server/news.lua" />-->
 
 	<script type="client" src="client/main.lua" />
 	<script type="client" src="client/mapchange.lua" />

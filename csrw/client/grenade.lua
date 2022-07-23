@@ -38,26 +38,28 @@ local SMOKE_GRENADE_GROUND_OBJECT_ID = 343
 
 local SMOKE_GRENADE_PARTICLE_EFFECT_NAME = "carwashspray"
 
+local PROJECTILE_COUNTER_MAX = 999999
+
 addEventHandler("onClientProjectileCreation", root,
 	function(creator)
-		if getProjectileType(source) == 16 then -- 16 = grenade
+		if getProjectileType(source) == WEAPON_GRENADE then
 			-- HE grenade
 			addEventHandler("onClientElementDestroy", source, onHEGrenadeExploded)
 
-		elseif getProjectileType(source) == 17 then -- 17 = teargas
+		elseif getProjectileType(source) == WEAPON_TEARGAS then
 			local slot = getElementData(creator, "currentSlot")
 			if slot then
 				local weapon = getElementData(creator, "wSlot" .. slot)
 				if weapon then
 					if g_weapon[slot][weapon]["objectID"] == "-2" then
 						-- Flashbang grenade
-						-- Set projectile counter high to avoid grenade explosion
-						setProjectileCounter(source, 99999)
+						-- Set projectile counter to max to avoid grenade explosion
+						source:setCounter(PROJECTILE_COUNTER_MAX)
 						setTimer(onFlashBangExploded, FLASHBANG_GRENADE_EXPLOSION_TIMEOUT, 1, source)				
 					
 					elseif g_weapon[slot][weapon]["objectID"] == "-3" then
 						-- Decoy grenade
-						setProjectileCounter(source, 99999)
+						source:setCounter(PROJECTILE_COUNTER_MAX)
 
 						-- Get best player weapon to use it as decoy
 						local weapon = {1, getElementData(creator, "wSlot1")}
@@ -100,14 +102,14 @@ function onFlashBangExploded(grenade)
 	if g_player.flashed or (localPlayer.team ~= g_team[1] and localPlayer.team ~= g_team[2]) then
 		-- Already flashed by another flashbang
 		-- Or in spectator
-		destroyElement(grenade)
+		destroyProjectile(grenade)
 		return
 	end
 	
 	if not isLineOfSightClear(x, y, z, x2, y2, z2, true, true, false, true, true, false, false, grenade) then
 		-- If flashbang projectile is behind some object
 		Sound3D(":csrw-sounds/sounds/weapons/flashbang/flashbang_explode2.wav", x, y, z).maxDistance = 50
-		destroyElement(grenade)
+		destroyProjectile(grenade)
 		return
 	end
 
@@ -147,11 +149,12 @@ function onFlashBangExploded(grenade)
 				fadeCamera(true, 1) 
 				showRadar(true)
 				g_player.flashed = false
-			end, 5000 / distance, 1)
+			end, 5000 / distance, 1
+		)
 	end
 
 	-- Destroy projectile
-	destroyElement(grenade)
+	destroyProjectile(grenade)
 
 	if exploded then
 		gl_flashedSound = playSound(":csrw-sounds/sounds/weapons/flashbang/flash.ogg")
@@ -183,8 +186,7 @@ function onDecoyExploded(grenade, slot, weapon)
 		groundZ = z
 	end
 
-	-- Destroy projectile
-	destroyElement(grenade)
+	destroyProjectile(grenade)
 
 	if not weapon then
 		-- Get default weapon for decoy if none specified
@@ -251,7 +253,7 @@ function onDecoyExploded(grenade, slot, weapon)
 
 				if i == 20 then
 					-- Create small explosion
-					createExplosion(x, y, z, 12)
+					createExplosion(x, y, z, EXPLOSION_TINY, false)
 
 					-- Play explosion sound
 					local sound = playSound3D(":csrw-sounds/sounds/weapons/hegrenade/explode3.wav", x, y, z)
@@ -274,9 +276,11 @@ function onDecoyExploded(grenade, slot, weapon)
 							local s = playSound3D(sound, x, y, z)
 							setSoundMaxDistance(s, 100)
 							createSparks(Vector3(x, y, z))
-						end, timeBetweenShots, 1)
+						end, timeBetweenShots, 1
+					)
 				end
-			end, (2000 + timeBetweenShots)*i, 1)
+			end, (2000 + timeBetweenShots)*i, 1
+		)
 	end
 end
 
@@ -293,7 +297,7 @@ function onSmokeGrenadeExploded(projectile)
 	else
 		table.insert(gl_grenades.smokesFlying, projectile)
 
-		-- Smoke projectile is still flying, we will wait
+		-- Smoke projectile is still in the air, we will wait
 		if not g_misc.smokeUpdate and #gl_grenades.smokes > 0 then
 			g_misc.smokeUpdate = true
 			gl_timer_flyingSmokeGrenadesUpdate = setTimer(updateFlyingSmokeGrenades, 50, 0)
@@ -331,11 +335,13 @@ function createSmokeGrenadeParticleEffect(projectile)
 	particle.speed = 1
 	particle.density = 2
 
-	setTimer(function()
-		if particle and isElement(particle) then
-			particle.speed = 0.25
-		end
-	end, 2000, 1)
+	setTimer(
+		function()
+			if particle and isElement(particle) then
+				particle.speed = 0.25
+			end
+		end, 2000, 1
+	)
 
 	particle.collisions = false
 	table.insert(gl_grenades.smokeParticles, particle)
@@ -346,7 +352,7 @@ function createSmokeGrenadeParticleEffect(projectile)
 
 	-- Smoke is already lying on the ground, we can delete it to easy projectile limits
 	table.remove(gl_grenades.smokes, table.find(gl_grenades.smokes, projectile))
-	destroyElement(projectile)
+	destroyProjectile(projectile)
 
 	-- Recreate projectile as object
 	local groundZ = getGroundPosition(x, y, z)
@@ -389,12 +395,15 @@ function createSmokeGrenadeParticleEffect(projectile)
 			particle.density = 0
 
 			-- Delete particle
-			setTimer(function()
-				if particle and isElement(particle) then
-					particle:destroy()
-				end
-			end, 10000, 1)
-		end, SMOKE_GRENADE_LIFETIME, 1)
+			setTimer(
+				function()
+					if particle and isElement(particle) then
+						particle:destroy()
+					end
+				end, 10000, 1
+			)
+		end, SMOKE_GRENADE_LIFETIME, 1
+	)
 end
 
 function onSmokeGrenadeDestroy()
@@ -434,8 +443,8 @@ function destroyGrenades()
 	for k, v in pairs(gl_grenades.decoys) do destroyElement(v) end
 
 	for k, v in pairs(gl_grenades.smokeSounds) do
-		if(isElement(v)) then
-			destroyElement(v)
+		if isElement(v) then
+			v:destroy()
 		end
 	end
 
@@ -446,7 +455,7 @@ function destroyGrenades()
 	gl_grenades.smokes = {}
 
 	for k, v in pairs(getElementsByType("projectile")) do
-		destroyElement(v)
+		destroyProjectile(v)
 	end
 end
 
@@ -454,12 +463,23 @@ function createSparks(position)
 	local fx = Effect("prt_spark", position, -90, 0, 0, 100, false)
 	fx.density = 0.2
 
-	setTimer(function()
-		fx.density = 0
-		
-		setTimer(function()
-			fx:destroy()
-		end, 400, 1)
+	setTimer(
+		function()
+			fx.density = 0
+			
+			setTimer(
+				function()
+					fx:destroy()
+				end, 400, 1
+			)
+		end, 150, 1
+	)
+end
 
-	end, 150, 1)
+function destroyProjectile(projectile)
+	-- Grenades explode while being destroyed
+	-- so update projectile counter and teleport them away before that
+	projectile:setCounter(PROJECTILE_COUNTER_MAX)
+	projectile.position = BLACKHOLE
+	projectile:destroy()
 end

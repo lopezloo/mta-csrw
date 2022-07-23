@@ -348,7 +348,7 @@ function buyWeapon(weaponCost, csSlot, csWeaponID)
 	end
 
 	local gtaWeaponID = tonumber(g_weapon[csSlot][csWeaponID]["weaponID"])
-	if gtaWeaponID == 16 or gtaWeaponID == 17 or gtaWeaponID == 18 then
+	if gtaWeaponID == WEAPON_GRENADE or gtaWeaponID == WEAPON_TEARGAS or gtaWeaponID == WEAPON_MOLOTOV then
 		local maxGrenades = 1
 		if csSlot == 4 then
 			maxGrenades = 2
