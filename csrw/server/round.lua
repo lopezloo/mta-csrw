@@ -441,6 +441,8 @@ function startRound()
 			voteMaps()
 		end			
 	end
+
+	triggerClientEvent("onClientRoundStart", root)
 end
 
 function countdownRoundTime(minutes, seconds)

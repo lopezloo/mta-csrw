@@ -22,7 +22,7 @@ function createHostages()
 end
 
 function removeHostages()
-	for k, hostage in pairs(getElementsByType("hostage")) do
+	for _, hostage in pairs(getElementsByType("hostage")) do
 		local ped = getElementData(hostage, "ped")
 		if isElement(ped) then
 			destroyElement(ped)
@@ -34,8 +34,12 @@ function respawnHostages()
 	removeHostages()
 
 	local hostages = getElementsByType("hostage")
-	for k, hostage in pairs(getElementsByType("hostage")) do
-		local skin = hostage:getData("skin") or HOSTAGE_DEFAULT_SKIN_ID
+	for _, hostage in pairs(getElementsByType("hostage")) do
+		local skin = hostage:getData("skin")
+		if skin == false then
+			skin = HOSTAGE_DEFAULT_SKIN_ID
+		end
+		
 		local ped = createPed(skin, getElementData(hostage, "posX"), getElementData(hostage, "posY"), getElementData(hostage, "posZ"), (getElementData(hostage, "rotZ") or 0) - 90)
 		
 		hostage:setData("ped", ped)
@@ -44,7 +48,13 @@ function respawnHostages()
 
 		playAnimationWithWalking("CRACK", "crckidle3", ped)
 		ped.frozen = true
-		ped.interior = hostage:getData("interior") or HOSTAGE_DEFAULT_INTERIOR_ID
+
+		local int = hostage:getData("interior")
+		if int == false then
+			int = HOSTAGE_DEFAULT_INTERIOR_ID
+		end
+
+		ped.interior = int
 	end
 end
 
