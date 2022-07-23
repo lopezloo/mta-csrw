@@ -263,7 +263,7 @@
 	</msg_buyTime>
 	
 	<msg_buyNeedSpawn>
-		You need to be near your spawn for buy weapons!
+		You need to be near your spawn to buy weapons!
 	</msg_buyNeedSpawn>
 	
 	<msg_enabled>
