@@ -158,15 +158,15 @@ end
 addEventHandler("onClientPlayerWasted", localPlayer,
 	function()
 		if getCurrentProgressBar() ~= "" then
-			if getPlayerTeam(localPlayer) == g_team[1] then cancelPlant()
-			elseif getPlayerTeam(localPlayer) == g_team[2] then cancelDefuse() end
+			if localPlayer.team == g_team[1] then cancelPlant()
+			elseif localPlayer.team == g_team[2] then cancelDefuse() end
 		end
 	end
 )
 
 addEventHandler("onClientPlayerQuit", localPlayer,
 	function()
-		if getCurrentProgressBar() == "defusing" and getPlayerTeam(localPlayer) == g_team[2] then
+		if getCurrentProgressBar() == "defusing" and localPlayer.team == g_team[2] then
 			setElementData(resourceRoot, "defusingBomb", false)
 		end
 	end

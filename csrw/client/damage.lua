@@ -17,13 +17,13 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 
 		-- Play hostage pain sounds
 		-- Rate limit it to max once per 2s
-		local ts = getElementData(source, "lastPainSoundTime")
+		local ts = source:getData("lastPainSoundTime")
 		if ts and getTickCount() - ts < HOSTAGE_PAIN_SOUND_TIMEOUT then
 			return
 		end
 
 		playSound3D(":csrw-sounds/sounds/hostage/hpain/hpain" .. math.random(1, 6) .. ".wav", getElementPosition(source))
-		setElementData(source, "lastPainSoundTime", getTickCount(), false)
+		source:setData("lastPainSoundTime", getTickCount(), false)
 		return
 	end
 
@@ -34,14 +34,14 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 	end
 
 	if weapon ~= DAMAGE_EXPLOSION and weapon ~= DAMAGE_FALL and weapon ~= DAMAGE_TANK_GRENADE and weapon ~= WEAPON_GRENADE and weapon ~= WEAPON_MOLOTOV and weapon ~= DAMAGE_ROCKET and weapon ~= 20 and weapon ~= WEAPON_SATCHEL and weapon ~= DAMAGE_BURNT then
-		if source == localPlayer or (getElementType(source) == "ped" and attacker == localPlayer) then
+		if source == localPlayer or (source.type == "ped" and attacker == localPlayer) then
 			calcDamage(source, attacker, bodypart, loss, weapon)
 		end
 	else
 		if weapon == DAMAGE_FALL then
 			-- Workaround fix for "Climbing over certain objects kills you, when you have high FPS"
 			-- https://github.com/multitheftauto/mtasa-blue/issues/602
-			if not attacker and bodypart == 3 then
+			if not attacker and bodypart == BODY_PART_TORSO then
 				local task = {}
 				task[1], task[2], task[3] = getPedTask(localPlayer, "primary", 3)
 				if task[1] == "TASK_COMPLEX_JUMP" and task[2] == "TASK_SIMPLE_CLIMB" then
@@ -61,8 +61,8 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 		
 		if source == localPlayer then
 			csSetPedHealth(source, csGetPedHealth(source) - loss)
-			if attacker and getElementType(attacker) == "player" then
-				outputConsole("[DAMAGE TAKEN] From: " .. getPlayerName(attacker) .. " | Amount: " .. loss)
+			if attacker and attacker.type == "player" then
+				outputConsole("[DAMAGE TAKEN] From: " .. attacker.name .. " | Amount: " .. loss)
 			else
 				outputConsole("[DAMAGE TAKEN] Amount: " .. loss)
 			end
@@ -105,7 +105,7 @@ function calcDamage(victim, attacker, bodypart, gtaLoss, gtaWeapon)
 			tempDamage = tonumber(g_weapon[slot][weapon][csGetBodyPartName(bodypart) .. "DamageArmor"])
 			hasArmor = true
 
-			if bodypart == 9 and g_player.items.helmet then
+			if bodypart == BODY_PART_HEAD and g_player.items.helmet then
 				tempDamage = tempDamage / 2 -- obrażenia o połowe mniejsze gdy ofiara posiada hełm
 				g_player.items.helmet = false
 				playSound(":csrw-sounds/sounds/player/bhit_helmet-1.wav")
@@ -141,14 +141,14 @@ function calcDamage(victim, attacker, bodypart, gtaLoss, gtaWeapon)
 	end
 
 	if damage.health > 0 then
-		if getElementType(victim) == "ped" then
+		if victim.type == "ped" then
 			damage.health = math.floor(damage.health / 2)
 		end
 		new.health = csGetPedHealth(victim) - damage.health
 
 		if new.health < 0 then
 			triggerServerEvent("csKillPed", resourceRoot, victim, attacker, gtaWeapon, bodypart)
-			if bodypart == 9 then
+			if bodypart == BODY_PART_HEAD then
 				playSound(":csrw-sounds/sounds/player/headshot" .. math.random(1, 2) .. ".wav")
 			end
 
@@ -167,11 +167,11 @@ addEventHandler("onClientPlayerDamage", localPlayer, onSomeoneDamaged)
 addEventHandler("onClientPedDamage", root, onSomeoneDamaged) -- obliczane przez ofiare (ofiara sama sobie ustawia date) (lub atakującego jeśli atakuje się peda - np. zakładnika)
 
 function csGetBodyPartName(partid)
-	if partid >= 3 and partid <= 6 then
+	if partid >= BODY_PART_TORSO and partid <= BODY_PART_RIGHT_ARM then
 		return "torso"
-	elseif partid == 7 or partid == 8 then
+	elseif partid == BODY_PART_LEFT_LEG or partid == BODY_PART_RIGHT_LEG then
 		return "legs"
-	elseif partid == 9 then
+	elseif partid == BODY_PART_HEAD then
 		return "head"
 	end
 end

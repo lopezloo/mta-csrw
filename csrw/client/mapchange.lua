@@ -9,7 +9,7 @@ addEventHandler("onMapStart", root,
 		spectator.exit()
 		preInit()
 
-		local team = getPlayerTeam(localPlayer)
+		local team = localPlayer.team
 
 		if loadingMusic and isElement(loadingMusic) then stopSound(loadingMusic) end
 		if team then

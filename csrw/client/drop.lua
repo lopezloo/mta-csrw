@@ -153,7 +153,7 @@ function onWeaponDropped(player, slot, weapon, totalAmmo, clipAmmo, uniqueID)
 				end
 			end, 7000, 1)
 
-		if getPlayerTeam(localPlayer) == g_team[3] then -- wall shader na wyrzuconej broni tylko gdy jest się w pełnym specu
+		if localPlayer.team == g_team[3] then -- wall shader na wyrzuconej broni tylko gdy jest się w pełnym specu
 			CWallShader:enable(wepObj, 255, 119, 0, 100)
 		end
 	end
