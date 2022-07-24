@@ -9,15 +9,19 @@ local debug = {
 
 function enableDebug(cmd, level)
 	if debug.enabled then
-		if not level then level = 1 end
+		if not level then
+			level = 1
+		end
+
 		level = tonumber(level)
-		--if level > 0 and level <= 5 then
-		if level == 1 then
+		if level > 0 and level <= 5 then
 			debug[level] = not debug[level]
 			outputChatBox("debug[" .. level .. "] = " .. tostring(debug[level]))
 			if debug[level] then
 				addEventHandler("onClientRender", root, loadstring("return drawDebug_" .. level .. "()"))
-			else removeEventHandler("onClientRender", root, loadstring("return drawDebug_" .. level .. "()")) end
+			else
+				removeEventHandler("onClientRender", root, loadstring("return drawDebug_" .. level .. "()"))
+			end
 		end
 	end
 end
@@ -53,7 +57,7 @@ function drawDebug_1()
 	text = text .. "\nprojectiles: " .. #getElementsByType("projectile") .. " | colshapes: " .. #getElementsByType("colshape")
 	text = text .. "\nlocalization: " .. getLocalization().name .. " (" .. getLocalization().code .. ")"
 	text = text .. "\naim: " .. tostring(getControlState("aim_weapon")) .. " | shoot: " .. tostring(getControlState("fire"))
-	text = text .. "\nskin: " .. getElementModel(localPlayer)
+	text = text .. "\nskin: " .. localPlayer.model
 	text = text .. "\nhelmet: " .. tostring(g_player.items.helmet) .. " | defuser: " .. tostring(g_player.items.defuser)
 	text = text .. "\ncamRot: " .. tostring( getPedCameraRotation(localPlayer) )
 	text = text .. "\nmoveState: " .. tostring( getPedMoveState(localPlayer) )
@@ -85,7 +89,7 @@ end
 
 -- draw other info about player debug
 function drawDebug_2()
-	for k, v in pairs(getElementsByType("player")) do
+	for _, v in pairs(getElementsByType("player")) do
 		if v ~= localPlayer and isElementOnScreen(v) then
 			local x, y, z = getPedBonePosition(v, 8)
 			local x, y = getScreenFromWorldPosition(x, y, z)
@@ -110,7 +114,7 @@ end
 
 -- weapons lying on the ground debug
 function drawDebug_3()
-	for k, v in pairs(getElementsByType("colshape")) do
+	for _, v in pairs(getElementsByType("colshape")) do
 		--if isElementOnScreen(v) then -- nie dziala na colshape o.o
 		local data = getElementData(v, "groundWeapon")
 		if data ~= false then
@@ -125,9 +129,9 @@ function drawDebug_3()
 	end
 end
 
--- localplayer bones debug
+-- local player bones debug
 function drawDebug_4()
-	for i=1, 60 do
+	for i = 1, 60 do
 		local x, y, z = getPedBonePosition(localPlayer, i)
 		if x and y and z then
 			local x, y = getScreenFromWorldPosition(x, y, z)
@@ -140,7 +144,7 @@ end
 
 -- show distance to other players
 function drawDebug_5()
-	for k, v in pairs(getElementsByType("player")) do
+	for _, v in pairs(getElementsByType("player")) do
 		if v ~= localPlayer and isElementStreamedIn(v) and getElementData(v, "alive") and isElementOnScreen(v) then
 			local x, y, z = getElementPosition(v)
 			local distance = getDistanceBetweenPoints3D(x, y, z, getElementPosition(localPlayer))
@@ -153,7 +157,7 @@ function drawDebug_5()
 	end
 end
 
--- debug strzałów
+-- shots debug
 local miscDebug = {
 	impacts = false
 }
@@ -178,17 +182,19 @@ function drawImpacts(weapon, ammo, clip, hitX, hitY, hitZ, hitElement, startX, s
 				dxDrawRectangle(x - 2, y - 2, 4, 4, tocolor(0, 255, 0))
 			end
 		end
+		
 		addEventHandler("onClientRender", root, drawThisImpact)
 		setTimer(
 			function()
 				removeEventHandler("onClientRender", root, drawThisImpact)
-			end, 2000, 1)
+			end, 2000, 1
+		)
 	end
 end
 
 if false then
 function spawnDebug()
-	for k, v in pairs(getElementsByType("spawntt")) do
+	for _, v in pairs(getElementsByType("spawntt")) do
 		local x, y, z = getElementData(v, "posX"), getElementData(v, "posY"), getElementData(v, "posZ")
 		x, y = getScreenFromWorldPosition(x, y, z)
 		if x and y then
@@ -196,7 +202,7 @@ function spawnDebug()
 		end
 	end
 
-	for k, v in pairs(getElementsByType("spawnct")) do
+	for _, v in pairs(getElementsByType("spawnct")) do
 		local x, y, z = getElementData(v, "posX"), getElementData(v, "posY"), getElementData(v, "posZ")
 		x, y = getScreenFromWorldPosition(x, y, z)
 		if x and y then

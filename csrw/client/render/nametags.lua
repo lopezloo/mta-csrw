@@ -33,7 +33,7 @@ addEventHandler("onClientRender", root,
 
 					elseif target.type == "player" then
 						color = teamColors[ getPlayerTeam(target) ]
-						if getPlayerTeam(target) == getPlayerTeam(localPlayer) then
+						if getPlayerTeam(target) == localPlayer.team then
 							subtext = getText("nametags_friend") .. ", " .. getElementData(target, "health")
 						else
 							subtext = getText("nametags_enemy")
