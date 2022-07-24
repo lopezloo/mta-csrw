@@ -22,7 +22,7 @@ g_resources = {
 }
 
 g_player = {}
-local DEFINE_VERSION = "1.0.1"
+local DEFINE_VERSION = "1.1.0"
 
 addEventHandler("onResourceStart", root,
 	function()
