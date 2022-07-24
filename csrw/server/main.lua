@@ -286,22 +286,22 @@ end
 
 function setPlayerSneaking(player, key, keyState)
 	if keyState == "down" then
-		setPedWalkingStyle(player, 69) -- MOVE_SNEAK
+		setPedWalkingStyle(player, MOVE_SNEAK)
 		g_player[player].sneaking = true
 		if not getElementData(player, "anim") then
 			playAnimationWithWalking("ped", "facanger", player)
 		end
-		if getPedWeaponSlot(player) == 1 then -- broń biała
+		if getPedWeaponSlot(player) == WEAPON_SLOT_MELEE then
 			toggleControl(player, "sprint", false)
 		end
 		
 	else
 		g_player[player].sneaking = false
-		setPedWalkingStyle(player, 56) -- MOVE_PLAYER_M
+		setPedWalkingStyle(player, MOVE_PLAYER_M)
 		if getElementData(player, "anim") == "ped:facanger" then
 			stopAnimationWithWalking(player)
 		end
-		if getPedWeaponSlot(player) == 1 then -- broń biała
+		if getPedWeaponSlot(player) == WEAPON_SLOT_MELEE then
 			toggleControl(player, "sprint", true)
 		end		
 	end
