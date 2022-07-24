@@ -1,14 +1,17 @@
 local radar = {
 	showing = false,
-	-- kolor tła i obramowania
+	-- background and border colors
 	background = {51, 162, 37, 160},
 	disc = {0, 0, 0, 240},
 
-	-- pozycja, rozmiary
+	-- position and size
 	x = sY * 0.028,
 	y = sY * 0.75,
 	height = sY * 0.200,
-	range = 100
+
+	range = 100,
+
+	blips = {}
 }
 
 radar.centerleft = radar.x + radar.height / 2
@@ -16,20 +19,44 @@ radar.centerTop = radar.y + radar.height / 2
 radar.blipSize = radar.height / 16
 radar.lpsize = radar.height / 8
 
+function csCreateBlip(pos, img, size)
+	table.insert(radar.blips, {
+		pos = pos,
+		attachedTo = nil,
+		img = img,
+		size = size
+	})
+end
+
+function csCreateBlipAttachedTo(attachedTo, img, size)
+	table.insert(radar.blips, {
+		pos = nil,
+		attachedTo = attachedTo,
+		img = img,
+		size = size
+	})
+end
+
+function csClearBlips()
+	radar.blips = {}
+end
+
 function showRadar(show)
 	if not show then show = not radar.showing end
 	if radar.showing and show == false then
-		removeEventHandler("onClientRender", root, onRadarRender)
+		removeEventHandler("onClientRender", root, renderRadar)
+	
 	elseif not radar.showing and show == true then
-		addEventHandler("onClientRender", root, onRadarRender)
+		addEventHandler("onClientRender", root, renderRadar)
 	end
 	radar.showing = show
 end
 
-function onRadarRender()
+function renderRadar()
 	local target = getCameraTarget()
 	if not radar.showing or (not target and not g_player.spectator) then return end
-	if target and getElementType(target) == "vehicle" and getPedOccupiedVehicle(localPlayer) == target then
+
+	if target and target.type == "vehicle" and localPlayer.vehicle == target then
 		target = localPlayer
 	end
 
@@ -47,14 +74,14 @@ function onRadarRender()
 	dxDrawImage(radar.x, radar.y, radar.height, radar.height, ":csrw-media/images/radar/disc.png", 0, 0, 0, tocolor(radar.disc[1], radar.disc[2], radar.disc[3], radar.disc[4]), false)
 
 	for k, v in ipairs(getElementsByType("player")) do
-		if (g_player.spectator or (getElementData(v, "alive") and getPlayerTeam(v) == getPlayerTeam(localPlayer))) and target ~= v then
+		if (g_player.spectator or (getElementData(v, "alive") and getPlayerTeam(v) == localPlayer.team)) and target ~= v then
 			local _, _, rot = getElementRotation(v)
 			local ex, ey, ez = getElementPosition(v)
 			local dist = getDistanceBetweenPoints2D(px, py, ex, ey)
 			if dist > radar.range then
 				dist = tonumber(radar.range)
 			end
-			local rot = 180-north + findRotation(px,py,ex,ey)
+			local rot = 180-north + findRotation(px, py, ex, ey)
 			local cblipx, cblipy = getPointFromDistanceRotation(0, 0, radar.height * (dist/radar.range)/2, rot)
 			local blipx = radar.centerleft + cblipx - radar.blipSize/2
 			local blipy = radar.centerTop + cblipy - radar.blipSize/2
@@ -67,38 +94,29 @@ function onRadarRender()
 		end
 	end
 
-	for k, v in ipairs(getElementsByType("bombsite")) do
-		local letter = getElementID(v)
-		if letter == "bombsite (1)" then letter = "A"
-		elseif letter == "bombsite (2)" then letter = "B"
-		elseif letter == "bombsite (3)" then letter = "C" end
-		if letter == "A" or letter == "B" or letter == "C" then
-			local ex, ey, ez = getElementPosition(v)
+	for _, v in ipairs(radar.blips) do
+		local ex, ey, ez
+		if v.pos then
+			ex, ey, ez = v.pos.x, v.pos.y, v.pos.z
+		elseif isElement(v.attachedTo) then
+			ex, ey, ez = v.attachedTo.position.x, v.attachedTo.position.y, v.attachedTo.position.z
+		end
+
+		if ex and ey and ez then
 			local dist = getDistanceBetweenPoints2D(px, py, ex, ey)
 			if dist > radar.range then
 				dist = tonumber(radar.range)
 			end
+
+			local size = radar.height / v.size
+
 			local rot = 180 - north + findRotation(px, py, ex, ey)
 			local cblipx, cblipy = getPointFromDistanceRotation(0, 0, radar.height * (dist/radar.range)/2, rot)
-			local blipx = radar.centerleft + cblipx - radar.lpsize/2
-			local blipy = radar.centerTop + cblipy - radar.lpsize/2
+			local blipx = radar.centerleft + cblipx - size/2
+			local blipy = radar.centerTop + cblipy - size/2
 
-			dxDrawImage(blipx, blipy, radar.lpsize, radar.lpsize, ":csrw-media/images/radar/" .. letter .. ".png")
+			dxDrawImage(blipx, blipy, size, size, ":csrw-media/images/radar/" .. v.img .. ".png")
 		end
-	end
-
-	for k, v in ipairs(getElementsByType("hostageSite")) do
-		local ex, ey, ez = getElementPosition(v)
-		local dist = getDistanceBetweenPoints2D(px, py, ex, ey)
-		if dist > radar.range then
-			dist = tonumber(radar.range)
-		end
-		local rot = 180 - north + findRotation(px, py, ex, ey)
-		local cblipx, cblipy = getPointFromDistanceRotation(0, 0, radar.height * (dist/radar.range)/2, rot)
-		local blipx = radar.centerleft + cblipx - radar.lpsize/2
-		local blipy = radar.centerTop + cblipy - radar.lpsize/2
-
-		dxDrawImage(blipx, blipy, radar.lpsize, radar.lpsize, ":csrw-media/images/radar/H.png")
 	end
 
 	if g_player.spectator and not target then
@@ -106,10 +124,4 @@ function onRadarRender()
 	else
 		dxDrawImage(radar.centerleft - radar.lpsize/2, radar.centerTop - radar.lpsize/2, radar.lpsize, radar.lpsize, ":csrw-media/images/radar/centre.png", north - pr)
 	end
-end
-
-function findRotation(x1,y1,x2,y2)
-	local t = -math.deg(math.atan2(x2-x1,y2-y1))
-	if t < 0 then t = t + 360 end;
-	return t;
 end
