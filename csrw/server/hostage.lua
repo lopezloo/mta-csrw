@@ -120,6 +120,12 @@ function onHostageDelivered(element, matchingDimensions)
 
 		g_player[element].carryingHost:setData("rescued", true)
 		detachCarriedHostage(element)
+		toggleControl(element, "sprint", isWeaponSlotSprintable(element.weaponSlot))
+
+		-- @todo?
+		toggleControl(element, "jump", true)
+		toggleControl(element, "crouch", true)
+
 		onRoundEnd(2, 5)
 	end
 end

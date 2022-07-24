@@ -1,21 +1,31 @@
 local reloadAnimation = {
-	-- zbiór, animacja normalna, animacja podczas kucania
-	[2] = {"COLT45", "colt45_reload", "colt45_crouchreload"}, -- pistolety
-	[3] = {"BUDDY", "buddy_reload", "buddy_crouchreload"}, -- shotguny
-	[4] = {"UZI", "UZI_reload", "UZI_crouchreload"}, -- maszynowe
-	[5] = {"PYTHON", "python_reload", "python_crouchreload"}, -- karabiny
-	[6] = {"BUDDY", "buddy_reload", "buddy_crouchreload"} -- rifle
+	-- animation block; standing reload animation; crouch reload animation
+	-- pistols
+	[2] = {"COLT45", "colt45_reload", "colt45_crouchreload"},
+
+	-- shotguns
+	[3] = {"BUDDY", "buddy_reload", "buddy_crouchreload"},
+
+	-- machine guns
+	[4] = {"UZI", "UZI_reload", "UZI_crouchreload"},
+
+	-- assault rifles
+	[5] = {"PYTHON", "python_reload", "python_crouchreload"},
+
+	-- rifles
+	[6] = {"BUDDY", "buddy_reload", "buddy_crouchreload"}
 }
 local duckState
 
 addCommandHandler("Reload weapon",
 	function()
 		--if getElementData(localPlayer, "reloading") >= 1 or not getElementData(localPlayer, "alive") or getControlState("fire") or getControlState("aim_weapon") or isElementInWater(localPlayer) or not isPedOnGround(localPlayer) then
-		if g_player.reloading or not getElementData(localPlayer, "alive") or getControlState("fire") or (getControlState("aim_weapon") and not CFirstPerson.enabled)or isPedDoingTask(localPlayer, "TASK_SIMPLE_USE_GUN") or getPedSimplestTask(localPlayer) ~= "TASK_SIMPLE_PLAYER_ON_FOOT" then
+		if g_player.reloading or not localPlayer:getData("alive") or getControlState("fire") or (getControlState("aim_weapon") and not CFirstPerson.enabled) or isPedDoingTask(localPlayer, "TASK_SIMPLE_USE_GUN") or getPedSimplestTask(localPlayer) ~= "TASK_SIMPLE_PLAYER_ON_FOOT" then
 			-- nie można przeładowywać jak już się przeładowuje, jest się nie żywym lub się celuje, jest się we wodzie lub powietrzu
 			-- proptip: TASK_SIMPLE_USE_GUN wyłącza się dopiero gdy ped skończy całkowicie celować (animacja celowania skończy się w 100%)
 			return false
 		end
+		
 		--local task = getPedSimplestTask(localPlayer)
 		--if ((task == "TASK_SIMPLE_JUMP" or task == "TASK_SIMPLE_IN_AIR") and not task == "TASK_SIMPLE_USE_GUN" and not doesPedHaveJetPack(localPlayer)) then return end
 		
@@ -52,7 +62,7 @@ function onClientPlayerReloading(slot)
 
 	g_player.reloading = true
 	
-	-- @todo: play reload sound
+	-- @TODO: play reload sound
 
 	-- czas dodania nowej amunicji może być różny na różnych fpsach
 	-- 1100 ms to za mało.. wtedy jeszcze gta nie daje nowej amunicji; 1800 jest ok bo minimalnie wyprzedza ten czas
@@ -108,7 +118,8 @@ function onClientPlayerReloadingEnd(slot)
 			if CFirstPerson.enabled then
 				setControlState("aim_weapon", true)
 			end
-		end, 50, 1, source)
+		end, 50, 1, source
+	)
 
 	g_player.reloading = false
 	return true

@@ -63,7 +63,11 @@ function onHostagePicked(progressName)
 		hostage.picked = hostage.tryingToPick
 		hostage.tryingToPick = nil
 		removeEventHandler("onProgressBarEnd", resourceRoot, onHostagePicked)
-		-- nie ma sensu resetowania daty "picking" tutaj (reset dopiero po stronie serwera przy upadku hosta)		
+		-- nie ma sensu resetowania daty "picking" tutaj (reset dopiero po stronie serwera przy upadku hosta)
+
+		toggleControl("sprint", false)
+		toggleControl("jump", false)
+		toggleControl("crouch", false)
 	end
 end
 
@@ -142,6 +146,10 @@ addEventHandler("onClientPedHeliKilled", root,
 
 function getPickedHostage()
 	return hostage.picked
+end
+
+function isPlayerCarryingHostage()
+	return hostage.picked ~= nil
 end
 
 addEventHandler("onClientElementStreamIn", root,

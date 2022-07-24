@@ -42,22 +42,22 @@ function spectator.join(temporary)
 	bindKey("arrow_r", "down", spectator.next)
 	bindKey("space", "down", spectator.switchMode)
 
-	local team = getPlayerTeam(localPlayer)
-	if (team == g_team[1] or team == g_team[2]) then
-		-- wallhackowanie swojego teamu
+	local team = localPlayer.team
+	if team == g_team[1] or team == g_team[2] then
+		-- wallhack people from own team
 		local r, g, b = getTeamColor(team)
 		for k, v in pairs(getPlayersInTeam(team)) do
-			if getElementHealth(v) > 0 then
+			if v.health > 0 then
 				CWallShader:enable(v, r, g, b)
 			end
 		end
 	else
-		-- wallhackowanie wszystkich
-		for k, v in pairs( getElementsByType("player") ) do
-			if getElementHealth(v) > 0 then
-				local team = getPlayerTeam(v)
-				if team then
-					local r, g, b = getTeamColor(team)
+		-- wallhack everyone
+		for k, v in pairs(getElementsByType("player")) do
+			if v.health > 0 then
+				local vteam = getPlayerTeam(v)
+				if vteam then
+					local r, g, b = getTeamColor(vteam)
 					CWallShader:enable(v, r, g, b)
 				end
 			end
@@ -78,33 +78,35 @@ function onNewPlayerSpawned(team)
 		table.insert(specData.list, source)
 	end
 
-	if getPlayerTeam(localPlayer) == g_team[3] or getPlayerTeam(localPlayer) == team then
+	if localPlayer.team == g_team[3] or localPlayer.team == team then
 		local r, g, b = getTeamColor(team)
 		CWallShader:enable(source, r, g, b)
 	end
 end
 
 function spectator.exit()
-	if g_player.spectating then
-		outputDebugString("leaving spectators")
-		if specData.mode == 1 then
-			setFreecamDisabled()
-		end
-		g_player.spectating = false
-		
-		unbindKey("arrow_l", "down", spectator.previous)
-		unbindKey("arrow_r", "down", spectator.next)
-		unbindKey("space", "down", spectator.switchMode)
-
-		removeEventHandler("onClientPlayerSpawn", root, onNewPlayerSpawned)
-
-		CWallShader:resetAll()
-		showRadar(false)
-		showHUD(false)
-		removeEventHandler("onClientRender", root, renderSpectatorHUD)
-		removeEventHandler("onClientPlayerQuit", root, updateSpectator)
-		removeEventHandler("onClientPlayerWasted", root, updateSpectator)		
+	if not g_player.spectating then
+		return
 	end
+
+	outputDebugString("leaving spectators")
+	if specData.mode == 1 then
+		setFreecamDisabled()
+	end
+	g_player.spectating = false
+	
+	unbindKey("arrow_l", "down", spectator.previous)
+	unbindKey("arrow_r", "down", spectator.next)
+	unbindKey("space", "down", spectator.switchMode)
+
+	removeEventHandler("onClientPlayerSpawn", root, onNewPlayerSpawned)
+
+	CWallShader:resetAll()
+	showRadar(false)
+	showHUD(false)
+	removeEventHandler("onClientRender", root, renderSpectatorHUD)
+	removeEventHandler("onClientPlayerQuit", root, updateSpectator)
+	removeEventHandler("onClientPlayerWasted", root, updateSpectator)
 end
 
 function spectator.updateList()
@@ -171,16 +173,17 @@ addEventHandler("joinSpectatorsTemporary", root, joinSpectatorsTemporary)
 
 function spectator.switchMode()
 	if specData.mode == 0 then
-		-- przełączanie na swobodną kamerę
+		-- switch to free cam
 		spectator.freecam(true)
 		playSound(":csrw-sounds/sounds/gui/whooshes/short_whoosh1.wav")
 		removeEventHandler("onClientRender", root, renderSpectatorHUD)
 		removeEventHandler("onClientPlayerQuit", root, updateSpectator)
 		removeEventHandler("onClientPlayerWasted", root, updateSpectator)
+	
 	else
-		-- przełączanie na podglądanie gracza
+		-- switch to player spectator
 		if spectator.updateList() > 0 then
-			-- jeśli są żywi gracze
+			-- if there are alive players
 			setFreecamDisabled()
 			
 			spectator.spectatePlayer(specData.currentID)
@@ -196,27 +199,31 @@ function spectator.switchMode()
 end
 
 function updateSpectator()
-	if g_player.spectating and source ~= localPlayer then
-		for k, v in pairs(specData.list) do
-			if v == source then
-				-- remove dead/non-existing player from spectator list
-				table.remove(specData.list, k)
-			end
-		end
+	if not g_player.spectating or source == localPlayer then
+		return
+	end
 
-		-- switch to next alive player or freecam
-		if specData.currentPlayer == source then
-			if #specData.list == 0 then
-				advert.error("msg_specAlone")
-				specData.mode = 0
-				spectator.freecam(true)
-				removeEventHandler("onClientRender", root, renderSpectatorHUD)
-				removeEventHandler("onClientPlayerQuit", root, updateSpectator)
-				removeEventHandler("onClientPlayerWasted", root, updateSpectator)					
-				showHUD(false)
-			else
-				spectator.next()
-			end
+	for k, v in pairs(specData.list) do
+		if v == source then
+			-- remove dead/non-existing player from spectator list
+			table.remove(specData.list, k)
+		end
+	end
+
+	-- @todo: shouldn't we disable wallshader for dead/non-existing player here?
+
+	-- switch to next alive player or freecam
+	if specData.currentPlayer == source then
+		if #specData.list == 0 then
+			advert.error("msg_specAlone")
+			specData.mode = 0
+			spectator.freecam(true)
+			removeEventHandler("onClientRender", root, renderSpectatorHUD)
+			removeEventHandler("onClientPlayerQuit", root, updateSpectator)
+			removeEventHandler("onClientPlayerWasted", root, updateSpectator)					
+			showHUD(false)
+		else
+			spectator.next()
 		end
 	end
 end
@@ -236,38 +243,40 @@ local render = { -- 1440x900
 }
 
 function renderSpectatorHUD()
-	if specData.currentPlayer then
-	    dxDrawRectangle(render.rectangle[1], render.rectangle[2], render.rectangle[3], render.rectangle[4], tocolor(0, 0, 0, 117), false)
-	    dxDrawText(getPlayerName( specData.currentPlayer ), render.name[1], render.name[2], render.name[3], render.name[4], tocolor(0, 0, 0, 255), 1.00, "bankgothic", "left", "top", false, false, false, false, false)
-	    dxDrawText(getPlayerName( specData.currentPlayer ), render.name[1]-1, render.name[2]-1, render.name[3]-1, render.name[4]-1, render.specNamesColors[getPlayerTeam( specData.currentPlayer )], 1.00, "bankgothic", "left", "top", false, false, false, false, false)
-	    --dxDrawRectangle(437, 509, 0, 0, tocolor(255, 255, 255, 255), true) -- ?
-
-	    -- @todo: localize
-	    dxDrawText("Kills: " .. (getElementData(specData.currentPlayer, "score") or 0) .. "\nDeaths: " .. (getElementData(specData.currentPlayer, "deaths") or 0), render.stats[1], render.stats[2], render.stats[3], render.stats[4], tocolor(255, 255, 255, 255), 1.00, "clear", "left", "top", false, false, false, false, false)
-	      
-	    local slot = getElementData(specData.currentPlayer, "currentSlot")
-	    if slot then
-	    	local wep = getElementData(specData.currentPlayer, "wSlot" .. slot)
-	    	if wep then
-	    		local img = g_weapon[slot][wep]["image"]
-	    		if img then
-	    			dxDrawImage(render.weaponImg1[1], render.weaponImg1[2], render.weaponImg1[3], render.weaponImg1[4], ":csrw-media/images/shop/" .. img, 0, 0, 0, tocolor(255, 255, 255, 255), false)
-	    			--dxDrawImage(render.weaponImg2[2], render.weaponImg2[3], render.weaponImg2[3], render.weaponImg2[4], 728, 166, 87, ":csrw-media/images/shop/pistols/40dual_elites.png", 0, 0, 0, tocolor(255, 255, 255, 255), false)
-	    		end
-	    		dxDrawText( g_weapon[slot][wep]["name"], render.weaponName[1], render.weaponName[2], render.weaponName[3], render.weaponName[4], tocolor(255, 255, 255, 255), 1.00, "clear", "center", "center", false, false, true, false, false)
-	    	end
-	    end
-
-	    -- pozycjonowanie kamery
-	    --[[if isPedDoingTask(specData.currentPlayer, "TASK_SIMPLE_USE_GUN") then
-	    	local tx, ty, tz = getPedTargetCollision(specData.currentPlayer)
-	    	setCameraTarget(tx, ty, tz)
-
-	    	local x, y, z = getElementPosition(specData.currentPlayer)
-	    	dxDrawLine(x, y, z, tx, ty, tz)
-	    else]]--
-	    --setPedCameraRotation(localPlayer, - getPedCameraRotation(specData.currentPlayer))
+	if not specData.currentPlayer then
+		return
 	end
+
+	dxDrawRectangle(render.rectangle[1], render.rectangle[2], render.rectangle[3], render.rectangle[4], tocolor(0, 0, 0, 117), false)
+	dxDrawText(getPlayerName( specData.currentPlayer ), render.name[1], render.name[2], render.name[3], render.name[4], tocolor(0, 0, 0, 255), 1.00, "bankgothic", "left", "top", false, false, false, false, false)
+	dxDrawText(getPlayerName( specData.currentPlayer ), render.name[1]-1, render.name[2]-1, render.name[3]-1, render.name[4]-1, render.specNamesColors[getPlayerTeam( specData.currentPlayer )], 1.00, "bankgothic", "left", "top", false, false, false, false, false)
+	--dxDrawRectangle(437, 509, 0, 0, tocolor(255, 255, 255, 255), true) -- ?
+
+	-- @todo: localize
+	dxDrawText("Kills: " .. (getElementData(specData.currentPlayer, "score") or 0) .. "\nDeaths: " .. (getElementData(specData.currentPlayer, "deaths") or 0), render.stats[1], render.stats[2], render.stats[3], render.stats[4], tocolor(255, 255, 255, 255), 1.00, "clear", "left", "top", false, false, false, false, false)
+
+	local slot = getElementData(specData.currentPlayer, "currentSlot")
+	if slot then
+		local wep = getElementData(specData.currentPlayer, "wSlot" .. slot)
+		if wep then
+			local img = g_weapon[slot][wep]["image"]
+			if img then
+				dxDrawImage(render.weaponImg1[1], render.weaponImg1[2], render.weaponImg1[3], render.weaponImg1[4], ":csrw-media/images/shop/" .. img, 0, 0, 0, tocolor(255, 255, 255, 255), false)
+				--dxDrawImage(render.weaponImg2[2], render.weaponImg2[3], render.weaponImg2[3], render.weaponImg2[4], 728, 166, 87, ":csrw-media/images/shop/pistols/40dual_elites.png", 0, 0, 0, tocolor(255, 255, 255, 255), false)
+			end
+			dxDrawText( g_weapon[slot][wep]["name"], render.weaponName[1], render.weaponName[2], render.weaponName[3], render.weaponName[4], tocolor(255, 255, 255, 255), 1.00, "clear", "center", "center", false, false, true, false, false)
+		end
+	end
+
+	-- pozycjonowanie kamery
+	--[[if isPedDoingTask(specData.currentPlayer, "TASK_SIMPLE_USE_GUN") then
+		local tx, ty, tz = getPedTargetCollision(specData.currentPlayer)
+		setCameraTarget(tx, ty, tz)
+
+		local x, y, z = getElementPosition(specData.currentPlayer)
+		dxDrawLine(x, y, z, tx, ty, tz)
+	else]]--
+	--setPedCameraRotation(localPlayer, - getPedCameraRotation(specData.currentPlayer))
 end
 
 -- KAMERA

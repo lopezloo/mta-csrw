@@ -416,6 +416,7 @@ function startRound()
 		else
 			if not isVehicleBlown(vehicle) then
 				blowVehicle(vehicle, false)
+				setVehicleWheelStates(vehicle, 2, 2, 2, 2)
 			end
 		end
 	end

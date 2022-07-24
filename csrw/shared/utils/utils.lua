@@ -231,3 +231,15 @@ function findRotation(x1, y1, x2, y2)
 	if t < 0 then t = t + 360 end
 	return t
 end
+
+local SPRINTABLE_SLOTS = {
+	WEAPON_SLOT_HAND,
+	WEAPON_SLOT_MELEE,
+	WEAPON_SLOT_GIFTS,
+	WEAPON_SLOT_SPECIAL2,
+	WEAPON_SLOT_DETONATOR
+}
+
+function isWeaponSlotSprintable(slot)
+	return table.find(SPRINTABLE_SLOTS, slot) ~= false
+end

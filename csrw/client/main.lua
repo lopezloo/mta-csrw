@@ -13,6 +13,7 @@ g_player = {
 	-- if can change slot or drop weapon
 	canChangeSlot = true,
 	reloading = false,
+	aiming = false,
 
 	-- current player skin in format 1 - 4
 	skin = false,
@@ -60,14 +61,15 @@ function preInit()
 
 	setCloudsEnabled(false)
 	setBirdsEnabled(false)
-	setInteriorSoundsEnabled(false)
 	setPedTargetingMarkerEnabled(false)
+	setInteriorSoundsEnabled(false)
 	setAmbientSoundEnabled("general", false)
 	setAmbientSoundEnabled("gunfire", false)
 	setPedsLODDistance(100)
 	setTime(12, 0)
 	clearWorld()
-
+	csClearBlips()
+	setCameraClip(true, true)
 	dealWithGTASounds()
 end
 
@@ -94,7 +96,7 @@ function dealWithGTASounds()
 			spaz: 71, 72
 			mp5/tec/uzi: 84, 85
 			m4/ak: 31, 32
-			snajperka: 32
+			sniper: 32
 
 		88 - knife sound
 		teargas choking sounds: group 21 - 24?
@@ -128,6 +130,9 @@ function init()
 	loadClassSelection()
 	changeViewToRandomCamera()
 	showMOTD()
+
+	-- new class stuff
+	--setClassSelectionVisible(true)
 end
 
 function clearWorld()
@@ -177,13 +182,12 @@ addEventHandler("onClientPlayerWasted", localPlayer,
 		setCameraGoggleEffect("normal")
 
 		g_player.reloading = false
-		--g_player.flashed = false
 		--g_player.canChangeSlot = true
 		g_player.items.helmet = false
 		g_player.items.goggles = 0
 		g_player.items.defuser = false
 
-		-- wypadanie C4
+		-- drop bomb
 		if getElementData(source, "wSlot" .. DEF_BOMB[1]) == DEF_BOMB[2] then
 			local aliveTT = 0
 			for k, v in pairs(getPlayersInTeam(g_team[1])) do
@@ -206,6 +210,7 @@ addEventHandler("onClientRoundEnd", root,
 
 		if winTeam == 1 then
 			playSound(":csrw-sounds/sounds/radio/terwin.wav")
+		
 		elseif winTeam == 2 then
 			if reason == 5 then
 				playSound(":csrw-sounds/sounds/radio/rescued.wav")
@@ -216,6 +221,7 @@ addEventHandler("onClientRoundEnd", root,
 			else
 				playSound(":csrw-sounds/sounds/radio/ctwin.wav")
 			end
+		
 		elseif winTeam == 3 then
 			playSound(":csrw-sounds/sounds/radio/rounddraw.wav")
 		end
@@ -226,6 +232,32 @@ addEventHandler("onClientRoundEnd", root,
 
 		cancelDefuse()
 		cancelPlant()
+		csClearBlips()
+	end
+)
+
+addEvent("onClientRoundStart", true)
+addEventHandler("onClientRoundStart", root,
+	function()
+		-- Create radar blips
+		for _, v in ipairs(getElementsByType("bombsite")) do
+			local letter = getElementID(v)
+			if letter == "bombsite (1)" then letter = "A"
+			elseif letter == "bombsite (2)" then letter = "B"
+			elseif letter == "bombsite (3)" then letter = "C" end
+			
+			if letter == "A" or letter == "B" or letter == "C" then
+				csCreateBlipAttachedTo(v, letter, 8)
+			end
+		end
+
+		for _, v in ipairs(getElementsByType("hostagesite")) do
+			csCreateBlipAttachedTo(v, "H", 8)
+		end
+
+		for _, v in ipairs(getElementsByType("hostage")) do
+			csCreateBlipAttachedTo(v, "hostage", 16)
+		end
 	end
 )
 
@@ -293,6 +325,25 @@ addEventHandler("onClientElementStreamIn", root,
 		if source.type == "player" or source.type == "ped" then
 			source:setVoice("PED_TYPE_DISABLED")
 		end
+
+		-- Make wrecked cars on the map look more wrecked
+		if source.type == "vehicle" and source:getData("wreck") == "true" then
+			-- Hide windows
+			for i = 1, 6 do
+				setVehicleWindowOpen(source, i, true)
+			end
+
+			-- Hide some components
+			source:setComponentVisible("bump_front_dummy", false)
+			source:setComponentVisible("bump_rear_dummy", false)
+
+			source:setComponentVisible("exhaust", false)
+			source:setComponentVisible("exhaust_ok", false)
+			source:setComponentVisible("exhaust_dam", false)
+
+			source:setComponentVisible("plate_front", false)
+			source:setComponentVisible("plate_rear", false)
+		end
 	end
 )
 
@@ -308,7 +359,55 @@ function fixPedLighting(ped)
 		obj:setCollidableWith(v, false)
 	end
 
-	setTimer(function()
-		obj:destroy()
-	end, 50, 1)
+	setTimer(
+		function()
+			obj:destroy()
+		end, 50, 1
+	)
+end
+
+-- Weapon slots which doesn't require aiming for shooting (attacking)
+local NO_AIM_FIRE_WEAPON_SLOTS = {
+	WEAPON_SLOT_HAND,
+	WEAPON_SLOT_MELEE,
+	WEAPON_SLOT_PROJECTILES,
+	WEAPON_SLOT_SPECIAL1,
+	WEAPON_SLOT_GIFTS,
+	WEAPON_SLOT_SPECIAL2,
+	WEAPON_SLOT_DETONATOR
+}
+
+function updatePlayerControls()
+	-- Can shoot?
+	local fire = false
+
+	local hasBombInHands = false
+	local slot = localPlayer:getData("currentSlot")
+	if slot then
+		if g_playerWeaponData[slot].clip ~= nil and g_playerWeaponData[slot].clip > 0 then
+			fire = true
+		end
+
+		if g_weapon[slot][g_playerWeaponData[slot].weapon]["weaponID"] == "-6" then -- bomb
+			hasBombInHands = true
+		end
+	end
+
+	if not g_player.aiming then
+		fire = false
+
+		if not hasBombInHands then
+			if table.find(NO_AIM_FIRE_WEAPON_SLOTS, localPlayer.weaponSlot) ~= false then
+				fire = true
+			end
+		end
+	end
+
+	if g_player.reloading then
+		fire = false
+	end
+
+	toggleControl("fire", fire)
+
+	-- @TODO: implement more controls here
 end

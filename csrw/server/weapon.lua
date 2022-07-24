@@ -59,7 +59,7 @@ addEventHandler("onElementDataChange", root,
 			detachWeaponFromBody(source, newSlot) -- odczepianie nowej broni z ciała
 
 			local newWeapon = tonumber(g_weapon[newSlot][ g_playerWeaponData[source][newSlot].weapon ]["weaponID"])
-			if g_player[source].sneaking and newWeapon > 0 and getSlotFromWeapon(newWeapon) == 1 then
+			if g_player[source].sneaking and newWeapon > 0 and getSlotFromWeapon(newWeapon) == WEAPON_SLOT_MELEE then
 				-- broń biała
 				toggleControl(source, "sprint", false)
 			end
@@ -127,6 +127,7 @@ function attachWeaponToBody(player, weapon, slot, bombType)
 		--local wep = getElementData(player, "wSlotE1") -- 24, 25 (weapons.xml) ; wSlotE1 - extra slot (gogle termowizyjne / nocnowizyjne)
 		--playerAttachments[slot][player] = createObject(368, 0, 0, 0)
 		objectID = 368
+	
 	else
 		objectID = g_weapon[slot][weapon]["objectID"]
 		if not objectID then
@@ -143,8 +144,10 @@ function attachWeaponToBody(player, weapon, slot, bombType)
 		local bone, x, y, z, rx, ry, rz
 		if slot == "goggle" then
 			bone, x, y, z, rx, ry, z = 1, 0, 0.12, 0.165, 0, 90, 0
+		
 		elseif slot == 1 then
 			bone, x, y, z, rx, ry, z = 3, 0, -0.14, 0.4, 0, 90, 0
+		
 		elseif slot == DEF_BOMB[1] and weapon == DEF_BOMB[2] then -- flaga c4
 			if bombType == "hands" then -- ręce
 				bone, x, y, z, rx, ry, z = 11, -0.1, 0.08, 0.15, 200, 70, 0
@@ -152,11 +155,13 @@ function attachWeaponToBody(player, weapon, slot, bombType)
 				bone, x, y, z, rx, ry, z = 3, -0.1, -0.13, 0.16, 0, 0, 0
 			end
 		end
+		
 		exports["bone_attach"]:attachElementToBone(playerAttachments[slot][player], player, bone, x, y, z, rx, ry, rz)
 		setElementData(playerAttachments[slot][player], "attachedPlayer", player) -- do pobierania obiektow do ukrycia przy celowaniu snajperką
 		setElementInterior(playerAttachments[slot][player], getElementInterior(player))
 		return true
 	end
+	
 	return false
 	
 	-- c4 na lewej nodze: crun exports["bone_attach"]:attachElementToBone(obj, localPlayer, 13, -0.13, -0.08, 0.2, 180, 0, 90)
@@ -200,7 +205,7 @@ function csGiveWeapon(player, csSlot, csWeaponID, ammo, ammoInClip, hideHer)
 	end
 	g_playerWeaponData[player][csSlot].weapon = csWeaponID
 
-	if csSlot == DEF_BOMB[1] and csWeaponID == DEF_BOMB[2] then -- nowa broń to c4
+	if csSlot == DEF_BOMB[1] and csWeaponID == DEF_BOMB[2] then
 		if not hideHer then
 			setElementData(player, "currentSlot", csSlot)
 			--setElementData(player, "currentWeapon", csWeaponID)
@@ -210,7 +215,7 @@ function csGiveWeapon(player, csSlot, csWeaponID, ammo, ammoInClip, hideHer)
 			toggleControl(player, "fire", false)
 			toggleControl(player, "jump", false)
 			toggleControl(player, "crouch", false)
-			setPedWeaponSlot(player, 0)
+			setPedWeaponSlot(player, WEAPON_SLOT_HAND)
 		else
 			stopAnimationWithWalking(player)
 			attachWeaponToBody(player, csWeaponID, csSlot, "body")
@@ -268,14 +273,14 @@ function csGiveWeapon(player, csSlot, csWeaponID, ammo, ammoInClip, hideHer)
 				setWeaponAmmo(player, gtaWeaponID, 51711, 51711)
 				--outputChatBox("Physicall weapon ammo change (new weapon GTAID " .. gtaWeaponID .. ", ammo " .. ammo .. ", clip " .. ammoInClip .. ")", player)
 			
-				if getSlotFromWeapon(gtaWeaponID) == 1 then
+				if getSlotFromWeapon(gtaWeaponID) == WEAPON_SLOT_MELEE then
 					if not g_player.sneaking then
 						toggleControl(player, "sprint", true) -- bieganie z bronią białą
 					end
 					toggleControl(player, "fire", true)
 				else
 					toggleControl(player, "sprint", false)
-					if getControlState(player, "aim_weapon") == false and getSlotFromWeapon(gtaWeaponID) ~= 8 then -- jeśli nie celuje i nie ma granata
+					if getControlState(player, "aim_weapon") == false and getSlotFromWeapon(gtaWeaponID) ~= WEAPON_SLOT_PROJECTILES then -- jeśli nie celuje i nie ma granata
 						toggleControl(player, "fire", false)
 					end
 				end

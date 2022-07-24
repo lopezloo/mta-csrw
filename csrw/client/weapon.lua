@@ -158,18 +158,33 @@ function changeWeaponSlot(slot, oldSlot, deleteWeapon)
 			toggleControl("crouch", true)
 		end
 
-		if gtaWeapon > 0 and getSlotFromWeapon(gtaWeapon) == 1 then
+		if isWeaponSlotSprintable(getSlotFromWeapon(gtaWeapon)) then
 			-- Enable sprinting with melee weapons
 			toggleControl("sprint", true)
 			toggleControl("fire", true)
+		
 		else
 			toggleControl("sprint", false)
-			--if gtaWeapon > 0 and not getControlState("aim_weapon") and getSlotFromWeapon(gtaWeapon) ~= 8 then -- jeśli nie celuje i nie ma granata
-			if gtaWeapon > 0 and getSlotFromWeapon(gtaWeapon) ~= 8 then -- usunięcie warunku o nie celowaniu ze względu na tryb FPS
+			--if gtaWeapon > 0 and not getControlState("aim_weapon") and getSlotFromWeapon(gtaWeapon) ~= WEAPON_SLOT_PROJECTILES then -- jeśli nie celuje i nie ma granata
+			if gtaWeapon > 0 and getSlotFromWeapon(gtaWeapon) ~= WEAPON_SLOT_PROJECTILES then -- usunięcie warunku o nie celowaniu ze względu na tryb FPS
 				toggleControl("fire", false)
 			end
 		end
 	end
+
+	-- Disable sprinting with bomb
+	if slot == DEF_BOMB[1] and newWeapon == DEF_BOMB[2] then
+		toggleControl("sprint", false)
+	end
+
+	-- Disallow sprinting & jumping & crouching while carrying hostage
+	if getPickedHostage() then
+		toggleControl("sprint", false)
+		toggleControl("jump", false)
+		toggleControl("crouch", false)
+	end
+
+	updatePlayerControls()
 
 	local oldAmmo, oldClip -- jeśli oldAmmo & oldClip jest nil to serwer usunie obecną broń przy triggerze na server_changeWeaponToSlot
 	if not deleteWeapon then
@@ -199,7 +214,7 @@ function onClientAim(key, keyState)
 	end
 
 	local gtaWep = getPedWeapon(localPlayer)
-	if getSlotFromWeapon(gtaWep) == 1 or getSlotFromWeapon(gtaWep) == 8 or (g_player.reloading and key ~= "induced") then
+	if getSlotFromWeapon(gtaWep) == WEAPON_SLOT_MELEE or getSlotFromWeapon(gtaWep) == WEAPON_SLOT_PROJECTILES or (g_player.reloading and key ~= "induced") then
 		-- blokowanie celowania tylko z bronią palną i przy przeładowywyaniu
 		return
 	end
@@ -210,9 +225,9 @@ function onClientAim(key, keyState)
 			return
 		end
 
-		if g_weapon[slot][g_playerWeaponData[slot].weapon]["weaponID"] ~= "-6" then -- inne niż c4
-			toggleControl("fire", true)
+		g_player.aiming = true
 
+		if g_weapon[slot][g_playerWeaponData[slot].weapon]["weaponID"] ~= "-6" then -- inne niż c4
 			--[[if not isPedDucked(localPlayer) then
 				for k, v in pairs(sprintAimableWeapons) do
 					if getWeaponIDFromName(v) == getPedWeapon(localPlayer) then
@@ -222,7 +237,7 @@ function onClientAim(key, keyState)
 				end
 			end]]--
 
-			if getPedWeapon(localPlayer) == 34 and getPedSimplestTask(localPlayer) == "TASK_SIMPLE_PLAYER_ON_FOOT" then
+			if getPedWeapon(localPlayer) == WEAPON_SNIPER and getPedSimplestTask(localPlayer) == "TASK_SIMPLE_PLAYER_ON_FOOT" then
 				-- Player is zooming sniper
 				-- Play sniper zoom sound
 				playSound(":csrw-sounds/sounds/weapons/zoom.wav")
@@ -242,6 +257,8 @@ function onClientAim(key, keyState)
 			end
 		end
 	else
+		g_player.aiming = false
+
 		--[[if isTimer(timer_updateWeaponAimMovingSkill) then killTimer(timer_updateWeaponAimMovingSkill) end
 
 		local skillName = getWeaponSkillID( getPedWeapon(localPlayer) )
@@ -249,9 +266,7 @@ function onClientAim(key, keyState)
 			triggerServerEvent("switchWeaponAimMovingSkill", resourceRoot, false) -- przywracanie właściwego skilla
 		end]]--
 
-		toggleControl("fire", false)
-
-		if gtaWep == 34 then -- sniper gta id
+		if gtaWep == WEAPON_SNIPER then
 			for k, v in pairs(getElementsByType("object")) do
 				if getElementData(v, "attachedPlayer") == localPlayer then
 					setElementAlpha(v, 255)
@@ -264,6 +279,8 @@ function onClientAim(key, keyState)
 			end
 		end		
 	end
+
+	updatePlayerControls()
 end
 
 --[[function updateWeaponAimMovingSkill()
@@ -302,21 +319,29 @@ function onSomeoneShot()
 
 			if g_playerWeaponData[slot].ammo == 0 then -- broń się skończyła
 				outputDebugString("No ammo in weapon, deleting.")
-				setTimer(
+				outputDebugString(tostring(getPedTotalAmmo(localPlayer)))
+
+				-- Weapon has no ammo
+				-- technically it has a lot ammo, so we disable fire control
+				-- so player won't be able to shoot
+				updatePlayerControls()
+
+				--[[setTimer(
 					function()
 						if getPedTotalAmmo(localPlayer) > 0 then
 							switchWeaponSlot("up", nil, nil, nil, nil, true) -- zmiana slota + usuwanie broni
 						else
 							switchWeaponSlot("up") -- tylko zmiana slota (broń się sama usunęła)
 						end
-					end, 50, 1)
+					end, 50, 1)]]--
 			else
 				-- weapon require reloading
-				if gtaWeaponID == WEAPON_GRENADE or gtaWeaponID == WEAPON_TEARGAS or gtaWeaponID == WEAPON_MOLOTOV or gtaWeaponID == WEAPON_SATCHEL then
+				--if gtaWeaponID == WEAPON_GRENADE or gtaWeaponID == WEAPON_TEARGAS or gtaWeaponID == WEAPON_MOLOTOV or gtaWeaponID == WEAPON_SATCHEL then
 					-- do not reload grenades
 					--setElementData(localPlayer, "wSlot" .. slot .. "Ammo", getPedAmmoInClip(localPlayer) - 1)
 					-- jaki jest sens aktualizacji liczby granatów do zmiennej ?
-				else
+				
+				if canWeaponBeReloaded(gtaWeaponID) then
 					--onClientPlayerReloading(false) -- przeładowanie wywołane w połowie naturalnie (bo GTA też wtedy zmienia ammo)
 					-- bez timera ostatni strzał u gracza nielokalnego jest ucinany przez wystartowanie animacji
 					onClientPlayerReloading(slot)
@@ -367,3 +392,18 @@ addEventHandler("updateWeaponData", root,
 		end
 	end
 )
+
+
+local RELOADABLE_SLOTS = {
+	WEAPON_SLOT_HANDGUNS,
+	WEAPON_SLOT_SHOTGUNS,
+	WEAPON_SLOT_MACHINE_GUNS,
+	WEAPON_SLOT_ASSAULT_RIFLES,
+	WEAPON_SLOT_RIFLES,
+	WEAPON_SLOT_HEAVY_WEAPONS
+}
+
+function canWeaponBeReloaded(gtaWeaponID)
+	local slot = getSlotFromWeapon(gtaWeaponID)
+	return table.find(RELOADABLE_SLOTS, slot) ~= false
+end

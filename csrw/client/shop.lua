@@ -1,12 +1,14 @@
 local shopButton = {}
 local currentWeapon = {}
 
-local shop = { {}, {} } -- dwa teamy
+local shop = { {}, {} } -- for two teams
 local currentCategory
 
 local shopInformation = {}
 
 local DEBUG_SKIP_GRENADE_LIMIT = true
+local DEBUG_BUY_ANYTIME = true
+local DEBUG_BUY_EVERYWHERE = true
 
 addCommandHandler("Shop",
 	function()
@@ -26,39 +28,40 @@ function showShop()
 	end
 
 	-- jeśli runda nie trwa ponad 15 sekund
-	--if getElementData(resourceRoot, "currentMode") == "cs" or getPlayerTeam(localPlayer) == ct then -- w trybie zombie tylko dla CT
+	--if getElementData(resourceRoot, "currentMode") == "cs" or localPlayer.team == ct then -- w trybie zombie tylko dla CT
 	local mapTime = 5
 	if getElementData(resourceRoot, "currentMode") == "zombie" then
 		mapTime = 10
 	end
 
-	--if (getElementData(resourceRoot, "roundTimeMinutes") == 5 and getElementData(resourceRoot, "roundTimeSeconds") == 0) or (getElementData(resourceRoot, "roundTimeMinutes") == 10 and getElementData(resourceRoot, "roundTimeSeconds") == 0) or (getElementData(resourceRoot, "roundTimeMinutes") == mapTime - 1 and getElementData(resourceRoot, "roundTimeSeconds") >= 15) then
-	if 1 == 1 then
-		local plus = 0
-		if getPlayerTeam(localPlayer) == g_team[1] then
+	if DEBUG_BUY_ANYTIME or ((getElementData(resourceRoot, "roundTimeMinutes") == 5 and getElementData(resourceRoot, "roundTimeSeconds") == 0) or (getElementData(resourceRoot, "roundTimeMinutes") == 10 and getElementData(resourceRoot, "roundTimeSeconds") == 0) or (getElementData(resourceRoot, "roundTimeMinutes") == mapTime - 1 and getElementData(resourceRoot, "roundTimeSeconds") >= 15)) then
+		local inSpawnPoint = false
+		if localPlayer.team == g_team[1] then
 			spawnsTT = getElementsByType("spawntt")
-			for i, spawn in pairs(spawnsTT) do
+			for _, spawn in pairs(spawnsTT) do
 				local x = getElementData(spawn, "posX")
 				local y = getElementData(spawn, "posY")
 				local z = getElementData(spawn, "posZ")
 				if isElementInRangeOfPoint(localPlayer, x, y, z, 5.0) then
-					plus = plus + 1
+					inSpawnPoint = true
+					break
 				end
 			end
 		
-		elseif getPlayerTeam(localPlayer) == g_team[2] then
+		elseif localPlayer.team == g_team[2] then
 			spawnsCT = getElementsByType("spawnct")
-			for i, spawn in pairs(spawnsCT) do
+			for _, spawn in pairs(spawnsCT) do
 				local x = getElementData(spawn, "posX")
 				local y = getElementData(spawn, "posY")
 				local z = getElementData(spawn, "posZ")
 				if isElementInRangeOfPoint(localPlayer, x, y, z, 5.0) then
-					plus = plus + 1
+					inSpawnPoint = true
+					break
 				end
 			end	
 		end
 		
-		if plus >= 1 then
+		if inSpawnPoint or DEBUG_BUY_EVERYWHERE then
 			activateWindow_shop()
 		else
 			advert.error("msg_buyNeedSpawn")
@@ -96,7 +99,6 @@ addEventHandler("onClientResourceStart", resourceRoot,
 			guiSetProperty(shopButton[i], "PushedTextColour", "FFFF6900")	
 			guiSetVisible(shopButton[i], false)
 		end
-		outputDebugString("shop GUI loaded")
 		-- koniec wczytywania gui		
 		loadShopWeapons()
 	end
@@ -147,7 +149,6 @@ function loadShopWeapons()
 	end
 
 	xmlUnloadFile(shopFile)
-	outputDebugString("shop weapons configuration loaded")
 end
 
 function shop_loadCategories()
@@ -160,8 +161,7 @@ function shop_loadCategories()
 	currentWeapon = {}
 	setBoxLabel(getText("shop"))
 	
-	local team = getTeamID(getPlayerTeam(localPlayer))
-	
+	local team = getTeamID(localPlayer.team)
 	local buttons = {}
 	for i, v in pairs(shop[team]) do
 		guiSetProperty(shopButton[i], "Text", i .. " " .. string.upper(getText("shop_cat_" .. v["name"])))
@@ -186,7 +186,7 @@ function shop_buttonChooseCategory(button, state)
 	end
 	
 	if button == "left" and state == "up" then
-		local team = getTeamID(getPlayerTeam(localPlayer))
+		local team = getTeamID(localPlayer.team)
 		for i = 1, table.getn(shop[team]) do
 			if source == shopButton[i] then
 				shop_loadWeaponsFromCategory(i)
@@ -199,11 +199,13 @@ function shop_buttonChooseCategory(button, state)
 	end
 end
 
-function shop_buttonHover(button, state) -- najazd na przyciski wyboru kategori (oraz ANULUJ); działa też to na przycisk w wyborze broni - ''ANULUJ''
+-- najazd na przyciski wyboru kategori (oraz ANULUJ); działa też to na przycisk w wyborze broni - ''ANULUJ''
+function shop_buttonHover(button, state)
 	--clickSound()
 end
 
-function shop_hideAllButtons() -- chowanie wszystkich 10 przycisków
+-- chowanie wszystkich 10 przycisków
+function shop_hideAllButtons()
 	for i = 1, 10 do
 		guiSetVisible(shopButton[i], false)
 		removeEventHandler("onClientGUIClick", shopButton[i], shop_buttonChooseCategory)
@@ -216,9 +218,10 @@ function shop_hideAllButtons() -- chowanie wszystkich 10 przycisków
 	clearBoxElements()
 end
 
-function shop_weaponButtonHover() -- najazd na przycisk wyboru broni
+-- najazd na przycisk wyboru broni
+function shop_weaponButtonHover()
 	local name = string.sub(guiGetText(source), 3)
-	local team = getTeamID(getPlayerTeam(localPlayer))
+	local team = getTeamID(localPlayer.team)
 
 	currentWeapon = {}
 	for k, v in pairs(shop[team][currentCategory]) do
@@ -263,7 +266,8 @@ function onShopClosed(window)
 	end
 end
 
-function activateWindow_shop() -- otworzenie / zamknięcie sklepu z bronią
+-- otworzenie / zamknięcie sklepu z bronią
+function activateWindow_shop()
 	--if getElementData(localPlayer, "choosingLanguage") then return false end
 	--outputChatBox("activateWindow_shop")
 	setBoxVisible(true, "", "shop", "renderShop")
@@ -275,10 +279,8 @@ function activateWindow_shop() -- otworzenie / zamknięcie sklepu z bronią
 	showCursor(true)
 end
 
---
-
-function shop_bindBuyWeapon(number) -- kupienie broni przez bind numerowy
-	--outputChatBox(number)
+-- kupienie broni przez bind numerowy
+function shop_bindBuyWeapon(number)
 	number = tonumber(number)
 	if number == 0 then
 		if getBoxLabel() ~= getText("shop") then -- jeśli gracz jest w wyborze broni
@@ -302,7 +304,7 @@ function shop_buyWeapon(button, state) -- onClientGUIClick; wybranie broni i pr�
 	if g_player.reloading then return end
 
 	local name = string.sub(guiGetText(source), 3)
-	local team = getTeamID(getPlayerTeam(localPlayer))
+	local team = getTeamID(localPlayer.team)
 		
 	setBoxVisible(false) -- chowanie okienka sklepu
 	for k, v in pairs(shop[team][currentCategory]) do
@@ -385,7 +387,7 @@ function buyWeapon(cost, slot, weapon)
 end
 
 function shop_loadWeaponsFromCategory(category) -- ładowanie broni z danej kategori do 10 przycisków
-	local team = getTeamID(getPlayerTeam(localPlayer))
+	local team = getTeamID(localPlayer.team)
 	shop_hideAllButtons()
 		
 	setBoxLabel(getText("shop_cat_" .. shop[team][category]["name"]))

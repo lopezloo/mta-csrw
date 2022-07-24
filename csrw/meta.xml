@@ -8,10 +8,10 @@
 	<file src="files/locales/en.xml" />
 	<file src="files/locales/pl.xml" />
 
-	<script type="shared" src="shared/utils/advert.lua" />
-	<script type="shared" src="shared/utils/utils.lua" />
 	<script type="shared" src="shared/utils/definitions.lua" />
 	<script type="shared" src="shared/utils/definitions2.lua" />
+	<script type="shared" src="shared/utils/advert.lua" />
+	<script type="shared" src="shared/utils/utils.lua" />
 
 	<script type="shared" src="shared/config.lua" />
 	<script type="shared" src="shared/language.lua" />
