@@ -8,7 +8,14 @@ g_roundData = {
 	bomb = false
 }
 
-function updateClassInfos(skin, teamid) -- update teamu, skinu (z c class.lua)
+-- update teamu, skinu (z c class.lua)
+function updateClassInfos(skin, teamid)
+	if not client or client ~= source then
+		return
+	end
+
+	outputChatBox("updateClassInfos " .. skin .. " " .. teamid)
+
 	--outputChatBox("SERWER: updateClassInfos: client: " .. getPlayerName(client))
 	-- zmienia team będąc żywym
 	if getElementData(client, "alive") then
@@ -34,7 +41,7 @@ function updateClassInfos(skin, teamid) -- update teamu, skinu (z c class.lua)
 				-- jeśli runda nie trwa ponad 30 sekund
 				if (getElementData(resourceRoot, "roundTimeMinutes") == 5 and getElementData(resourceRoot, "roundTimeSeconds") == 0) or (getElementData(resourceRoot, "roundTimeMinutes") == 4 and getElementData(resourceRoot, "roundTimeSeconds") >= 30) then
 					spawn(client)
-					syncGroundWeapons(client) -- sync broni położonych na ziemi (do danego gracza)
+					syncGroundWeapons(client, false) -- sync broni położonych na ziemi (do danego gracza)
 				else -- jeśli trwa
 					outputChatBox("#FC6666" .. getText("msg_roundArleadyStarted", client), client, 255, 255, 255, true)
 					joinSpectatorsTemporary(client)
@@ -44,7 +51,7 @@ function updateClassInfos(skin, teamid) -- update teamu, skinu (z c class.lua)
 	end
 end
 addEvent("updateClassInfos", true)
-addEventHandler("updateClassInfos", root, updateClassInfos, skin, theTeam)
+addEventHandler("updateClassInfos", root, updateClassInfos)
 
 function spawn(player)
 	detachCarriedHostage(player)
@@ -134,10 +141,10 @@ function randomizeBomberMan()
 	end
 
 	local terrorists = getPlayersInTeam(g_team[1])
-	for k, v in pairs(terrorists) do
+	for _, v in pairs(terrorists) do
 		-- usuwanie nieżywych tt
 		if getElementData(v, "alive") == false then
-			table.remove( terrorists, table.find( terrorists, v ) )
+			table.removeElement(terrorists, v)
 		end
 	end
 	
@@ -389,28 +396,32 @@ function startRound()
 	destroyBomb()
 
 	respawnHostages()
+	
+	loadGroundWeaponsFromMap()
+	syncGroundWeapons(root, true)
 
 	local spawnedTT = 0
 	local spawnedCT = 0
 	g_roundData.aliveTT = 0
 	g_roundData.aliveCT = 0
 	
-	for k, v in pairs(getPlayersInTeam(g_team[1])) do
+	for _, v in pairs(getPlayersInTeam(g_team[1])) do
 		spawn(v)
 		spawnedTT = spawnedTT + 1
 	end
 
-	for k, v in pairs(getPlayersInTeam(g_team[2])) do
+	for _, v in pairs(getPlayersInTeam(g_team[2])) do
 		spawn(v)
 		spawnedCT = spawnedCT + 1
 	end
 
-	for k, v in pairs( getPlayersInTeam(g_team[3]) ) do
+	for _, v in pairs( getPlayersInTeam(g_team[3]) ) do
 		-- hide spectator dead bodies
 		v.position = BLACKHOLE
+		v.frozen = true
 	end
 	
-	for k, vehicle in pairs(getElementsByType("vehicle")) do
+	for _, vehicle in pairs(getElementsByType("vehicle")) do
 		if getElementData(vehicle, "wreck") ~= "true" then
 			respawnVehicle(vehicle)
 		else

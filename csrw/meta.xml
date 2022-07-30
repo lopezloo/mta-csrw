@@ -1,5 +1,6 @@
 <meta>
-	<info type="gamemode" name="Counter Strike: RenderWare" author="lopezloo" version="1.1.0" edf:definition="edf/csrw.xml" />
+	<info type="gamemode" name="CSRW" author="lopezloo" version="1.1.0" edf:definition="edf/csrw.xml" />
+	
 	<file src="files/config.xml" />
 	<file src="files/shop.xml" />
 	<file src="files/weapons.xml" />
@@ -16,6 +17,7 @@
 	<script type="shared" src="shared/config.lua" />
 	<script type="shared" src="shared/language.lua" />
 	<script type="shared" src="shared/weapon_core.lua" />
+	<script type="shared" src="shared/shop.lua" />
 
 	<script type="server" src="server/acmd.lua" />
 	<!--<script type="server" src="server/update.lua" />-->
@@ -30,6 +32,7 @@
 	<script type="server" src="server/security.lua" />
 	<script type="server" src="server/voice.lua" />
 	<script type="server" src="server/weapon.lua" />
+	<script type="server" src="server/shop.lua" />
 
 	<script type="client" src="client/main.lua" />
 	<script type="client" src="client/mapchange.lua" />

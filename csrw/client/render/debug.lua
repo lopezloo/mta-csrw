@@ -1,4 +1,4 @@
-if true then
+if true or not DEBUG_MODE then
 	-- Disable debug stuff
 	return
 end
@@ -8,7 +8,7 @@ local debug = {
 }
 
 function enableDebug(cmd, level)
-	if debug.enabled then
+	if debug.enabled and DEBUG_MODE then
 		if not level then
 			level = 1
 		end

@@ -51,16 +51,15 @@ addEventHandler("onClientProjectileCreation", root,
 			if slot then
 				local weapon = getElementData(creator, "wSlot" .. slot)
 				if weapon then
+					-- Set projectile counter to max to avoid grenade explosion
+					source:setCounter(PROJECTILE_COUNTER_MAX)
+					
 					if g_weapon[slot][weapon]["objectID"] == "-2" then
 						-- Flashbang grenade
-						-- Set projectile counter to max to avoid grenade explosion
-						source:setCounter(PROJECTILE_COUNTER_MAX)
 						setTimer(onFlashBangExploded, FLASHBANG_GRENADE_EXPLOSION_TIMEOUT, 1, source)				
 					
 					elseif g_weapon[slot][weapon]["objectID"] == "-3" then
 						-- Decoy grenade
-						source:setCounter(PROJECTILE_COUNTER_MAX)
-
 						-- Get best player weapon to use it as decoy
 						local weapon = {1, getElementData(creator, "wSlot1")}
 						if not weapon[2] then
@@ -108,7 +107,7 @@ function onFlashBangExploded(grenade)
 	
 	if not isLineOfSightClear(x, y, z, x2, y2, z2, true, true, false, true, true, false, false, grenade) then
 		-- If flashbang projectile is behind some object
-		Sound3D(":csrw-sounds/sounds/weapons/flashbang/flashbang_explode2.wav", x, y, z).maxDistance = 50
+		Sound3D(":csrw-sounds/sounds/weapons/flashbang/flashbang_explode1.wav", x, y, z).maxDistance = 50
 		destroyProjectile(grenade)
 		return
 	end
@@ -203,7 +202,7 @@ function onDecoyExploded(grenade, slot, weapon)
 		return
 	end
 
-	sound = ":csrw-sounds/sounds/weapons/" .. shotSound
+	local sound = ":csrw-sounds/sounds/weapons/" .. shotSound
 
 	-- Recreate projectile as object
 	local obj = Object(DECOY_GRENADE_GROUND_OBJECT_ID, x, y, z, -rx, -ry, -rz)
@@ -241,7 +240,7 @@ function onDecoyExploded(grenade, slot, weapon)
 		-- Add extra reload time if weapon has only one bullet in the clip
 		local clip = tonumber(g_weapon[slot][weapon]["clip"])
 		if clip == 1 then
-			timeBetweenShots = timeBetweenShots + 1700
+			timeBetweenShots = timeBetweenShots + 2000
 		end
 	end
 
@@ -259,7 +258,7 @@ function onDecoyExploded(grenade, slot, weapon)
 					local sound = playSound3D(":csrw-sounds/sounds/weapons/hegrenade/explode3.wav", x, y, z)
 					setSoundMaxDistance(sound, 150)
 
-					table.remove(gl_grenades.decoys, table.find(gl_grenades.decoys, obj))
+					table.removeElement(gl_grenades.decoys, obj)
 
 					-- Destroy grenade object
 					destroyElement(obj)
@@ -334,6 +333,7 @@ function createSmokeGrenadeParticleEffect(projectile)
 	local particle = Effect(SMOKE_GRENADE_PARTICLE_EFFECT_NAME, x, y, z-2, -90, 0, 0)
 	particle.speed = 1
 	particle.density = 2
+	particle.collisions = false
 
 	setTimer(
 		function()
@@ -343,7 +343,6 @@ function createSmokeGrenadeParticleEffect(projectile)
 		end, 2000, 1
 	)
 
-	particle.collisions = false
 	table.insert(gl_grenades.smokeParticles, particle)
 
 	local sound = Sound3D(":csrw-sounds/sounds/weapons/smokegrenade/sg_explode.wav", x, y, z)
@@ -351,7 +350,7 @@ function createSmokeGrenadeParticleEffect(projectile)
 	table.insert(gl_grenades.smokeSounds, sound)
 
 	-- Smoke is already lying on the ground, we can delete it to easy projectile limits
-	table.remove(gl_grenades.smokes, table.find(gl_grenades.smokes, projectile))
+	table.removeElement(gl_grenades.smokes, projectile)
 	destroyProjectile(projectile)
 
 	-- Recreate projectile as object
@@ -368,14 +367,17 @@ function createSmokeGrenadeParticleEffect(projectile)
 	
 	setTimer(
 		function()
+			extinguishFire(x, y, z, 5.0)
+		end, 1000, 1
+	)
+	
+	setTimer(
+		function()
 			if obj and isElement(obj) then
 				obj:destroy()
 			end
 
-			local tPos = table.find(gl_grenades.smokeObjects, obj)
-			if tPos then
-				table.remove(gl_grenades.smokeObjects, tPos)
-			end
+			table.removeElement(gl_grenades.smokeObjects, obj)
 
 			if sound and isElement(sound) then
 				sound:destroy()
@@ -385,10 +387,7 @@ function createSmokeGrenadeParticleEffect(projectile)
 				return
 			end
 
-			local tPos = table.find(gl_grenades.smokeParticles, particle)
-			if tPos then
-				table.remove(gl_grenades.smokeParticles, tPos)
-			end
+			table.removeElement(gl_grenades.smokeParticles, particle)
 
 			-- Let particle smoothly fade away
 			particle.speed = 0.5
@@ -414,16 +413,14 @@ function onSmokeGrenadeDestroy()
 		end
 	end
 
-	local tPos = table.find(gl_grenades.smokesFlying, source)
-	if tPos then
-		table.remove(gl_grenades.smokesFlying, source)
-	end
+	table.removeElement(gl_grenades.smokesFlying, source)
 
 	if g_misc.smokeUpdate and #gl_grenades.smokesFlying == 0 then
 		g_misc.smokeUpdate = false
 		killTimer(gl_timer_flyingSmokeGrenadesUpdate)
 	end
-	table.remove(gl_grenades.smokes, table.find(gl_grenades.smokes, source))
+
+	table.removeElement(gl_grenades.smokes, source)
 end
 
 function onHEGrenadeExploded()
@@ -437,12 +434,12 @@ function destroyGrenades()
 		killTimer(gl_timer_flyingSmokeGrenadesUpdate)
 	end
 
-	for k, v in pairs(gl_grenades.smokeObjects) do destroyElement(v) end
-	for k, v in pairs(gl_grenades.smokeParticles) do destroyElement(v) end
-	for k, v in pairs(gl_grenades.smokes) do destroyElement(v) end
-	for k, v in pairs(gl_grenades.decoys) do destroyElement(v) end
+	for _, v in pairs(gl_grenades.smokeObjects) do destroyElement(v) end
+	for _, v in pairs(gl_grenades.smokeParticles) do destroyElement(v) end
+	for _, v in pairs(gl_grenades.smokes) do destroyElement(v) end
+	for _, v in pairs(gl_grenades.decoys) do destroyElement(v) end
 
-	for k, v in pairs(gl_grenades.smokeSounds) do
+	for _, v in pairs(gl_grenades.smokeSounds) do
 		if isElement(v) then
 			v:destroy()
 		end
@@ -454,7 +451,7 @@ function destroyGrenades()
 	gl_grenades.decoys = {}
 	gl_grenades.smokes = {}
 
-	for k, v in pairs(getElementsByType("projectile")) do
+	for _, v in pairs(getElementsByType("projectile")) do
 		destroyProjectile(v)
 	end
 end
@@ -463,6 +460,7 @@ function createSparks(position)
 	local fx = Effect("prt_spark", position, -90, 0, 0, 100, false)
 	fx.density = 0.2
 
+	-- Make it smoothly fade away after a moment
 	setTimer(
 		function()
 			fx.density = 0

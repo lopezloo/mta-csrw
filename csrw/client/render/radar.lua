@@ -41,18 +41,7 @@ function csClearBlips()
 	radar.blips = {}
 end
 
-function showRadar(show)
-	if not show then show = not radar.showing end
-	if radar.showing and show == false then
-		removeEventHandler("onClientRender", root, renderRadar)
-	
-	elseif not radar.showing and show == true then
-		addEventHandler("onClientRender", root, renderRadar)
-	end
-	radar.showing = show
-end
-
-function renderRadar()
+local function renderRadar()
 	local target = getCameraTarget()
 	if not radar.showing or (not target and not g_player.spectator) then return end
 
@@ -73,8 +62,8 @@ function renderRadar()
 	dxDrawImage(radar.x, radar.y, radar.height, radar.height, ":csrw-media/images/radar/background.png", 0, 0, 0, tocolor(radar.background[1], radar.background[2], radar.background[3], radar.background[4]), false)
 	dxDrawImage(radar.x, radar.y, radar.height, radar.height, ":csrw-media/images/radar/disc.png", 0, 0, 0, tocolor(radar.disc[1], radar.disc[2], radar.disc[3], radar.disc[4]), false)
 
-	for k, v in ipairs(getElementsByType("player")) do
-		if (g_player.spectator or (getElementData(v, "alive") and getPlayerTeam(v) == localPlayer.team)) and target ~= v then
+	for _, v in ipairs(getElementsByType("player")) do
+		if (g_player.spectator or (getElementData(v, "alive") and v.team == localPlayer.team)) and target ~= v then
 			local _, _, rot = getElementRotation(v)
 			local ex, ey, ez = getElementPosition(v)
 			local dist = getDistanceBetweenPoints2D(px, py, ex, ey)
@@ -86,7 +75,7 @@ function renderRadar()
 			local blipx = radar.centerleft + cblipx - radar.blipSize/2
 			local blipy = radar.centerTop + cblipy - radar.blipSize/2
 
-			if getPlayerTeam(v) == g_team[1] then
+			if v.team == g_team[1] then
 				dxDrawImage(blipx, blipy, radar.blipSize, radar.blipSize, ":csrw-media/images/radar/tt.png", north-rot+45)
 			else
 				dxDrawImage(blipx, blipy, radar.blipSize, radar.blipSize, ":csrw-media/images/radar/ct.png", north-rot+45)
@@ -124,4 +113,18 @@ function renderRadar()
 	else
 		dxDrawImage(radar.centerleft - radar.lpsize/2, radar.centerTop - radar.lpsize/2, radar.lpsize, radar.lpsize, ":csrw-media/images/radar/centre.png", north - pr)
 	end
+end
+
+function showRadar(show)
+	if not show then
+		show = not radar.showing
+	end
+
+	if radar.showing and show == false then
+		removeEventHandler("onClientRender", root, renderRadar)
+	
+	elseif not radar.showing and show == true then
+		addEventHandler("onClientRender", root, renderRadar)
+	end
+	radar.showing = show
 end

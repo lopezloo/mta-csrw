@@ -7,7 +7,7 @@ local gl_projectileLines = {}
 local gl_projectileLines_lastIndex = 0
 
 local PROJECTILE_LINES_RENDER_HANDLER = "onClientPreRender"
-local DEBUG_ALWAYS_RENDER_PROJECTILE_LINES = true
+local DEBUG_ALWAYS_RENDER_PROJECTILE_LINES = DEBUG_MODE and true
 local GRENADE_LINE_TIMEOUT = 7000
 local MARKER_SCALE = 0.25
 

@@ -4,7 +4,14 @@ local gl_bombObj
 -- Bomb update timer
 local gl_bombBeepTimer
 
-function onBombPlanted(player)
+local BOMB_BEEP_SOUND_DISTANCE = 70
+local BOMB_EXPLOSION_SOUND_DISTANCE = 120
+
+function onBombPlanted()
+	if not client or client ~= source then
+		return
+	end
+
 	if g_roundData.bomb then
 		-- Bomb is already planted
 		return
@@ -15,12 +22,12 @@ function onBombPlanted(player)
 	end
 
 	g_roundData.bomb = true
-	csTakeWeapon(player, DEF_BOMB[1], DEF_BOMB[2])
+	csTakeWeapon(client, DEF_BOMB[1], DEF_BOMB[2])
 
-	local x, y, z = getElementPosition(player)
-	gl_bombObj = createObject(g_weapon[DEF_BOMB[1]][DEF_BOMB[2]]["objectID"], x, y, z - 0.7, -90, 90, 0)
-	gl_bombObj.interior = player.interior
-	gl_bombObj.dimension = player.dimension
+	local x, y, z = getElementPosition(client)
+	gl_bombObj = createObject(g_weapon[DEF_BOMB[1]][DEF_BOMB[2]]["objectID"], x, y, z - 0.75, -90, 90, 0)
+	gl_bombObj.interior = client.interior
+	gl_bombObj.dimension = client.dimension
 	gl_bombObj.collisions = false
 	gl_bombObj:setData("bomb", true)
 
@@ -36,10 +43,10 @@ function bombBeep(interval)
 	end
 
 	local x, y, z = getElementPosition(gl_bombObj)
-	local light = createMarker(x, y, z, "corona", 0.5, 255, 0, 0)
-	setElementInterior(light, getElementInterior(gl_bombObj))
+	local light = createMarker(x, y, z + 0.075, "corona", 0.1, 255, 0, 0)
+	light.interior = gl_bombObj.interior
 	setTimer(destroyElement, 50, 1, light)
-	triggerClientEvent("cPlaySound", root, "weapons/c4/c4_beep1.wav", x, y, z, 50)
+	triggerClientEvent("cPlaySound", root, "weapons/c4/c4_beep1.wav", x, y, z, BOMB_BEEP_SOUND_DISTANCE)
 
 	interval = interval-50 -- ~40 s
 	if interval <= 0 then
@@ -56,7 +63,7 @@ function onBombExploded()
 
 	local x, y, z = getElementPosition(gl_bombObj)
 	createExplosion(x, y, z, 6)
-	triggerClientEvent("cPlaySound", root, "weapons/c4/c4_explode1.wav", x, y, z, 100)
+	triggerClientEvent("cPlaySound", root, "weapons/c4/c4_explode1.wav", x, y, z, BOMB_EXPLOSION_SOUND_DISTANCE)
 
 	if countPlayersInTeam(g_team[2]) > 0 then
 		onRoundEnd(1, 2) -- jeśli jest conajmniej 1 CT to wygrywa TT
@@ -80,7 +87,11 @@ function destroyBomb()
 	g_roundData.bomb = false
 end
 
-function onBombDefused(player)
+function onBombDefused()
+	if not client or client ~= source then
+		return
+	end
+
 	if not g_roundData.bomb then
 		return
 	end

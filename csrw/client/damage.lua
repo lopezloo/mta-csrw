@@ -43,7 +43,7 @@ function onSomeoneDamaged(attacker, weapon, bodypart, loss)
 			-- https://github.com/multitheftauto/mtasa-blue/issues/602
 			if not attacker and bodypart == BODY_PART_TORSO then
 				local task = {}
-				task[1], task[2], task[3] = getPedTask(localPlayer, "primary", 3)
+				task[1], task[2], task[3] = getPedTask(localPlayer, "primary", TASK_PRIMARY)
 				if task[1] == "TASK_COMPLEX_JUMP" and task[2] == "TASK_SIMPLE_CLIMB" then
 					return
 				end
@@ -147,7 +147,7 @@ function calcDamage(victim, attacker, bodypart, gtaLoss, gtaWeapon)
 		new.health = csGetPedHealth(victim) - damage.health
 
 		if new.health < 0 then
-			triggerServerEvent("csKillPed", resourceRoot, victim, attacker, gtaWeapon, bodypart)
+			triggerServerEvent("csKillPed", localPlayer, victim, attacker, gtaWeapon, bodypart)
 			if bodypart == BODY_PART_HEAD then
 				playSound(":csrw-sounds/sounds/player/headshot" .. math.random(1, 2) .. ".wav")
 			end

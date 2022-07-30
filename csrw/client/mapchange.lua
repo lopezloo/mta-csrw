@@ -21,7 +21,9 @@ addEventHandler("onMapStart", root,
 			else
 				loadingMusic = playSound(":csrw-sounds/sounds/music/drawmusic.mp3")
 			end
-		else loadingMusic = playSound(":csrw-sounds/sounds/music/drawmusic.mp3") end
+		else
+			loadingMusic = playSound(":csrw-sounds/sounds/music/drawmusic.mp3")
+		end
 
 		outputDebugString("New map started (" .. mapname .. ").")
 		loadingMap = mapname

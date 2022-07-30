@@ -99,8 +99,8 @@ function onClientPlayerReloadingEnd(slot)
 		function(source)
 			--setElementData(source, "reloading", 0)
 			toggleControl("aim_weapon", true)
-			toggleControl("crouch", true)
-			toggleControl("jump", true)
+			toggleControl("crouch", not isPlayerCarryingHostage())
+			toggleControl("jump", not isPlayerCarryingHostage())
 
 			setTimer(
 				function()

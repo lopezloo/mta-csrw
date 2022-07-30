@@ -144,10 +144,7 @@ function removeElementsFromCurrentBox(elements)
 	if isBoxVisible() then
 		for k, v in pairs(elements) do
 			if isElement(v) then
-				local pos = table.find(box["elements"], v)
-				if pos then
-					table.remove(box["elements"], pos)
-				end
+				table.removeElement(box["elements"], v)
 			end
 		end
 		return true

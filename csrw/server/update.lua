@@ -95,7 +95,7 @@ function onUpdateDataRecieved(data, errno) -- pobranie info o update (lista plik
 				xmlNodeSetAttribute(metaInfo, "name", "csrw")
 				xmlNodeSetAttribute(metaInfo, "author", "lopezloo")
 				xmlNodeSetAttribute(metaInfo, "version", xmlNodeGetAttribute( xmlFindChild(updateFile, "info", 0) , "ver") or "0.0" )
-				xmlNodeSetAttribute(metaInfo, "description", "Counter Strike RenderWare (last update: " .. (xmlNodeGetAttribute( xmlFindChild(updateFile, "info", 0) , "date") or "never") .. ")")
+				xmlNodeSetAttribute(metaInfo, "description", "CSRW (last update: " .. (xmlNodeGetAttribute( xmlFindChild(updateFile, "info", 0) , "date") or "never") .. ")")
 				xmlNodeSetAttribute(metaInfo, "edf:definition", "edf/csrw.xml")
 				--
 

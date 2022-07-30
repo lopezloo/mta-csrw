@@ -13,7 +13,7 @@ g_playerWeaponData = {} -- informacje o broniach lokalnego gracza
 function onTrySlotChange(key, keyState)
 	--getElementData(localPlayer, "reloading") >= 1
 	--if not g_player.canChangeSlot or isPedInVehicle(localPlayer) or isCursorShowing() or g_player.reloading or not getElementData(localPlayer, "alive") or getControlState("fire") or getControlState("aim_weapon") or (getPedSimplestTask(localPlayer) ~= "TASK_SIMPLE_PLAYER_ON_FOOT" and getPedSimplestTask(localPlayer) ~= "TASK_SIMPLE_SWIM") then
-	if not g_player.canChangeSlot or isPedInVehicle(localPlayer) or g_player.reloading or not getElementData(localPlayer, "alive") or getControlState("fire") or (isCursorShowing() and not CFirstPerson.enabled) or (getControlState("aim_weapon") and not CFirstPerson.enabled) or (getPedSimplestTask(localPlayer) ~= "TASK_SIMPLE_PLAYER_ON_FOOT" and getPedSimplestTask(localPlayer) ~= "TASK_SIMPLE_SWIM") then
+	if not g_player.canChangeSlot or isPedInVehicle(localPlayer) or g_player.reloading or not getElementData(localPlayer, "alive") or getControlState("fire") or getCurrentProgressBar() ~= "" or (isCursorShowing() and not CFirstPerson.enabled) or (getControlState("aim_weapon") and not CFirstPerson.enabled) or (getPedSimplestTask(localPlayer) ~= "TASK_SIMPLE_PLAYER_ON_FOOT" and getPedSimplestTask(localPlayer) ~= "TASK_SIMPLE_SWIM") then
 		-- nie można przeładowywać jak już się przeładowuje, jest się nie żywym lub się celuje (bez FPS), jest się we wodzie lub powietrzu
 		return false
 	else
@@ -29,10 +29,11 @@ bindKey("mouse_wheel_up", "down", onTrySlotChange)
 bindKey("mouse_wheel_down", "down", onTrySlotChange)
 
 function onBindTrySlotChange(key, keyState)
-	if g_player.canChangeSlot and not isPedInVehicle(localPlayer) and not g_player.reloading and getElementData(localPlayer, "alive") and (not isCursorShowing() or CFirstPerson.enabled) and getElementData(localPlayer, "currentSlot") ~= tonumber(key) and getElementData(localPlayer, "wSlot" .. key) ~= false and not delay and not getControlState("fire") and not getControlState("aim_weapon") and (getPedSimplestTask(localPlayer) == "TASK_SIMPLE_PLAYER_ON_FOOT" or getPedSimplestTask(localPlayer) == "TASK_SIMPLE_SWIM") then
+	if g_player.canChangeSlot and not isPedInVehicle(localPlayer) and not g_player.reloading and getElementData(localPlayer, "alive") and getCurrentProgressBar() == "" and (not isCursorShowing() or CFirstPerson.enabled) and getElementData(localPlayer, "currentSlot") ~= tonumber(key) and getElementData(localPlayer, "wSlot" .. key) ~= false and not delay and not getControlState("fire") and not getControlState("aim_weapon") and (getPedSimplestTask(localPlayer) == "TASK_SIMPLE_PLAYER_ON_FOOT" or getPedSimplestTask(localPlayer) == "TASK_SIMPLE_SWIM") then
 		if g_playerWeaponData[tonumber(key)] then
 			changeWeaponSlot(tonumber(key))
-			playSound(":csrw-sounds/sounds/weapons/change/slot" .. key .. ".wav")
+			playSlotChangeSound(tonumber(key))
+
 			delay = true
 			setTimer(function() delay = false end, 100, 1)
 		end
@@ -85,11 +86,10 @@ function switchWeaponSlot(state, baseSlot, slot, ignoreDelay, noSound, deleteHer
 		return
 	end
 
-	-- if getElementData(localPlayer, "wSlot" .. newSlot) ~= false then
 	if g_playerWeaponData[newSlot] then
 		changeWeaponSlot(newSlot, baseSlot, deleteHerToo)
 		if not noSound then
-			playSound(":csrw-sounds/sounds/weapons/change/slot" .. newSlot .. ".wav")
+			playSlotChangeSound(newSlot)
 		end
 		delay = true
 		setTimer(function() delay = false end, 100, 1)
@@ -188,8 +188,10 @@ function changeWeaponSlot(slot, oldSlot, deleteWeapon)
 
 	local oldAmmo, oldClip -- jeśli oldAmmo & oldClip jest nil to serwer usunie obecną broń przy triggerze na server_changeWeaponToSlot
 	if not deleteWeapon then
-		oldAmmo = g_playerWeaponData[oldSlot].ammo
-		oldClip = g_playerWeaponData[oldSlot].clip
+		if g_playerWeaponData[oldSlot] then
+			oldAmmo = g_playerWeaponData[oldSlot].ammo
+			oldClip = g_playerWeaponData[oldSlot].clip
+		end
 	else
 		--outputDebugString("Deleting weapon.")
 		g_playerWeaponData[oldSlot] = nil
@@ -263,7 +265,7 @@ function onClientAim(key, keyState)
 
 		local skillName = getWeaponSkillID( getPedWeapon(localPlayer) )
 		if skillName and getPedStat(localPlayer, skillName) == 1 then
-			triggerServerEvent("switchWeaponAimMovingSkill", resourceRoot, false) -- przywracanie właściwego skilla
+			triggerServerEvent("switchWeaponAimMovingSkill", localPlayer, false) -- przywracanie właściwego skilla
 		end]]--
 
 		if gtaWep == WEAPON_SNIPER then
@@ -286,9 +288,9 @@ end
 --[[function updateWeaponAimMovingSkill()
 	if getControlState("aim_weapon") then
 		if not isPedDucked(localPlayer) and getPedStat(localPlayer, getWeaponSkillID(getPedWeapon(localPlayer))) > 1 and (getControlState("forwards") or getControlState("backwards") or getControlState("left") or getControlState("right")) then
-			triggerServerEvent("switchWeaponAimMovingSkill", resourceRoot, true)
+			triggerServerEvent("switchWeaponAimMovingSkill", localPlayer, true)
 		elseif getPedStat(localPlayer, getWeaponSkillID(getPedWeapon(localPlayer))) == 1 and not (getControlState("forwards") or getControlState("backwards") or getControlState("left") or getControlState("right")) then
-			triggerServerEvent("switchWeaponAimMovingSkill", resourceRoot, false)
+			triggerServerEvent("switchWeaponAimMovingSkill", localPlayer, false)
 		end
 	end
 end]]--
@@ -307,7 +309,7 @@ function onSomeoneShot()
 	if not g_player.flashed then
 		local sound = g_weapon[slot][weapon]["shotSound"]
 		if sound then
-			playSound3D(":csrw-sounds/sounds/weapons/" .. g_weapon[slot][weapon]["shotSound"], getElementPosition(source))
+			playSound3D(":csrw-sounds/sounds/weapons/" .. g_weapon[slot][weapon]["shotSound"], getPedWeaponMuzzlePosition(localPlayer))
 		end
 	end
 
@@ -318,44 +320,67 @@ function onSomeoneShot()
 			local gtaWeaponID = getPedWeapon(localPlayer)
 
 			if g_playerWeaponData[slot].ammo == 0 then -- broń się skończyła
-				outputDebugString("No ammo in weapon, deleting.")
-				outputDebugString(tostring(getPedTotalAmmo(localPlayer)))
-
+				outputDebugString("No ammo in weapon.")
 				-- Weapon has no ammo
-				-- technically it has a lot ammo, so we disable fire control
+				-- technically it has a lot of ammo, so we disable fire control
 				-- so player won't be able to shoot
 				updatePlayerControls()
 
-				--[[setTimer(
-					function()
-						if getPedTotalAmmo(localPlayer) > 0 then
-							switchWeaponSlot("up", nil, nil, nil, nil, true) -- zmiana slota + usuwanie broni
-						else
-							switchWeaponSlot("up") -- tylko zmiana slota (broń się sama usunęła)
-						end
-					end, 50, 1)]]--
+				-- Remove projectiles though
+				if isWeaponProjectile(gtaWeaponID) then
+					-- Timer is required so flashbang / decoy grenade won't be broken
+					setTimer(
+						function()
+							if getPedTotalAmmo(localPlayer) > 0 then
+								-- change weapon slot and delete weapon
+								switchWeaponSlot("up", nil, nil, nil, nil, true)
+							else
+								-- change weapon slot only (weapon got deleted by gta)
+								switchWeaponSlot("up")
+							end
+						end, 50, 1
+					)
+				end
 			else
-				-- weapon require reloading
-				--if gtaWeaponID == WEAPON_GRENADE or gtaWeaponID == WEAPON_TEARGAS or gtaWeaponID == WEAPON_MOLOTOV or gtaWeaponID == WEAPON_SATCHEL then
-					-- do not reload grenades
-					--setElementData(localPlayer, "wSlot" .. slot .. "Ammo", getPedAmmoInClip(localPlayer) - 1)
-					-- jaki jest sens aktualizacji liczby granatów do zmiennej ?
-				
 				if canWeaponBeReloaded(gtaWeaponID) then
-					--onClientPlayerReloading(false) -- przeładowanie wywołane w połowie naturalnie (bo GTA też wtedy zmienia ammo)
-					-- bez timera ostatni strzał u gracza nielokalnego jest ucinany przez wystartowanie animacji
 					onClientPlayerReloading(slot)
 				end
 			end
 
-			if gtaWeaponID == WEAPON_SNIPER then -- sniper
-				onClientAim("induced", "up") -- ponowne pokazywanie obiektów przyczepionych do gracza (bo po strzale niekoniecznie musi skończyć celowanie)
+			if gtaWeaponID == WEAPON_SNIPER then
+				-- ponowne pokazywanie obiektów przyczepionych do gracza (bo po strzale niekoniecznie musi skończyć celowanie)
+				onClientAim("induced", "up")
 			end
 		end
 	end
 end
 addEventHandler("onClientPlayerWeaponFire", root, onSomeoneShot)
 --addEventHandler("onClientPedWeaponFire", root, onSomeoneShot)
+
+function onClientFire()
+	if not g_player.aiming then
+		return
+	end
+
+	local slot = localPlayer:getData("currentSlot")
+	if not slot then
+		return
+	end
+
+	local task = localPlayer:getTask("secondary", TASK_SECONDARY_ATTACK)
+	if task ~= "TASK_SIMPLE_USE_GUN" then
+		return
+	end
+
+	-- Play empty clip sound
+	if g_playerWeaponData[slot].clip == 0 and g_playerWeaponData[slot].ammo == 0 then
+		if localPlayer.weaponSlot == WEAPON_SLOT_HANDGUNS then
+			playSound(":csrw-sounds/sounds/weapons/clipempty_pistol.wav")
+		else
+			playSound(":csrw-sounds/sounds/weapons/clipempty_rifle.wav")
+		end
+	end
+end
 
 addEvent("updateWeaponData", true)
 addEventHandler("updateWeaponData", root,
@@ -406,4 +431,21 @@ local RELOADABLE_SLOTS = {
 function canWeaponBeReloaded(gtaWeaponID)
 	local slot = getSlotFromWeapon(gtaWeaponID)
 	return table.find(RELOADABLE_SLOTS, slot) ~= false
+end
+
+function playSlotChangeSound(slot)
+	if g_player.flashed then
+		return
+	end
+
+	playSound(":csrw-sounds/sounds/common/wpn_hudoff.wav").volume = 0.5
+	local weapon = localPlayer:getData("wSlot" .. slot)
+	if not weapon then
+		return
+	end
+
+	local sound = g_weapon[slot][weapon]["pulloutSound"]
+	if sound then
+		playSound(":csrw-sounds/sounds/weapons/" .. sound)
+	end
 end

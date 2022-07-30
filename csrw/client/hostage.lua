@@ -3,10 +3,13 @@ local hostage = {
 	picked = nil,
 	renderedHostages = {},
 
-	lastPickTryTime = nil
+	lastPickTryTime = nil,
+
+	tryingToDrop = nil,
+	lastDropTryTime = nil
 }
 
-function pickHostage(key, keyState)
+local function pickHostage(key, keyState)
 	if not g_misc.roundStarted or not localPlayer:getData("alive") or localPlayer.team ~= g_team[2] then return end
 
 	if keyState == "down" and getCurrentProgressBar() == "" and not hostage.tryingToPick and not hostage.picked then
@@ -42,6 +45,7 @@ function pickHostage(key, keyState)
 			localPlayer.frozen = true
 			playAnimationWithWalking("BOMBER", "BOM_Plant_Loop")
 			nearHost:setData("picking", true)
+			updatePlayerControls()
 		end
 	
 	elseif getCurrentProgressBar() == "host" then
@@ -50,25 +54,77 @@ function pickHostage(key, keyState)
 		hostage.tryingToPick:setData("picking", false)
 		hostage.tryingToPick = nil
 		stopProgressBar()
+		updatePlayerControls()
 		removeEventHandler("onProgressBarEnd", resourceRoot, onHostagePicked)
 	end
 end
 bindKey("E", "both", pickHostage)
 
-function onHostagePicked(progressName)
-	if progressName == "host" then
-		stopAnimationWithWalking()
-		setElementFrozen(localPlayer, false)
-		setElementData(hostage.tryingToPick, "carryBy", localPlayer)
-		hostage.picked = hostage.tryingToPick
-		hostage.tryingToPick = nil
-		removeEventHandler("onProgressBarEnd", resourceRoot, onHostagePicked)
-		-- nie ma sensu resetowania daty "picking" tutaj (reset dopiero po stronie serwera przy upadku hosta)
+local function dropHostage(key, keyState)
+	if not g_misc.roundStarted or not localPlayer:getData("alive") or localPlayer.team ~= g_team[2] then return end
+	if not hostage.picked then return end
+	if hostage.tryingToPick then return end
 
-		toggleControl("sprint", false)
-		toggleControl("jump", false)
-		toggleControl("crouch", false)
+	if keyState == "down" and getCurrentProgressBar() == "" and not hostage.tryingToDrop then
+		if not g_player.canChangeSlot then return end
+		if isPedInVehicle(localPlayer) then return end
+		if isCursorShowing() then return end
+		if g_player.reloading then return end
+		if getControlState("fire") or getControlState("aim_weapon") then return end
+
+		if hostage.lastDropTryTime and getTickCount() - hostage.lastDropTryTime < 2000 then
+			-- Rate limit hostage picking
+			return
+		end
+
+		hostage.lastDropTryTime = getTickCount()
+		hostage.tryingToDrop = true
+
+		setProgressBar("host-drop", 0.015)
+		addEventHandler("onProgressBarEnd", resourceRoot, onHostageDropped)
+		localPlayer.frozen = true
+		playAnimationWithWalking("BOMBER", "BOM_Plant_Loop")
+		updatePlayerControls()
+	
+	elseif getCurrentProgressBar() == "host-drop" then
+		stopAnimationWithWalking()
+		localPlayer.frozen = false
+		hostage.tryingToDrop = false
+		stopProgressBar()
+		updatePlayerControls()
+		removeEventHandler("onProgressBarEnd", resourceRoot, onHostageDropped)
 	end
+end
+bindKey("H", "both", dropHostage)
+
+function onHostagePicked(progressName)
+	if progressName ~= "host" then return end
+
+	stopAnimationWithWalking()
+	localPlayer.frozen = false
+	setElementData(hostage.tryingToPick, "carryBy", localPlayer)
+	hostage.picked = hostage.tryingToPick
+	hostage.tryingToPick = nil
+	removeEventHandler("onProgressBarEnd", resourceRoot, onHostagePicked)
+	-- nie ma sensu resetowania daty "picking" tutaj (reset dopiero po stronie serwera przy upadku hosta)
+
+	toggleControl("sprint", false)
+	toggleControl("jump", false)
+	toggleControl("crouch", false)
+	toggleControl("walk", false)
+end
+
+function onHostageDropped(progressName)
+	if progressName ~= "host-drop" then return end
+
+	stopAnimationWithWalking()
+	localPlayer.frozen = false
+
+	hostage.picked = nil
+	hostage.tryingToDrop = false
+
+	triggerServerEvent("dropHostage", localPlayer)
+	removeEventHandler("onProgressBarEnd", resourceRoot, onHostageDropped)
 end
 
 addEventHandler("onClientElementDataChange", root,
@@ -150,6 +206,10 @@ end
 
 function isPlayerCarryingHostage()
 	return hostage.picked ~= nil
+end
+
+function isPlayerPickingUpHostage()
+	return hostage.tryingToPick ~= nil
 end
 
 addEventHandler("onClientElementStreamIn", root,

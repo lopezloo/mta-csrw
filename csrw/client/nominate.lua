@@ -20,7 +20,7 @@ addEventHandler("updateMapList", root,
 		outputDebugString("Map list updated.")
 	end
 )
-triggerServerEvent("pleaseSendMeMapList", resourceRoot)
+triggerServerEvent("pleaseSendMeMapList", localPlayer)
 
 addEventHandler("onClientGUIDoubleClick", nominateGrid,
 	function(button, state)
@@ -29,7 +29,7 @@ addEventHandler("onClientGUIDoubleClick", nominateGrid,
 			if row ~= -1 then
 				local mapName = guiGridListGetItemText(nominateGrid, row, 1)
 				outputDebugString("Nominating " .. tostring(mapName))
-				triggerServerEvent("nominateMap", resourceRoot, mapName)
+				triggerServerEvent("nominateMap", localPlayer, mapName)
 				guiSetVisible(nominateWindow, false)
 				showCursor(false)
 			end

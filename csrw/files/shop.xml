@@ -1,109 +1,793 @@
 <shop>
 	<!-- 
 		Notes:
-			* category name is being loaded from locales - shop_cat_[CATEGORYNAMEHERE]
+			* category names are being loaded from locales - shop_cat_[CATEGORYNAMEHERE]
 			* categories should contain max 9 weapons (UI limitation)
-			* info[1-10] = nil or "-1" = don't display this info line
-			* ammo = ammo without 1 clip (real ammo count = ammo + clip)
 	-->
 	
-	
-	<team1> <!-- TT -->
+	<!-- TT -->
+	<team1> 
 		<category name="guns">
-			<weapon name="9X19MM SIDEARM" cost="400" csWeaponID="1" slot="2" info1="Austria" info2="9MM Parabellum" info3="20 rounds" info4="not applicable" info6="0,9 kg" info7="8 grams" info8="345 m/s" info9="475 joules" />
-			<weapon name="KM .45 TACTICAL" cost="500" csWeaponID="2" slot="2" info1="Germany" info2=".45 ACP" info3="12 rounds" info4="not applicable" info6="1 kg" info7="15,2 grams" info8="270 M/S" info9="553 dżule" />
-			<weapon name="228 COMPACT" cost="600" csWeaponID="3" slot="2" info1="Switzerland / Germany" info2=".357 SIG" info3="13 rounds" info4="not applicable" info6="1,03 kg" info7="8,1 grams" info8="427 m/s" info9="600 joules" />
-			<weapon name="NIGHT HAWK .50C" cost="650" csWeaponID="4" slot="2" info1="Izrael" info2=".50 Action Express" info3="7 rounds" info4="not applicable" info6="1,8 kg" info7="19,4 grams" info8="421 m/s" info9="1650 joules" />
-			<weapon name=".40 DUEL ELITES" cost="800" csWeaponID="5" slot="2" info1="Italy" info2=".40 S&W" info3="15 rounds" info4="not applicable" info6="1,15 kg" info7="8 grams" info8="390 m/s" info9="606 joules" />		
+			<item>
+				<name>9X19MM SIDEARM</name>
+				<cost>400</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>2</slot>
+				<information>
+					<info-1>Austria</info-1>
+					<info-2>9MM Parabellum</info-2>
+					<info-3>20 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-6>0,9 kg</info-6>
+					<info-7>8 grams</info-7>
+					<info-8>345 m/s</info-8>
+					<info-9>475 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>KM .45 TACTICAL</name>
+				<cost>500</cost>
+				<csWeaponID>2</csWeaponID>
+				<slot>2</slot>
+				<information>
+					<info-1>Germany</info-1>
+					<info-2>.45 ACP</info-2>
+					<info-3>12 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-6>1 kg</info-6>
+					<info-7>15,2 grams</info-7>
+					<info-8>270 m/s</info-8>
+					<info-9>553 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>228 COMPACT</name>
+				<cost>600</cost>
+				<csWeaponID>3</csWeaponID>
+				<slot>2</slot>
+				<information>
+					<info-1>Switzerland / Germany</info-1>
+					<info-2>.357 SIG</info-2>
+					<info-3>13 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-6>1,03 kg</info-6>
+					<info-7>8,1 grams</info-7>
+					<info-8>427 m/s</info-8>
+					<info-9>600 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>NIGHT HAWK .50C</name>
+				<cost>650</cost>
+				<csWeaponID>4</csWeaponID>
+				<slot>2</slot>
+				<information>
+					<info-1>Israel</info-1>
+					<info-2>.50 Action Express</info-2>
+					<info-3>7 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-6>1,8 kg</info-6>
+					<info-7>19,4 grams</info-7>
+					<info-8>421 m/s</info-8>
+					<info-9>1650 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>.40 DUEL ELITES</name>
+				<cost>800</cost>
+				<csWeaponID>5</csWeaponID>
+				<slot>2</slot>
+				<information>
+					<info-1>Italy</info-1>
+					<info-2>.40 S&W</info-2>
+					<info-3>15 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-6>1,15 kg</info-6>
+					<info-7>8 grams</info-7>
+					<info-8>390 m/s</info-8>
+					<info-9>606 joules</info-9>
+				</information>
+			</item>	
 		</category>
 			
 		<category name="shotguns">
-			<weapon name="LEONE 12 GAUGER SUPER" cost="1700" csWeaponID="1" slot="1" info1="Italy" info2="Kaliber 12" info3="8 rounds" info4="not applicable" info5="3,5 KG" info7="3,8 grams" info8="381 m/s" info9="2429 joules" />
-			<weapon name="LEONE YG1265 AUTO SHOTGUN" cost="3000" csWeaponID="2" slot="1" info1="Italy" info2="Kaliber 12" info3="7 rounds" info4="400 shots / min" info5="4 KG" info7="3,8 grams" info8="381 m/s" info9="2429 joules" />
+			<item>
+				<name>LEONE 12 GAUGER SUPER</name>
+				<cost>1700</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Italy</info-1>
+					<info-2>Caliber 12</info-2>
+					<info-3>8 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-5>3,5 KG</info-5>
+					<info-7>3,8 grams</info-7>
+					<info-8>381 m/s</info-8>
+					<info-9>2429 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>LEONE YG1265 AUTO SHOTGUN</name>
+				<cost>3000</cost>
+				<csWeaponID>2</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Italy</info-1>
+					<info-2>Caliber 12</info-2>
+					<info-3>7 rounds</info-3>
+					<info-4>400 shots / min</info-4>
+					<info-5>4 KG</info-5>
+					<info-7>3,8 grams</info-7>
+					<info-8>381 m/s</info-8>
+					<info-9>2429 joules</info-9>
+				</information>
+			</item>
 		</category>
 		
 		<category name="machineguns">
-			<weapon name="INGRAM MAC 10" cost="1400" csWeaponID="3" slot="1" info1="United States" info2=".45 ACP" info3="30 rounds" info4="857 shots / min" info6="3,82 kg" info7="15,2 grams" info8="280 m/s" info9="584 dżule" />
-			<weapon name="KM SUB MACHINE GUN" cost="1500" csWeaponID="4" slot="1" info1="Germany" info2="9MM Parabellum" info3="30 rounds" info4="800 shots / min" info6="3,42 kg" info7="8 grams" info8="345 m/s" info9="637 joules" />
-			<weapon name="KM UMP45" cost="1700" csWeaponID="5" slot="1" info1="Germany" info2=".45 ACP" info3="25 rounds" info4="600 shots / min" info6="2,27 kg" info7="15,2 grams" info8="306 m/s" info9="625 joules" />
-			<weapon name="ES C90" cost="2350" csWeaponID="6" slot="1" info1="Belgium" info2="5.7 x 28MM" info3="50 rounds" info4="900 shots / min" info6="3 kg" info7="2 grams" info8="715 m/s" info9="465 joules" />
+			<item>
+				<name>INGRAM MAC 10</name>
+				<cost>1400</cost>
+				<csWeaponID>3</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>United States</info-1>
+					<info-2>.45 ACP</info-2>
+					<info-3>30 rounds</info-3>
+					<info-4>857 shots / min</info-4>
+					<info-5>3,82 kg</info-5>
+					<info-6></info-6>
+					<info-7>15,2 grams</info-7>
+					<info-8>280 m/s</info-8>
+					<info-9>584 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>KM SUB MACHINE GUN</name>
+				<cost>1500</cost>
+				<csWeaponID>4</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Germany</info-1>
+					<info-2>9MM Parabellum</info-2>
+					<info-3>30 rounds</info-3>
+					<info-4>800 shots / min</info-4>
+					<info-6>3,42 kg</info-6>
+					<info-7>8 grams</info-7>
+					<info-8>345 m/s</info-8>
+					<info-9>637 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>KM UMP45</name>
+				<cost>1700</cost>
+				<csWeaponID>5</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Germany</info-1>
+					<info-2>.45 ACP</info-2>
+					<info-3>25 rounds</info-3>
+					<info-4>600 shots / min</info-4>
+					<info-6>2,27 kg</info-6>
+					<info-7>15,2 grams</info-7>
+					<info-8>306 m/s</info-8>
+					<info-9>625 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>ES C90</name>
+				<cost>2350</cost>
+				<csWeaponID>6</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Belgium</info-1>
+					<info-2>5.7 x 28MM</info-2>
+					<info-3>50 rounds</info-3>
+					<info-4>900 shots / min</info-4>
+					<info-6>3 kg</info-6>
+					<info-7>2 grams</info-7>
+					<info-8>715 m/s</info-8>
+					<info-9>465 joules</info-9>
+				</information>
+			</item>
 		</category>
 		
 		<category name="rifles">
-			<weapon name="IDF DEFENDER" cost="2000" csWeaponID="8" slot="1" info1="Izrael" info2=".223" info3="35 rounds" info4="675 shots / min" info6="4,35 kg" info7="4 grams" info8="614 m/s" info9="1712 joules" />
-			<weapon name="CV 47" cost="2500" csWeaponID="9" slot="1" info1="Rosja" info2="7,62 NATO" info3="30 rounds" info4="600 shots / min" info6="4,79 kg" info7="7,9 grams" info8="710 m/s" info9="1992 dżule" />
-			<weapon name="SCHMIDT SCOUT" cost="2750" csWeaponID="10" slot="1" info1="Austria" info2="7,62 NATO" info3="10 rounds" info4="not applicable" info5="3,3 kg" info7="8 grams" info8="853 m/s" info9="2200 joules" />
-			<weapon name="KRIEG 552" cost="3500" csWeaponID="11" slot="1" info1="Switzerland" info2="5,56 NATO" info3="30 rounds" info4="727 shots / min" info5="3.1 kg" info7="4 grams" info8="884 m/s" info9="1750 joules" />
-			<weapon name="MAGNUM SNIPER RIFLE" cost="4750" csWeaponID="12" slot="1" info1="United Kingdom" info2=".339 LAPUA MAGNUM" info3="10 rounds" info4="not applicable" info6="6 kg" info7="16,2 grams" info8="914 m/s" info9="7000 joules" />
-			<weapon name="D3/AU 1" cost="5000" csWeaponID="13" slot="1" info1="Germany" info2="7,62 NATO" info3="20 rounds" info4="not applicable" info6="4,41 kg" info7="8 grams" info8="853 m/s" info9="2200 joules" />
+			<item>
+				<name>IDF DEFENDER</name>
+				<cost>2000</cost>
+				<csWeaponID>8</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Israel</info-1>
+					<info-2>.223</info-2>
+					<info-3>35 rounds</info-3>
+					<info-4>675 shots / min</info-4>
+					<info-6>4,35 kg</info-6>
+					<info-7>4 grams</info-7>
+					<info-8>614 m/s</info-8>
+					<info-9>1712 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>CV 47</name>
+				<cost>2500</cost>
+				<csWeaponID>9</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Russia</info-1>
+					<info-2>7,62 NATO</info-2>
+					<info-3>30 rounds</info-3>
+					<info-4>600 shots / min</info-4>
+					<info-6>4,79 kg</info-6>
+					<info-7>7,9 grams</info-7>
+					<info-8>710 m/s</info-8>
+					<info-9>1992 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>SCHMIDT SCOUT</name>
+				<cost>2750</cost>
+				<csWeaponID>10</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Austria</info-1>
+					<info-2>7,62 NATO</info-2>
+					<info-3>10 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-5>3,3 kg</info-5>
+					<info-7>8 grams</info-7>
+					<info-8>853 m/s</info-8>
+					<info-9>2200 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>KRIEG 552</name>
+				<cost>3500</cost>
+				<csWeaponID>11</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Switzerland</info-1>
+					<info-2>5,56 NATO</info-2>
+					<info-3>30 rounds</info-3>
+					<info-4>727 shots / min</info-4>
+					<info-5>3.1 kg</info-5>
+					<info-7>4 grams</info-7>
+					<info-8>884 m/s</info-8>
+					<info-9>1750 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>MAGNUM SNIPER RIFLE</name>
+				<cost>4750</cost>
+				<csWeaponID>12</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>United Kingdom</info-1>
+					<info-2>.339 LAPUA MAGNUM</info-2>
+					<info-3>10 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-5></info-5>
+					<info-6>6 kg</info-6>
+					<info-7>16,2 grams</info-7>
+					<info-8>914 m/s</info-8>
+					<info-9>7000 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>D3/AU 1</name>
+				<cost>5000</cost>
+				<csWeaponID>13</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Germany</info-1>
+					<info-2>7,62 NATO</info-2>
+					<info-3>20 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-6>4,41 kg</info-6>
+					<info-7>8 grams</info-7>
+					<info-8>853 m/s</info-8>
+					<info-9>2200 joules</info-9>
+				</information>
+			</item>
 		</category>
 		
 		<category name="equipment"> <!-- S1 -->
-			<weapon name="KEVLAR" cost="600" csWeaponID="1" slot="S1" info10="Protect your body." />
-			<weapon name="KEVLAR + HELMET" cost="1000" csWeaponID="2" slot="S1" info10="Protect your body and head." />
-			<weapon name="NIGHT VISION GOGGLES" cost="1250" csWeaponID="3" slot="S1" info10="Nightvision goggles is an equipment item that enable users to see in complete darkness." />
-			<weapon name="THERMAL VISION GOGGLES" cost="1800" csWeaponID="4" slot="S1" info10=" " />
+			<item>
+				<name>KEVLAR</name>
+				<cost>600</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>S1</slot>
+				<information>
+					<info-10>Protect your body.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>KEVLAR + HELMET</name>
+				<cost>1000</cost>
+				<csWeaponID>2</csWeaponID>
+				<slot>S1</slot>
+				<information>
+					<info-10>Protect your body and head.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>NIGHT VISION GOGGLES</name>
+				<cost>1250</cost>
+				<csWeaponID>3</csWeaponID>
+				<slot>S1</slot>
+				<information>
+					<info-10>Nightvision goggles is an equipment item that enable users to see in complete darkness.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>THERMAL VISION GOGGLES</name>
+				<cost>1800</cost>
+				<csWeaponID>4</csWeaponID>
+				<slot>S1</slot>
+			</item>
 		</category>
 
 		<category name="grenades">
-			<weapon name="HE GRENADE" cost="300" csWeaponID="1" slot="4" info10="The high explosive fragmentation grenade administers high damage through a wide area, making it ideal for clearing out hostile rooms." />
-			<weapon name="FLASHBANG" cost="200" csWeaponID="1" slot="5" info10="The non-lethal flashbang grenade temporarily blinds anybody within its concussive blast, making it perfect for flushing out closed-in areas. Its loud explosion also temporarily masks the sound of footsteps" />		
-			<weapon name="SMOKE GRENADE" cost="300" csWeaponID="1" slot="6" info10="The smoke grenade creates a medium-area smoke screen. It can effectively hide your team from snipers, or even just create a useful distraction." />
-			<weapon name="MOLOTOV" cost="1000" csWeaponID="1" slot="7" info10="The Molotov is a powerful and unpredictable area denial weapon that bursts into flames when thrown on the ground, injuring any player in its radius." />
+			<item>
+				<name>HE GRENADE</name>
+				<cost>300</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>4</slot>
+				<information>
+					<info-10>The high explosive fragmentation grenade administers high damage through a wide area, making it ideal for clearing out hostile rooms.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>FLASHBANG</name>
+				<cost>200</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>5</slot>
+				<information>
+					<info-10>The non-lethal flashbang grenade temporarily blinds anybody within its concussive blast, making it perfect for flushing out closed-in areas. Its loud explosion also temporarily masks the sound of footsteps.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>SMOKE GRENADE</name>
+				<cost>300</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>6</slot>
+				<information>
+					<info-10>The smoke grenade creates a medium-area smoke screen. It can effectively hide your team from snipers, or even just create a useful distraction.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>DECOY GRENADE</name>
+				<cost>50</cost>
+				<csWeaponID>2</csWeaponID>
+				<slot>7</slot>
+				<information>
+					<info-10>When thrown, the decoy grenade emulates the sound of the most powerful weapon you are carrying, creating the illusion of additional supporting forces.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>MOLOTOV</name>
+				<cost>1000</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>7</slot>
+				<information>
+					<info-10>The Molotov is a powerful and unpredictable area denial weapon that bursts into flames when thrown on the ground, injuring any player in its radius.</info-10>
+				</information>
+			</item>
 		</category>
 	</team1>
-		
-	<team2> <!-- CT -->
+	
+	<!-- CT -->
+	<team2>
 		<category name="guns">
-			<weapon name="9X19MM SIDEARM" cost="400" csWeaponID="1" slot="2" info1="Austria" info2="9MM Parabellum" info3="20 rounds" info4="not applicable" info6="0,9 kg" info7="8 grams" info8="345 m/s" info9="475 joules" />
-			<weapon name="KM .45 TACTICAL" cost="500" csWeaponID="2" slot="2" info1="Germany" info2=".45 ACP" info3="12 rounds" info4="not applicable" info6="1 kg" info7="15,2 grams" info8="270 M/S" info9="553 dżule" />
-			<weapon name="228 COMPACT" cost="600" csWeaponID="3" slot="2" info1="Switzerland / Germany" info2=".357 SIG" info3="13 rounds" info4="not applicable" info6="1,03 kg" info7="8,1 grams" info8="427 m/s" info9="600 joules" />
-			<weapon name="NIGHT HAWK .50C" cost="650" csWeaponID="4" slot="2" info1="Izrael" info2=".50 Action Express" info3="7 rounds" info4="not applicable" info6="1,8 kg" info7="19,4 grams" info8="421 m/s" info9="1650 joules" />
-			<weapon name="ES FIVE SEVEN" cost="750" csWeaponID="6" slot="2" info1="Belgium" info2="5,7 x 28MM" info3="20 rounds" info4="not applicable" info6="0,618 kg" info7="2 grams" info8="715 m/s" info9="465 joules" />
+			<item>
+				<name>9X19MM SIDEARM</name>
+				<cost>400</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>2</slot>
+				<information>
+					<info-1>Austria</info-1>
+					<info-2>9MM Parabellum</info-2>
+					<info-3>20 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-6>0,9 kg</info-6>
+					<info-7>8 grams</info-7>
+					<info-8>345 m/s</info-8>
+					<info-9>475 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>KM .45 TACTICAL</name>
+				<cost>500</cost>
+				<csWeaponID>2</csWeaponID>
+				<slot>2</slot>
+				<information>
+					<info-1>Germany</info-1>
+					<info-2>.45 ACP</info-2>
+					<info-3>12 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-6>1 kg</info-6>
+					<info-7>15,2 grams</info-7>
+					<info-8>270 m/s</info-8>
+					<info-9>553 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>228 COMPACT</name>
+				<cost>600</cost>
+				<csWeaponID>3</csWeaponID>
+				<slot>2</slot>
+				<information>
+					<info-1>Switzerland / Germany</info-1>
+					<info-2>.357 SIG</info-2>
+					<info-3>13 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-6>1,03 kg</info-6>
+					<info-7>8,1 grams</info-7>
+					<info-8>427 m/s</info-8>
+					<info-9>600 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>NIGHT HAWK .50C</name>
+				<cost>650</cost>
+				<csWeaponID>4</csWeaponID>
+				<slot>2</slot>
+				<information>
+					<info-1>Israel</info-1>
+					<info-2>.50 Action Express</info-2>
+					<info-3>7 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-6>1,8 kg</info-6>
+					<info-7>19,4 grams</info-7>
+					<info-8>421 m/s</info-8>
+					<info-9>1650 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>ES FIVE SEVEN</name>
+				<cost>750</cost>
+				<csWeaponID>6</csWeaponID>
+				<slot>2</slot>
+				<information>
+					<info-1>Belgium</info-1>
+					<info-2>5,7 x 28MM</info-2>
+					<info-3>20 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-6>0,618 kg</info-6>
+					<info-7>2 grams</info-7>
+					<info-8>715 m/s</info-8>
+					<info-9>465 joules</info-9>
+				</information>
+			</item>
 		</category>
 		
 		<category name="shotguns">
-			<weapon name="LEONE 12 GAUGER SUPER" cost="1700" csWeaponID="1" slot="1" info1="Italy" info2="Kaliber 12" info3="8 rounds" info4="not applicable" info5="3,5 KG" info7="3,8 grams" info8="381 m/s" info9="2429 joules" />
-			<weapon name="LEONE YG1265 AUTO SHOTGUN" cost="3000" csWeaponID="2" slot="1" info1="Italy" info2="Kaliber 12" info3="7 rounds" info4="400 shots / min" info5="4 KG" info7="3,8 grams" info8="381 m/s" info9="2429 joules" />
+			<item>
+				<name>LEONE 12 GAUGER SUPER</name>
+				<cost>1700</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Italy</info-1>
+					<info-2>Caliber 12</info-2>
+					<info-3>8 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-5>3,5 KG</info-5>
+					<info-7>3,8 grams</info-7>
+					<info-8>381 m/s</info-8>
+					<info-9>2429 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>LEONE YG1265 AUTO SHOTGUN</name>
+				<cost>3000</cost>
+				<csWeaponID>2</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Italy</info-1>
+					<info-2>Caliber 12</info-2>
+					<info-3>7 rounds</info-3>
+					<info-4>400 shots / min</info-4>
+					<info-5>4 KG</info-5>
+					<info-7>3,8 grams</info-7>
+					<info-8>381 m/s</info-8>
+					<info-9>2429 joules</info-9>
+				</information>
+			</item>
 		</category>
 		
 		<category name="machineguns">
-			<weapon name="SCHMIDT MACHINE PISTOL" cost="1250" csWeaponID="7" slot="1" info1="Austria" info2="9MM Parabellum" info3="30 rounds" info4="857 shots / min" info5="1,3 kg" info7="8 grams" info8="366 m/s" info9="606 joules" />
-			<weapon name="KM SUB MACHINE GUN" cost="1500" csWeaponID="4" slot="1" info1="Germany" info2="9MM Parabellum" info3="30 rounds" info4="800 shots / min" info6="3,42 kg" info7="8 grams" info8="345 m/s" info9="637 joules" />
-			<weapon name="KM UMP45" cost="1700" csWeaponID="5" slot="1" info1="Germany" info2=".45 ACP" info3="25 rounds" info4="600 shots / min" info6="2,27 kg" info7="15,2 grams" info8="306 m/s" info9="625 joules" />
-			<weapon name="ES C90" cost="2350" csWeaponID="6" slot="1" info1="Belgium" info2="5.7 x 28MM" info3="50 rounds" info4="900 shots / min" info6="3 kg" info7="2 grams" info8="715 m/s" info9="465 joules" />		
+			<item>
+				<name>SCHMIDT MACHINE PISTOL</name>
+				<cost>1250</cost>
+				<csWeaponID>7</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Austria</info-1>
+					<info-2>9MM Parabellum</info-2>
+					<info-3>30 rounds</info-3>
+					<info-4>857 shots / min</info-4>
+					<info-5>1,3 kg</info-5>
+					<info-7>8 grams</info-7>
+					<info-8>366 m/s</info-8>
+					<info-9>606 joules</info-9>
+				</information>
+			</item>
+			
+			<item>
+				<name>KM SUB MACHINE GUN</name>
+				<cost>1500</cost>
+				<csWeaponID>4</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Germany</info-1>
+					<info-2>9MM Parabellum</info-2>
+					<info-3>30 rounds</info-3>
+					<info-4>800 shots / min</info-4>
+					<info-6>3,42 kg</info-6>
+					<info-7>8 grams</info-7>
+					<info-8>345 m/s</info-8>
+					<info-9>637 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>KM UMP45</name>
+				<cost>1700</cost>
+				<csWeaponID>5</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Germany</info-1>
+					<info-2>.45 ACP</info-2>
+					<info-3>25 rounds</info-3>
+					<info-4>600 shots / min</info-4>
+					<info-6>2,27 kg</info-6>
+					<info-7>15,2 grams</info-7>
+					<info-8>306 m/s</info-8>
+					<info-9>625 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>ES C90</name>
+				<cost>2350</cost>
+				<csWeaponID>6</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Belgium</info-1>
+					<info-2>5.7 x 28MM</info-2>
+					<info-3>50 rounds</info-3>
+					<info-4>900 shots / min</info-4>
+					<info-6>3 kg</info-6>
+					<info-7>2 grams</info-7>
+					<info-8>715 m/s</info-8>
+					<info-9>465 joules</info-9>
+				</information>
+			</item>	
 		</category>
 		
 		<category name="rifles">
-			<weapon name="CLARION 5 56" cost="2250" csWeaponID="14" slot="1" info1="France" info2="5,56 NATO" info3="25 rounds" info4="1100 shots / min" info6="3,40 kg" info7="4 grams" info8="674 m/s" info9="1712 joules" />
-			<weapon name="SCHMIDT SCOUT" cost="2750" csWeaponID="10" slot="1" info1="Austria" info2="7,62 NATO" info3="10 rounds" info4="not applicable" info5="3,3 kg" info7="8 grams" info8="853 m/s" info9="2200 joules" />
-			<weapon name="MAVERICK M4A1 CARABINE" cost="3100" csWeaponID="15" slot="1" info1="United States" info2="5,56 NATO" info3="30 rounds" info4="685 shots / min" info5="3,22 kg" info7="4 grams" info8="884 m/s" info9="1570 joules" />
-			<weapon name="BULLPUP" cost="3500" csWeaponID="16" slot="1" info1="Austria" info2="5,56 NATO" info3="30 rounds" info4="727 shots / min" info6="4,09 kg" info7="4 grams" info8="884 m/s" info9="1570 joules" />
-			<weapon name="KRIEG 550 COMMANDO" cost="4200" csWeaponID="17" slot="1" info1="Switzerland" info2="5,56 NATO" info3="30 rounds" info4="not applicable" info5="7,02 kg" info7="4 grams" info8="945 m/s" info9="1650 joules" />
-			<weapon name="MAGNUM SNIPER RIFLE" cost="4750" csWeaponID="12" slot="1" info1="United Kingdom" info2=".339 LAPUA MAGNUM" info3="10 rounds" info4="not applicable" info6="6 kg" info7="16,2 grams" info8="914 m/s" info9="7000 joules" />
+			<item>
+				<name>CLARION 5 56</name>
+				<cost>2250</cost>
+				<csWeaponID>14</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>France</info-1>
+					<info-2>5,56 NATO</info-2>
+					<info-3>25 rounds</info-3>
+					<info-4>1100 shots / min</info-4>
+					<info-6>3,40 kg</info-6>
+					<info-7>4 grams</info-7>
+					<info-8>674 m/s</info-8>
+					<info-9>1712 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>SCHMIDT SCOUT</name>
+				<cost>2750</cost>
+				<csWeaponID>10</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Austria</info-1>
+					<info-2>7,62 NATO</info-2>
+					<info-3>10 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-5>3,3 kg</info-5>
+					<info-7>8 grams</info-7>
+					<info-8>853 m/s</info-8>
+					<info-9>2200 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>MAVERICK M4A1 CARABINE</name>
+				<cost>3100</cost>
+				<csWeaponID>15</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>United States</info-1>
+					<info-2>5,56 NATO</info-2>
+					<info-3>30 rounds</info-3>
+					<info-4>685 shots / min</info-4>
+					<info-5>3,22 kg</info-5>
+					<info-7>4 grams</info-7>
+					<info-8>884 m/s</info-8>
+					<info-9>1570 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>BULLPUP</name>
+				<cost>3500</cost>
+				<csWeaponID>16</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Austria</info-1>
+					<info-2>5,56 NATO</info-2>
+					<info-3>30 rounds</info-3>
+					<info-4>727 shots / min</info-4>
+					<info-6>4,09 kg</info-6>
+					<info-7>4 grams</info-7>
+					<info-8>884 m/s</info-8>
+					<info-9>1570 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>KRIEG 550 COMMANDO</name>
+				<cost>4200</cost>
+				<csWeaponID>17</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>Switzerland</info-1>
+					<info-2>5,56 NATO</info-2>
+					<info-3>30 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-5>7,02 kg</info-5>
+					<info-7>4 grams</info-7>
+					<info-8>945 m/s</info-8>
+					<info-9>1650 joules</info-9>
+				</information>
+			</item>
+
+			<item>
+				<name>MAGNUM SNIPER RIFLE</name>
+				<cost>4750</cost>
+				<csWeaponID>12</csWeaponID>
+				<slot>1</slot>
+				<information>
+					<info-1>United Kingdom</info-1>
+					<info-2>.339 LAPUA MAGNUM</info-2>
+					<info-3>10 rounds</info-3>
+					<info-4>not applicable</info-4>
+					<info-5></info-5>
+					<info-6>6 kg</info-6>
+					<info-7>16,2 grams</info-7>
+					<info-8>914 m/s</info-8>
+					<info-9>7000 joules</info-9>
+				</information>
+			</item>
 		</category>
 		
-		<category name="equipment"> <!-- S1 -->
-<!-- 			<item>
+		<!-- S1 -->
+		<category name="equipment">
+			<item>
 				<name>KEVLAR</name>
 				<cost>600</cost>
-				<weapon_id>1</weapon_id>
-				<weapon_slot_id>S1</slot>
-				<info_10>asd</info_10>
-			</item> -->
+				<csWeaponID>1</csWeaponID>
+				<slot>S1</slot>
+				<information>
+					<info-10>Protect your body.</info-10>
+				</information>
+			</item>
 
-			<weapon name="KEVLAR" cost="600" csWeaponID="1" slot="S1" info10="Protect your body." />
-			<weapon name="KEVLAR + HELMET" cost="1000" csWeaponID="2" slot="S1" info10="Protect your body and head." />
-			<weapon name="DEFUSE KIT" cost="200" csWeaponID="5" slot="S1" info10="Equipment used to decrease the defuse time of bombs." />
-			<weapon name="NIGHT VISION GOGGLES" cost="1250" csWeaponID="3" slot="S1" info10="Nightvision goggles is an equipment item that enable users to see in complete darkness." />
-			<weapon name="THERMAL VISION GOGGLES" cost="1800" csWeaponID="4" slot="S1" info10=" " />
+			<item>
+				<name>KEVLAR + HELMET</name>
+				<cost>1000</cost>
+				<csWeaponID>2</csWeaponID>
+				<slot>S1</slot>
+				<information>
+					<info-10>Protect your body and head.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>DEFUSE KIT</name>
+				<cost>200</cost>
+				<csWeaponID>5</csWeaponID>
+				<slot>S1</slot>
+				<information>
+					<info-10>Equipment used to decrease the defuse time of bombs.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>NIGHT VISION GOGGLES</name>
+				<cost>1250</cost>
+				<csWeaponID>3</csWeaponID>
+				<slot>S1</slot>
+				<information>
+					<info-10>Nightvision goggles is an equipment item that enable users to see in complete darkness.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>THERMAL VISION GOGGLES</name>
+				<cost>1800</cost>
+				<csWeaponID>4</csWeaponID>
+				<slot>S1</slot>
+			</item>
 		</category>
 
 		<category name="grenades">
-			<weapon name="HE GRENADE" cost="300" csWeaponID="1" slot="4" info10="The high explosive fragmentation grenade administers high damage through a wide area, making it ideal for clearing out hostile rooms." />
-			<weapon name="FLASHBANG" cost="200" csWeaponID="1" slot="5" info10="The non-lethal flashbang grenade temporarily blinds anybody within its concussive blast, making it perfect for flushing out closed-in areas. Its loud explosion also temporarily masks the sound of footsteps" />		
-			<weapon name="SMOKE GRENADE" cost="300" csWeaponID="1" slot="6" info10="The smoke grenade creates a medium-area smoke screen. It can effectively hide your team from snipers, or even just create a useful distraction." />
-			<weapon name="DECOY GRENADE" cost="50" csWeaponID="2" slot="7" info10="When thrown, the decoy grenade emulates the sound of the most powerful weapon you are carrying, creating the illusion of additional supporting forces." />
+			<item>
+				<name>HE GRENADE</name>
+				<cost>300</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>4</slot>
+				<information>
+					<info-10>The high explosive fragmentation grenade administers high damage through a wide area, making it ideal for clearing out hostile rooms.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>FLASHBANG</name>
+				<cost>200</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>5</slot>
+				<information>
+					<info-10>The non-lethal flashbang grenade temporarily blinds anybody within its concussive blast, making it perfect for flushing out closed-in areas. Its loud explosion also temporarily masks the sound of footsteps.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>SMOKE GRENADE</name>
+				<cost>300</cost>
+				<csWeaponID>1</csWeaponID>
+				<slot>6</slot>
+				<information>
+					<info-10>The smoke grenade creates a medium-area smoke screen. It can effectively hide your team from snipers, or even just create a useful distraction.</info-10>
+				</information>
+			</item>
+
+			<item>
+				<name>DECOY GRENADE</name>
+				<cost>50</cost>
+				<csWeaponID>2</csWeaponID>
+				<slot>7</slot>
+				<information>
+					<info-10>When thrown, the decoy grenade emulates the sound of the most powerful weapon you are carrying, creating the illusion of additional supporting forces.</info-10>
+				</information>
+			</item>
 		</category>
 	</team2>
 </shop>

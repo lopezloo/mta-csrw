@@ -34,6 +34,8 @@ g_misc = {
 	roundStarted = false
 }
 
+g_matchSettings = deepcopy(DEFAULT_MATCH_SETTINGS)
+
 sX, sY = guiGetScreenSize()
 
 local gl_goggleDelay
@@ -44,10 +46,11 @@ addEventHandler("onClientResourceStart", resourceRoot,
 		init()
 		toggleControl("fire", false)
 		bindKey("aim_weapon", "both", onClientAim)
+		bindKey("fire", "down", onClientFire)
 		addEventHandler("onBoxClosed", root, onClassClosed) -- class.lua
 		addEventHandler("onBoxClosed", root, onMOTDClosed) -- motd.lua
 
-		triggerServerEvent("sendMeLocalization", resourceRoot, getLocalLanguage())
+		triggerServerEvent("sendMeLocalization", localPlayer, getLocalLanguage())
 	end
 )
 
@@ -66,6 +69,8 @@ function preInit()
 	setAmbientSoundEnabled("general", false)
 	setAmbientSoundEnabled("gunfire", false)
 	setPedsLODDistance(100)
+	setVehiclesLODDistance(100, 200)
+	setCoronaReflectionsEnabled(1)
 	setTime(12, 0)
 	clearWorld()
 	csClearBlips()
@@ -136,7 +141,6 @@ function init()
 end
 
 function clearWorld()
-	destroyGroundWeapons()
 	destroyGrenades()
 	destroyProjectileLines()
 	extinguishFire(0, 0, 0, 999999)
@@ -167,6 +171,9 @@ addEventHandler("onClientPlayerSpawn", localPlayer,
 		if g_config["free_defusing_kit"] and localPlayer.team == g_team[2] then
 			g_player.items.defuser = true
 		end
+
+		toggleControl("jump", true)
+		updatePlayerControls()
 	end
 )
 
@@ -232,7 +239,6 @@ addEventHandler("onClientRoundEnd", root,
 
 		cancelDefuse()
 		cancelPlant()
-		csClearBlips()
 	end
 )
 
@@ -240,15 +246,19 @@ addEvent("onClientRoundStart", true)
 addEventHandler("onClientRoundStart", root,
 	function()
 		-- Create radar blips
-		for _, v in ipairs(getElementsByType("bombsite")) do
-			local letter = getElementID(v)
-			if letter == "bombsite (1)" then letter = "A"
-			elseif letter == "bombsite (2)" then letter = "B"
-			elseif letter == "bombsite (3)" then letter = "C" end
-			
-			if letter == "A" or letter == "B" or letter == "C" then
-				csCreateBlipAttachedTo(v, letter, 8)
+		csClearBlips()
+
+		local letters = {
+			"A", "B", "C"
+		}
+
+		for k, v in ipairs(getElementsByType("bombsite")) do
+			local letter = letters[k]
+			if letter == nil then
+				letter = letters[#letters]
 			end
+
+			csCreateBlipAttachedTo(v, letters[k], 8)
 		end
 
 		for _, v in ipairs(getElementsByType("hostagesite")) do
@@ -290,7 +300,7 @@ function enableGoggles()
 			end
 			g_player.goggleState = true
 			playSound(":csrw-sounds/sounds/items/nvg_on.wav")
-			triggerServerEvent("attachWeaponToBody", localPlayer, localPlayer, nil, "goggle")
+			triggerServerEvent("attachWeaponToMe", localPlayer, nil, "goggle", nil)
 		end
 	end
 	gl_goggleDelay = true
@@ -311,7 +321,7 @@ function setGogglesOff()
 
 	g_player.goggleState = false
 	setCameraGoggleEffect("normal")
-	triggerServerEvent("detachWeaponFromBody", localPlayer, localPlayer, "goggle")
+	triggerServerEvent("detachWeaponFromMe", localPlayer, "goggle")
 end
 
 bindKey(getKeyBoundToCommand("screenshot"), "down", 
@@ -355,7 +365,7 @@ function fixPedLighting(ped)
 	obj.frozen = true
 	obj.breakable = false
 
-	for k, v in pairs(getElementsByType("player")) do
+	for _, v in pairs(getElementsByType("player")) do
 		obj:setCollidableWith(v, false)
 	end
 
@@ -381,9 +391,12 @@ function updatePlayerControls()
 	-- Can shoot?
 	local fire = false
 
+	-- Can aim?
+	local aim = true
+
 	local hasBombInHands = false
 	local slot = localPlayer:getData("currentSlot")
-	if slot then
+	if slot and g_playerWeaponData[slot] then
 		if g_playerWeaponData[slot].clip ~= nil and g_playerWeaponData[slot].clip > 0 then
 			fire = true
 		end
@@ -407,7 +420,24 @@ function updatePlayerControls()
 		fire = false
 	end
 
+	--if isPlayerPickingUpHostage() or getCurrentProgressBar() == "planting" then
+	if getCurrentProgressBar() ~= "" then
+		fire = false
+		aim = false
+	end
+
 	toggleControl("fire", fire)
+	toggleControl("aim_weapon", aim)
 
 	-- @TODO: implement more controls here
 end
+
+addEvent("updateMatchSettings", true)
+addEventHandler("updateMatchSettings", root,
+	function(settings)
+		outputChatBox("C updateMatchSettings " .. tostring(settings["weaponShop"]))
+		outputChatBox("C updateMatchSettings weaponDrop " .. tostring(settings["weaponDrop"]))
+		outputChatBox("C updateMatchSettings everythingIsFree " .. tostring(settings["everythingIsFree"]))
+		g_matchSettings = settings
+	end
+)

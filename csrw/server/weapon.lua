@@ -26,6 +26,8 @@ playerAttachments["goggle"] = {}
 g_playerWeaponData = {} -- informacja o broniach gracza na danym slocie
 -- g_playerWeaponData[player][slot] = {weapon, ammo, clip}
 
+local WEAPON_AMMO_MAX = 51711
+
 function server_changeWeaponToSlot(oldSlot, slot, oldAmmo, oldClip, deleteWeapon)
 	if client and source == client then
 		--[[if not oldAmmo and not oldClip then
@@ -60,7 +62,6 @@ addEventHandler("onElementDataChange", root,
 
 			local newWeapon = tonumber(g_weapon[newSlot][ g_playerWeaponData[source][newSlot].weapon ]["weaponID"])
 			if g_player[source].sneaking and newWeapon > 0 and getSlotFromWeapon(newWeapon) == WEAPON_SLOT_MELEE then
-				-- broń biała
 				toggleControl(source, "sprint", false)
 			end
 
@@ -80,7 +81,7 @@ addEventHandler("onElementDataChange", root,
 			end
 
 		elseif data == "health" and getElementData(source, "alive") and getElementData(source, data) <= 0 then
-			setElementHealth(source, 0)
+			source.health = 0
 		end
 	end
 )
@@ -125,21 +126,21 @@ function attachWeaponToBody(player, weapon, slot, bombType)
 	if slot == "goggle" then
 		-- @todo
 		--local wep = getElementData(player, "wSlotE1") -- 24, 25 (weapons.xml) ; wSlotE1 - extra slot (gogle termowizyjne / nocnowizyjne)
-		--playerAttachments[slot][player] = createObject(368, 0, 0, 0)
-		objectID = 368
+
+		-- @todo: why is this hardcoded? couldn't it be loaded from weapons config file?
+		objectID = OBJECT_NIGHTVISION_GOGGLES
 	
 	else
 		objectID = g_weapon[slot][weapon]["objectID"]
-		if not objectID then
-			-- jeśli coś jest nie tak z objectID używanie modelu AK-47
-			objectID = 355
-			outputChatBox("ERROR: There is a problem with attaching weapon (slot " .. slot .. ", weapon " .. weapon .. ") to body - objectID parameter is invalid, using AK-47 model.", player)
-		end
 	end
 
 	if objectID then
-		playerAttachments[slot][player] = createObject(objectID, 0, 0, 0)
-		setObjectScale(playerAttachments[slot][player], 0.9)
+		playerAttachments[slot][player] = Object(objectID, BLACKHOLE)
+		playerAttachments[slot][player].scale = 0.9
+		playerAttachments[slot][player].collisions = false
+		playerAttachments[slot][player].breakable = false
+		playerAttachments[slot][player].interior = player.interior
+		playerAttachments[slot][player].dimension = player.dimension
 		
 		local bone, x, y, z, rx, ry, rz
 		if slot == "goggle" then
@@ -148,53 +149,91 @@ function attachWeaponToBody(player, weapon, slot, bombType)
 		elseif slot == 1 then
 			bone, x, y, z, rx, ry, z = 3, 0, -0.14, 0.4, 0, 90, 0
 		
-		elseif slot == DEF_BOMB[1] and weapon == DEF_BOMB[2] then -- flaga c4
-			if bombType == "hands" then -- ręce
+		elseif slot == DEF_BOMB[1] and weapon == DEF_BOMB[2] then
+			-- bomb
+			if bombType == "hands" then
+				-- hands
 				bone, x, y, z, rx, ry, z = 11, -0.1, 0.08, 0.15, 200, 70, 0
-			else -- plecy
+			else
+				-- back
 				bone, x, y, z, rx, ry, z = 3, -0.1, -0.13, 0.16, 0, 0, 0
 			end
 		end
 		
 		exports["bone_attach"]:attachElementToBone(playerAttachments[slot][player], player, bone, x, y, z, rx, ry, rz)
-		setElementData(playerAttachments[slot][player], "attachedPlayer", player) -- do pobierania obiektow do ukrycia przy celowaniu snajperką
-		setElementInterior(playerAttachments[slot][player], getElementInterior(player))
+		playerAttachments[slot][player]:setData("attachedPlayer", player) -- do pobierania obiektow do ukrycia przy celowaniu snajperką
 		return true
 	end
 	
 	return false
 	
-	-- c4 na lewej nodze: crun exports["bone_attach"]:attachElementToBone(obj, localPlayer, 13, -0.13, -0.08, 0.2, 180, 0, 90)
-	-- c4 na plecach: crun exports["bone_attach"]:attachElementToBone(obj, localPlayer, 3, -0.1, -0.13, 0.16, 0, 0, 0)
+	-- c4 on left leg: crun exports["bone_attach"]:attachElementToBone(obj, localPlayer, 13, -0.13, -0.08, 0.2, 180, 0, 90)
+	-- c4 on back: crun exports["bone_attach"]:attachElementToBone(obj, localPlayer, 3, -0.1, -0.13, 0.16, 0, 0, 0)
 end
-addEvent("attachWeaponToBody", true)
-addEventHandler("attachWeaponToBody", root, attachWeaponToBody, player, slot, bombType)
+
+addEvent("attachWeaponToMe", true)
+addEventHandler("attachWeaponToMe", root,
+	function(weapon, slot, bombType)
+		if not client or client ~= source then
+			return
+		end
+
+		if slot ~= "goggle" then
+			-- We don't need support for other slots currently
+			return
+		end
+
+		attachWeaponToBody(client, weapon, slot, bombType)
+	end
+)
+
 
 function detachWeaponFromBody(player, slot)
 	if isElement(playerAttachments[slot][player]) then
-		destroyElement(playerAttachments[slot][player])
+		playerAttachments[slot][player]:destroy()
+		playerAttachments[slot][player] = nil
 	end
 end
-addEvent("detachWeaponFromBody", true)
-addEventHandler("detachWeaponFromBody", root, detachWeaponFromBody)
+
+addEvent("detachWeaponFromMe", true)
+addEventHandler("detachWeaponFromMe", root,
+	function(slot)
+		if not client or client ~= source then
+			return
+		end
+		
+		if slot ~= "goggle" then
+			-- We don't need support for other slots currently
+			return
+		end
+
+		detachWeaponFromBody(client, slot)
+	end
+)
 
 function unloadBombFromHands(player)
 	if getElementData(player, "currentSlot") == DEF_BOMB[1] then
 		if isElement(playerAttachments[ DEF_BOMB[1] ][player]) then
 			destroyElement(playerAttachments[DEF_BOMB[1]][player])
 		end
+
 		stopAnimationWithWalking(player)
 		toggleControl(player, "jump", true)
 		toggleControl(player, "crouch", true)
 
-		if getElementData( player, "wSlot" .. DEF_BOMB[1] ) ~= false then
-			attachWeaponToBody(player, DEF_BOMB[2], DEF_BOMB[1], "body") -- podczepianie C4 do pleców
+		if getElementData(player, "wSlot" .. DEF_BOMB[1]) ~= false then
+			-- attach bomb to player back
+			attachWeaponToBody(player, DEF_BOMB[2], DEF_BOMB[1], "body")
 		end		
 	end
 end
 
 function csGiveWeapon(player, csSlot, csWeaponID, ammo, ammoInClip, hideHer)
 	if not player or not csSlot or not csWeaponID then return false end
+
+	if not g_weapon[csSlot] or not g_weapon[csSlot][csWeaponID] then
+		return false
+	end
 	
 	local csWeaponID = tonumber(csWeaponID)
 	--outputChatBox("DEBUG: csGiveWeapon( " .. getPlayerName(player) .. ", csSlot=" .. tostring(csSlot) .. ", csWeaponID=" .. tostring(csWeaponID) .. ", ... )")
@@ -227,18 +266,21 @@ function csGiveWeapon(player, csSlot, csWeaponID, ammo, ammoInClip, hideHer)
 		--unloadBomb(player) -- usuwa starą broń z "kieszeni" postaci (tylko c4)
 		unloadBombFromHands(player)
 
-		if gtaWeaponID == 16 or gtaWeaponID == 17 or gtaWeaponID == 18 then -- granaty (grenade, smoke (+ flash, decoy), molotov)
+		if isWeaponProjectile(gtaWeaponID) then
 			--if not ammo then ammo = 1 end
 			if not ammoInClip then
 				ammoInClip = ammo or 1 -- gracz wszystkie granaty trzyma w 'magazynku'
 			end
 
-			if ammo then ammo = 0 end
+			if ammo then
+				ammo = 0
+			end
+
 			if not hideHer then
 				setElementData(player, "currentSlot", csSlot) -- ustawienie info o obecnym slocie
 				--setElementData(player, "currentWeapon", csWeaponID)
 				giveWeapon(player, gtaWeaponID, 1, true)
-				setWeaponAmmo(player, gtaWeaponID, 51711, 51711)
+				setWeaponAmmo(player, gtaWeaponID, WEAPON_AMMO_MAX, WEAPON_AMMO_MAX)
 				toggleControl(player, "fire", true)
 				-- ^ gta ma tak zjebany system, że jak nie ma się obecnie tej broni to nie dodaje amunicji tylko podmienia
 			end
@@ -270,7 +312,7 @@ function csGiveWeapon(player, csSlot, csWeaponID, ammo, ammoInClip, hideHer)
 				--setElementData(player, "currentWeapon", csWeaponID)
 				giveWeapon(player, gtaWeaponID, 1, true)
 				--setWeaponAmmo(player, gtaWeaponID, ammo, ammoInClip) -- zmiana ilości amunicji (w giveWeapon nie można podać ilości ammo w magazynku)
-				setWeaponAmmo(player, gtaWeaponID, 51711, 51711)
+				setWeaponAmmo(player, gtaWeaponID, WEAPON_AMMO_MAX, WEAPON_AMMO_MAX)
 				--outputChatBox("Physicall weapon ammo change (new weapon GTAID " .. gtaWeaponID .. ", ammo " .. ammo .. ", clip " .. ammoInClip .. ")", player)
 			
 				if getSlotFromWeapon(gtaWeaponID) == WEAPON_SLOT_MELEE then
@@ -278,22 +320,22 @@ function csGiveWeapon(player, csSlot, csWeaponID, ammo, ammoInClip, hideHer)
 						toggleControl(player, "sprint", true) -- bieganie z bronią białą
 					end
 					toggleControl(player, "fire", true)
+				
 				else
 					toggleControl(player, "sprint", false)
-					if getControlState(player, "aim_weapon") == false and getSlotFromWeapon(gtaWeaponID) ~= WEAPON_SLOT_PROJECTILES then -- jeśli nie celuje i nie ma granata
+					if getControlState(player, "aim_weapon") == false and not isWeaponProjectile(gtaWeaponID) then -- jeśli nie celuje i nie ma granata
 						toggleControl(player, "fire", false)
 					end
 				end
 			end
 		end
 	end
+	
 	g_playerWeaponData[player][csSlot].ammo = ammo
 	g_playerWeaponData[player][csSlot].clip = ammoInClip
 	setElementData(player, "wSlot" .. csSlot, csWeaponID) -- potrzebne do synchronizowania: obrażeń, spectatora, wyrzucania broni, rzucania customowymi granatami (flash, smoke, decoy etc.) etc.
 	triggerClientEvent(player, "updateWeaponData", resourceRoot, csSlot, csWeaponID, ammo, ammoInClip, hideHer)
 end
-addEvent("csGiveWeapon", true)
-addEventHandler("csGiveWeapon", root, csGiveWeapon, player, csweaponID, ammo, ammoInClip)
 
 function unloadSlotWeapon(player, slot) -- uwaga! funkcja nie przerzuca na niższy slot, dlatego po niej należy dać funkcję zmiany slota bądź nadać nową broń!
 	-- nie stosować przed nadaniem nowej broni (gta)
@@ -322,7 +364,9 @@ function unloadSlotWeapon(player, slot) -- uwaga! funkcja nie przerzuca na niżs
 
 	if gtaWeaponID > 0 then
 		takeWeapon(player, gtaWeaponID)
-	elseif slot == DEF_BOMB[1] and weapon == DEF_BOMB[2] then -- chowanie c4
+	
+	elseif slot == DEF_BOMB[1] and weapon == DEF_BOMB[2] then
+		-- hide bomb
 		stopAnimationWithWalking(player)
 		toggleControl(player, "jump", true)
 		toggleControl(player, "crouch", true)
@@ -344,53 +388,20 @@ function getPedArmorEx(ped)
 	return armor
 end
 
--- Called from client/shop.lua
-function buyWeapon(weaponCost, csSlot, csWeaponID)
-	if getPlayerMoneyEx(client) < weaponCost and not g_config["everything_is_free"] then
-		advert.error("msg_noMoney", client)
-		triggerClientEvent("cPlaySound", client, "files/sounds/buttons/weapon_cant_buy.wav")
+function csKillPed(ped, attacker, weapon, bodypart)
+	if not client or client ~= source then
 		return
 	end
 
-	local gtaWeaponID = tonumber(g_weapon[csSlot][csWeaponID]["weaponID"])
-	if gtaWeaponID == WEAPON_GRENADE or gtaWeaponID == WEAPON_TEARGAS or gtaWeaponID == WEAPON_MOLOTOV then
-		local maxGrenades = 1
-		if csSlot == 4 then
-			maxGrenades = 2
-		end
-
-		local clip = 0
-		if g_playerWeaponData[client][csSlot] then
-			clip = g_playerWeaponData[client][csSlot].clip or 0
-		end
-
-		takePlayerMoneyEx(client, weaponCost)
-		csGiveWeapon(client, csSlot, csWeaponID, clip + 1)
-		--outputChatBox("SERWER: Granat kupiony za $" .. weaponCost .. ". csWeaponID = " .. csWeaponID, client)
-	else
-		--local ammo = tonumber(g_weapon[csSlot][csWeaponID]["ammo"]) + tonumber(g_weapon[csSlot][csWeaponID]["clip"])
-		local ammo = tonumber(g_weapon[csSlot][csWeaponID]["ammo"])
-		
-		--detachWeaponFromBody(client, csSlot)
-		takePlayerMoneyEx(client, weaponCost)
-		--outputChatBox("buyWeapon " .. csSlot .. " " .. csWeaponID .. " " .. tostring(ammo))
-		csGiveWeapon(client, csSlot, csWeaponID, ammo)
-		--outputChatBox("SERWER: Broń " .. weaponName .. "(" .. csWeaponID .. ") z " .. ammo .. " nabojami kupiona za $" .. weaponCost, client)
-	end
-end
-addEvent("buyWeapon", true)
-addEventHandler("buyWeapon", root, buyWeapon, weaponCost, csSlot, csWeaponID)
-
-function csKillPed(ped, attacker, weapon, bodypart)
 	-- bodypart = gta body part ; weapon = gta weapon (w przyszłości zamienić na cs weapon - własna lista zabójstw)
 	
-	killPed(ped, attacker, weapon, bodypart)
-	setElementData(ped, "alive", false)
-	setElementData(ped, "health", 0)
+	ped:kill(attacker, weapon, bodypart)
+	ped:setData("alive", false)
+	ped:setData("health", 0)
+	ped.collisions = false
 
-	setElementCollisionsEnabled(ped, false)
-	if bodypart == 9 and g_config["gore"] then
-		setPedHeadless(ped, true)
+	if bodypart == BODY_PART_HEAD and g_config["gore"] then
+		ped.headless = true
 	end
 end
 addEvent("csKillPed", true)

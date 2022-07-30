@@ -72,12 +72,15 @@ addEventHandler("onElementDataChange", root,
 
 				g_player[player].carryingHost = source
 				playAnimationWithWalking("GYMNASIUM", "gym_bike_fast", source)
-				--setElementPosition(source, getElementPosition(player)) -- fix lighting
+				--setElementPosition(source, getElementPosition(player)) -- fix ped lighting
 				
 				setTimer(
 					function(ped)
 						exports.bone_attach:attachElementToBone(ped, getElementData(ped, "carryBy"), 3, -0.52, -0.5, -0.2, 0, 0, 0)
-					end, 250, 1, source)
+					end, 250, 1, source
+				)
+
+				player.walkingStyle = MOVE_PLAYER_F
 			end
 		end
 	end
@@ -100,6 +103,7 @@ function detachCarriedHostage(player)
 	end
 
 	g_player[player].carryingHost = nil
+	player.walkingStyle = MOVE_PLAYER_M
 end
 
 addEventHandler("onPlayerWasted", root,
@@ -125,7 +129,27 @@ function onHostageDelivered(element, matchingDimensions)
 		-- @todo?
 		toggleControl(element, "jump", true)
 		toggleControl(element, "crouch", true)
+		toggleControl(element, "walk", true)
+
+		element.frozen = false
 
 		onRoundEnd(2, 5)
 	end
 end
+
+addEvent("dropHostage", true)
+addEventHandler("dropHostage", root,
+	function()
+		if not client or client ~= source then return end
+
+		if g_roundData.state ~= "started" then
+			return
+		end
+
+		if not g_player[client].carryingHost then
+			return
+		end
+
+		detachCarriedHostage(client)
+	end
+)

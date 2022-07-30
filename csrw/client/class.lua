@@ -157,7 +157,7 @@ function classUpdatePlayer(skin, team)
 	if not skin then skin = classData["skin"] end
 	if not team then team = classData["team"] end
 	if team ~= 3 then spectator.exit() end
-	triggerServerEvent("updateClassInfos", resourceRoot, skin, team)
+	triggerServerEvent("updateClassInfos", localPlayer, skin, team)
 end
 
 -- bind

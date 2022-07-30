@@ -199,10 +199,10 @@ function output(text)
 	end
 end
 
-function table.find(table, find)
-	if not table or not find then return false end
+function table.find(t, find)
+	if not t or not find then return false end
 	
-	for k, v in pairs(table) do
+	for k, v in pairs(t) do
 		if v == find then
 			return k
 		end
@@ -211,8 +211,30 @@ function table.find(table, find)
 	return false
 end
 
-function strip()
-	return string.gsub(strval, "^%s*(.-)%s*$", "%1")
+function table.removeElement(t, element)
+	local pos = table.find(t, element)
+	if pos ~= false then
+		table.remove(t, pos)
+	end
+end
+
+function deepcopy(orig)
+	local orig_type = type(orig)
+	local copy
+	if orig_type == 'table' then
+		copy = {}
+		for orig_key, orig_value in next, orig, nil do
+		copy[deepcopy(orig_key)] = deepcopy(orig_value)
+		end
+		setmetatable(copy, deepcopy(getmetatable(orig)))
+	else -- number, string, boolean, etc
+		copy = orig
+	end
+	return copy
+end
+
+function strip(str)
+	return string.gsub(str, "^%s*(.-)%s*$", "%1")
 end
 
 function getTeamSkinValue(team)
@@ -242,4 +264,13 @@ local SPRINTABLE_SLOTS = {
 
 function isWeaponSlotSprintable(slot)
 	return table.find(SPRINTABLE_SLOTS, slot) ~= false
+end
+
+function isWeaponProjectile(gtaWeaponID)
+	local slot = getSlotFromWeapon(gtaWeaponID)
+	return isWeaponSlotProjectile(slot)
+end
+
+function isWeaponSlotProjectile(gtaSlot)
+	return gtaSlot == WEAPON_SLOT_PROJECTILES
 end

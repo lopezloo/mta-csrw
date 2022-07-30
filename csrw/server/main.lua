@@ -87,7 +87,7 @@ addEventHandler("onResourceStart", root,
 			-- todo: maszynowe
 			--
 
-			for k, v in pairs(getElementsByType("player")) do
+			for _, v in pairs(getElementsByType("player")) do
 				onPlayerJoinFunc(v)
 			end
 
@@ -110,6 +110,7 @@ addEventHandler("onResourceStart", root,
 						outputServerLog("WARNING: Gamemode need these permissions:")
 						problems.errors = problems.errors + 1
 					end
+
 					outputServerLog(" * " .. v[1] .. " for " .. v[2])
 					if k == #neededPermissions then
 						outputServerLog("Please use \"aclrequest allow " .. getResourceName(getThisResource()) .. " all\" command.\n")
@@ -172,10 +173,11 @@ addEventHandler("onResourceStart", root,
 			if problems.criticals > 0 or problems.errors > 0 then
 				outputServerLog("WARNING: Gamemode was started but got some problems. Please FIX IT.")
 			else
-				outputServerLog("Counter Strike: RenderWare started properly!")
+				outputServerLog("CSRW started properly!")
 			end
+		
 		else
-			-- inne zasoby
+			-- other resources
 			for _, v in pairs(g_resources.toStop) do
 				local resource = getResourceFromName(v)
 				if source == resource then
@@ -206,6 +208,7 @@ end
 
 addEventHandler("onResourceStop", resourceRoot,
 	function()
+		-- Reset weapon properties
 		local allWeapons = {
 			"ak-47",
 			"m4",
@@ -224,9 +227,9 @@ addEventHandler("onResourceStop", resourceRoot,
 			"anim2_loop_stop"
 		}
 
-		for k, v in pairs(allWeapons) do
-			for k2, v2 in pairs(parameters) do
-				for k3, v3 in pairs({"poor", "std", "pro"}) do
+		for _, v in pairs(allWeapons) do
+			for _, v2 in pairs(parameters) do
+				for _, v3 in pairs({"poor", "std", "pro"}) do
 					setWeaponProperty(v, v3, v2, getOriginalWeaponProperty(v, v3, v2))
 				end
 			end
@@ -257,6 +260,7 @@ addEventHandler("onPlayerQuit", root,
 		if g_player[source].rtv then
 			g_match.wantsRTV = g_match.wantsRTV - 1
 		end
+
 		detachCarriedHostage(source)
 		g_player[source] = nil
 	end
@@ -282,28 +286,40 @@ function onPlayerJoinFunc(player)
 	bindKey(player, "walk", "down", setPlayerSneaking)
 	bindKey(player, "walk", "up", setPlayerSneaking)
 	g_playerWeaponData[player] = {}
+
+	sendMatchSettingsToPlayer(player)
 end
 
 function setPlayerSneaking(player, key, keyState)
+	if g_player[player].carryingHost then
+		-- Player can't sneak while carrying hostage
+		return
+	end
+
 	if keyState == "down" then
-		setPedWalkingStyle(player, MOVE_SNEAK)
+		player.walkingStyle = MOVE_SNEAK
 		g_player[player].sneaking = true
+		
 		if not getElementData(player, "anim") then
 			playAnimationWithWalking("ped", "facanger", player)
 		end
-		if getPedWeaponSlot(player) == WEAPON_SLOT_MELEE then
+		
+		if player.weaponSlot == WEAPON_SLOT_MELEE then
 			toggleControl(player, "sprint", false)
 		end
 		
 	else
 		g_player[player].sneaking = false
-		setPedWalkingStyle(player, MOVE_PLAYER_M)
+		player.walkingStyle = MOVE_PLAYER_M
+		if g_player[player].carryingHost ~= nil then
+			player.walkingStyle = MOVE_PLAYER_F
+		end
+
 		if getElementData(player, "anim") == "ped:facanger" then
 			stopAnimationWithWalking(player)
 		end
-		if getPedWeaponSlot(player) == WEAPON_SLOT_MELEE then
-			toggleControl(player, "sprint", true)
-		end		
+
+		toggleControl(player, "sprint", isWeaponSlotSprintable(player.weaponSlot) and g_player[player].carryingHost == nil)
 	end
 end
 
@@ -318,7 +334,7 @@ addEventHandler("onVehicleStartEnter", root,
 addEvent("sendMeLocalization", true)
 addEventHandler("sendMeLocalization", root,
 	function(loc)
-		if client then
+		if client and source == client then
 			if g_lang[loc] then
 				g_player[client].localization = loc
 			else
@@ -339,6 +355,7 @@ function outputText(txt, r, g, b, to)
 		for k, v in pairs(to) do
 			outputChatBox(getText(txt, v), v, r, g, b)
 		end
+	
 	elseif getElementType(to) == "player" then
 		outputChatBox(getText(txt, to), to, r, g, b)
 	end

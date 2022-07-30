@@ -1,14 +1,14 @@
 local shopButton = {}
 local currentWeapon = {}
 
-local shop = { {}, {} } -- for two teams
+local shop
 local currentCategory
 
 local shopInformation = {}
 
-local DEBUG_SKIP_GRENADE_LIMIT = true
-local DEBUG_BUY_ANYTIME = true
-local DEBUG_BUY_EVERYWHERE = true
+local DEBUG_SKIP_GRENADE_LIMIT = DEBUG_MODE and true
+local DEBUG_BUY_ANYTIME = DEBUG_MODE and true
+local DEBUG_BUY_EVERYWHERE = DEBUG_MODE and true
 
 addCommandHandler("Shop",
 	function()
@@ -24,6 +24,15 @@ bindKey("B", "down", "Shop")
 
 function showShop()
 	if not getElementData(localPlayer, "alive") then
+		return
+	end
+
+	if getCurrentProgressBar() ~= "" then
+		return
+	end
+
+	if not g_matchSettings.weaponShop then
+		outputChatBox("shop disabledddd")
 		return
 	end
 
@@ -100,56 +109,9 @@ addEventHandler("onClientResourceStart", resourceRoot,
 			guiSetVisible(shopButton[i], false)
 		end
 		-- koniec wczytywania gui		
-		loadShopWeapons()
+		shop = loadShopWeapons()
 	end
 )
-
-function loadShopWeapons()
-	-- wczytywanie kategori broni teamów i broni przypisanych do nich
-	local shopFile = xmlLoadFile("files/shop.xml")
-	if not shopFile then
-		outputDebugString("CRTICAL ERROR: shop configuration file don't exists or is damaged", 1)
-		outputChatBox("CRTICAL ERROR: shop configuration file don't exists or is damaged")
-		outputChatBox("BŁĄD KRYTYCZNY! Nie znaleziono pliku z konfiguracją sklepu z bronią lub jest on uszkodzony.")
-		return
-	end
-
-	for k, v in pairs(xmlNodeGetChildren(shopFile)) do -- wykona się 2 razy (2 teamy) (nod <teamX>)
-		for k2, v2 in pairs(xmlNodeGetChildren(v)) do -- pętla na kategorie
-			shop[k][k2] = {}
-
-			shop[k][k2]["name"] = xmlNodeGetAttribute(v2, "name")
-			--shop[k][k2]["slot"] = xmlNodeGetAttribute(v2, "slot") -- slot[team][kategoria][info kategorii/bron][parametr]
-
-			for k3, v3 in pairs(xmlNodeGetChildren(v2)) do -- pętla na wszystkie bronie z kategorii
-				shop[k][k2][k3] = {}
-				for attribute, value in pairs(xmlNodeGetAttributes(v3)) do -- uzyskiwanie atrybutów broni
-					if attribute == "csWeaponID" or attribute == "cost" then
-						value = tonumber(value)
-					end
-					if attribute == "slot" then
-						if not string.find(value, "S") then
-							value = tonumber(value)
-						end
-					end
-					shop[k][k2][k3][attribute] = value
-
-					--[[if value ~= "-1" then -- debug
-						--outputChatBox(tostring(attribute) .. " = " .. value)
-						--outputChatBox("shop[" .. k .. "][" .. k2 .. "][" .. k3 .. "][" .. attribute .. "]")
-						--outputChatBox("shop[" .. k .. "][" .. k2 .. "][" .. k3 .. "][" .. attribute .. "] = " .. value)
-					end]]--
-				end
-				if not shop[k][k2][k3]["csWeaponID"] or not shop[k][k2][k3]["slot"] then
-					--outputChatBox("shop[" .. k .. "][" .. k2 .. "][" .. k3 .. "][name] = " .. tostring(shop[k][k2][k3]["name"]) .. " ?")
-					outputChatBox("CRITICAL ERROR: Weapon " .. tostring(k3) .. " (category " .. tostring(k2) .. ", team " .. tostring(k) .. ") has not setted csWeaponID or slot.")
-				end
-			end
-		end
-	end
-
-	xmlUnloadFile(shopFile)
-end
 
 function shop_loadCategories()
 	-- kategoria z broniami, powrot, powrot - nie kasuje buttonow
@@ -233,13 +195,20 @@ function shop_weaponButtonHover()
 			currentWeapon.cost = v["cost"]
 			local text = ""
 			local text2 = ""
-			for i=1, 10 do
-				local info = v["info" .. i]
-				if info and info ~= "-1" then
-					text = text .. shopInformation[i] .. "\n" -- lewa belka
-					text2 = text2 .. info .. "\n" -- prawa belka
+
+			if v["information"] then
+				for i=1, 10 do
+					local info = v["information"]["info-" .. i]
+					if info then
+						-- left side
+						text = text .. shopInformation[i] .. "\n"
+
+						-- right side
+						text2 = text2 .. info .. "\n"
+					end
 				end
 			end
+
 			currentWeapon.text = text
 			currentWeapon.text2 = text2
 			break			
@@ -310,13 +279,20 @@ function shop_buyWeapon(button, state) -- onClientGUIClick; wybranie broni i pr�
 	for k, v in pairs(shop[team][currentCategory]) do
 		--outputChatBox("c shop_buyWeapon: " .. name .. " " .. v["name"] .. " ?")
 		if name == v["name"] then
-			buyWeapon(v["cost"], v["slot"], v["csWeaponID"])
+			-- buyWeapon(v["cost"], v["slot"], v["csWeaponID"])
+			buyWeapon(currentCategory, k)
 			break
 		end
 	end
 end
 
-function buyWeapon(cost, slot, weapon)
+function buyWeapon(weaponCategory, weaponPos)
+	local tid = getTeamID(localPlayer.team)
+	local shopWeapon = shop[tid][weaponCategory][weaponPos]
+	local slot = shopWeapon["slot"]
+	local weapon = shopWeapon["csWeaponID"]
+	local cost = shopWeapon["cost"]
+
 	local gtaWepID
 	if slot == "S1" then
 		gtaWepID = tonumber(g_weapon["S1"][weapon]["weaponID"])
@@ -324,36 +300,45 @@ function buyWeapon(cost, slot, weapon)
 		gtaWepID = tonumber(g_weapon[slot][weapon]["weaponID"])
 	end
 
-	if getPlayerMoneyEx(localPlayer) < cost and not g_config["everything_is_free"] then
+	if getPlayerMoneyEx(localPlayer) < cost and not g_matchSettings.everythingIsFree then
 		advert.error("msg_noMoney")
 		playSound(":csrw-sounds/sounds/buttons/weapon_cant_buy.wav")
 		return
 	end
 
-	if g_playerWeaponData[slot] then
+	-- Do not drop weapon if player is buying same weapon
+	-- so ammo can be refilled
+	if g_playerWeaponData[slot] and g_playerWeaponData[slot].weapon ~= weapon then
 		dropWeapon(true, slot)
 	end
 
 	local noserver = true
-	if gtaWepID == -1 then -- kamizelka
+	-- kevlar
+	if gtaWepID == -1 then
 		csSetPedArmor(localPlayer, 100)
+		playSound(":csrw-sounds/sounds/items/ammopickup.wav")
 
-	elseif gtaWepID == -2 then -- kamizelka + hełm
+	-- kevlar + helmet
+	elseif gtaWepID == -2 then
 		csSetPedArmor(localPlayer, 100)
 		g_player.items.helmet = true
+		playSound(":csrw-sounds/sounds/items/ammopickup.wav")
 
-	elseif gtaWepID == -3 or gtaWepID == -4 then -- termowizor lub noktowizor
+	-- nightvision or thermalvision
+	elseif gtaWepID == -3 or gtaWepID == -4 then
 		local g = 1
 		if gtaWepID == -4 then g = 2 end
 		g_player.items.goggles = g
+		playSound(":csrw-sounds/sounds/items/ammopickup.wav")
 		turnGogglesOff()
 
+	-- defusing kit
 	elseif gtaWepID == -5 then
-		-- defusing kit
 		g_player.items.defuser = true
+		playSound(":csrw-sounds/sounds/items/ammopickup.wav")
 
 	else
-		if gtaWepID == WEAPON_GRENADE or gtaWepID == WEAPON_TEARGAS or gtaWepID == WEAPON_MOLOTOV then
+		if isWeaponProjectile(gtaWepID) then
 			local maxGrenades = 1
 			if slot == 4 then
 				maxGrenades = 2
@@ -372,16 +357,18 @@ function buyWeapon(cost, slot, weapon)
 		end
 
 		noserver = false
-		triggerServerEvent("buyWeapon", localPlayer, cost, slot, weapon)
+		triggerServerEvent("buyWeapon", localPlayer, weaponCategory, weaponPos)
 		
 		if CFirstPerson.enabled then
 			setControlState("aim_weapon", true)
 		end
+		playSound(":csrw-sounds/sounds/items/itempickup.wav")
+		-- @todo: play ammopickup.wav instead if player already has this weapon?
 	end
-	playSound(":csrw-sounds/sounds/buttons/weapon_confirm.wav")
+	--playSound(":csrw-sounds/sounds/buttons/weapon_confirm.wav")
 
 	--outputChatBox("noserver " .. tostring(noserver))
-	if noserver and not g_config["everything_is_free"] then
+	if noserver and not g_matchSettings.everythingIsFree then
 		takePlayerMoneyEx(localPlayer, cost)
 	end
 end
@@ -389,7 +376,6 @@ end
 function shop_loadWeaponsFromCategory(category) -- ładowanie broni z danej kategori do 10 przycisków
 	local team = getTeamID(localPlayer.team)
 	shop_hideAllButtons()
-		
 	setBoxLabel(getText("shop_cat_" .. shop[team][category]["name"]))
 
 	local buttons = {}
@@ -397,11 +383,13 @@ function shop_loadWeaponsFromCategory(category) -- ładowanie broni z danej kate
 		if v["name"] then
 			guiSetProperty(shopButton[k], "Text", k .. " " .. v["name"])
 			guiSetVisible(shopButton[k], true)
-			setTimer(function()
+			setTimer(
+				function()
 					addEventHandler("onClientGUIClick", shopButton[k], shop_buyWeapon)
 					addEventHandler("onClientMouseEnter", shopButton[k], shop_weaponButtonHover, false)
 					addEventHandler("onClientMouseLeave", shopButton[k], shop_weaponButtonLeave, false)
-				end, 50, 1)
+				end, 50, 1
+			)
 			table.insert(buttons, shopButton[k])
 		end
 	end
@@ -429,7 +417,7 @@ function renderShop()
 		dxDrawImage(render["img"][1], render["img"][2], render["img"][3], render["img"][4], ":csrw-media/images/shop/" .. currentWeapon.image, 0, 0, 0, tocolor(255, 255, 255, 255), false)
 	
 		local cost = "$" .. currentWeapon.cost
-		if g_config["everything_is_free"] then
+		if g_matchSettings.everythingIsFree then
 			cost = free_str
 		end
 

@@ -7,6 +7,10 @@ local nominateLimit = 5
 local currentVoteOptions = {}
 
 function nominateMap(mapName)
+	if not client or client ~= source then
+		return
+	end
+
 	if #currentVoteOptions > 0 then
 		outputText("msg_ArleadyVoting", 255, 102, 102, client)
 		return
@@ -21,7 +25,7 @@ function nominateMap(mapName)
 		return
 	end
 
-	for k, v in pairs(nominations) do
+	for _, v in pairs(nominations) do
 		if v == mapName then
 			outputText("msg_mapAlreadyNominated", 255, 102, 120, client)
 			return
@@ -37,7 +41,7 @@ function nominateMap(mapName)
 		playerNominations[client] = mapName
 		table.insert(nominations, mapName)
 
-		for k, v in pairs(getElementsByType("player")) do
+		for _, v in pairs(getElementsByType("player")) do
 			outputChatBox(" * " .. getPlayerName(client) .. getText("msgPart_nominated", v) .. string.gsub(mapName, "csrw_", "") .. ".", v)
 		end
 	else -- nominował wcześniej mape
@@ -46,9 +50,9 @@ function nominateMap(mapName)
 			return
 		end
 
-		table.remove(nominations, table.find(nominations, playerNominations[client]))
+		table.removeElement(nominations, playerNominations[client])
 
-		for k, v in pairs(getElementsByType("player")) do
+		for _, v in pairs(getElementsByType("player")) do
 			outputChatBox(" * " .. getPlayerName(client) .. getText("nomChanged", v) .. playerNominations[client] .. " " .. getText("to", v) .. " " .. string.gsub(mapName, "csrw_", "") .. ".", v)
 		end
 		playerNominations[client] = mapName
@@ -61,10 +65,14 @@ addEventHandler("nominateMap", root, nominateMap, mapName)
 addEvent("pleaseSendMeMapList", true)
 addEventHandler("pleaseSendMeMapList", root,
 	function()
-		local maps = getCounterStrikeMaps()
+		if not client or client ~= source then
+			return
+		end
+
+		local maps = getCSMaps()
 		local mapsData = {}
 		
-		for id, map in pairs(maps) do
+		for _, map in pairs(maps) do
 			table.insert(mapsData, { getResourceName(map), getResourceInfo(map, "author") or "-" })
 		end
 		triggerClientEvent("updateMapList", client, mapsData)
@@ -73,7 +81,7 @@ addEventHandler("pleaseSendMeMapList", root,
 
 function deletePlayerNomination(player)
 	if playerNominations[player] then
-		table.remove(nominations, table.find(nominations, playerNominations[player])) -- todo if nie ma aktualnie głosowania
+		table.removeElement(nominations, playerNominations[player]) -- todo if nie ma aktualnie głosowania
 		playerNominations[player] = nil
 	end
 end
@@ -95,10 +103,10 @@ function voteMaps()
 
 	if getResourceState(getResourceFromName("votemanager")) ~= "running" then
 		if hasObjectPermissionTo(getThisResource(), "function.startResource") then
-			outputServerLog("Turning votemanger on due to maps vote.")
+			outputServerLog("Turning votemanger on due to map vote.")
 			startResource(getResourceFromName("votemanager"))
 		else
-			outputServerLog("ERROR: Vote can't be started because votemanager is turned off.")
+			outputServerLog("ERROR: Map vote can't be started because votemanager is turned off.")
 			return
 		end
 	end
@@ -114,7 +122,7 @@ function voteMaps()
 		--start options (array part)
 	}
 
-	for k, v in pairs(nominations) do
+	for _, v in pairs(nominations) do
 		table.insert(pollTable, {v})
 		table.insert(currentVoteOptions, v)
 	end
@@ -122,7 +130,7 @@ function voteMaps()
 	-- if there is still place for maps
 	if #nominations < nominateLimit then
 		local maps = {}
-		for k, v in pairs(exports["mapmanager"]:getMapsCompatibleWithGamemode(getThisResource())) do
+		for _, v in pairs(exports["mapmanager"]:getMapsCompatibleWithGamemode(getThisResource())) do
 			local name = getResourceName(v)
 			if getCurrentMap() ~= v and name ~= "editor_test" and name ~= "editor_dump" then
 				local nominated = false
@@ -142,6 +150,7 @@ function voteMaps()
 			if #maps == 0 then
 				break
 			end
+			
 			local r = math.random(1, #maps)
 			table.insert(pollTable, { getResourceName(maps[r]) })
 			table.insert(currentVoteOptions, getResourceName(maps[r]))

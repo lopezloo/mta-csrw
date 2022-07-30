@@ -43,7 +43,7 @@ function plantBomb(key, keyState)
 				setProgressBar("planting", 0.02)
 				addEventHandler("onProgressBarEnd", resourceRoot, onBombPlanted)
 
-				setElementFrozen(localPlayer, true)
+				localPlayer.frozen = true
 				playAnimationWithWalking("BOMBER", "BOM_Plant_Loop")
 				g_player.canChangeSlot = false
 			end
@@ -59,7 +59,7 @@ function cancelPlant()
 	if getCurrentProgressBar() == "planting" then
 		stopProgressBar()
 
-		setElementFrozen(localPlayer, false)
+		localPlayer.frozen = false
 		playAnimationWithWalking("CARRY", "crry_prtial")
 		g_player.canChangeSlot = true
 		removeEventHandler("onProgressBarEnd", resourceRoot, onBombPlanted)
@@ -68,13 +68,12 @@ end
 
 function onBombPlanted(progressName)
 	if progressName == "planting" then
-		setElementFrozen(localPlayer, false)
-		toggleControl("fire", true)
-		toggleControl("aim_weapon", true)
+		localPlayer.frozen = false
 		stopAnimationWithWalking()
+		updatePlayerControls()
 		g_player.canChangeSlot = true
 
-		triggerServerEvent("plantBomb", resourceRoot, localPlayer)
+		triggerServerEvent("plantBomb", localPlayer)
 		switchWeaponSlot("up")
 		removeEventHandler("onProgressBarEnd", resourceRoot, onBombPlanted)
 	end
@@ -104,15 +103,15 @@ function defuseBomb(key, keyState)
 					gl_lastDefuseTryTime = getTickCount()
 
 					if g_player.items.defuser then
+						-- defusing is faster with defuse kit
 						setProgressBar("defusing", 0.012, true)
 					else
-						setProgressBar("defusing", 0.0055, true) -- bez zestawu do rozbrajania
+						setProgressBar("defusing", 0.0055, true)
 					end
 					addEventHandler("onProgressBarEnd", resourceRoot, onBombDefused)
 
-					setElementFrozen(localPlayer, false)
-					toggleControl("fire", false)
-					toggleControl("aim_weapon", false)
+					localPlayer.frozen = true
+					updatePlayerControls()
 					playAnimationWithWalking("BOMBER", "BOM_Plant_Loop")
 					g_player.canChangeSlot = false
 					setElementData(resourceRoot, "defusingBomb", true)
@@ -129,11 +128,10 @@ bindKey("E", "both", defuseBomb)
 
 function cancelDefuse()
 	if getCurrentProgressBar() == "defusing" then
-		stopProgressBar()
-		
-		setElementFrozen(localPlayer, false)
-		toggleControl("fire", true)
-		toggleControl("aim_weapon", true)
+		stopProgressBar()		
+		localPlayer.frozen = false
+		updatePlayerControls()
+
 		setElementData(resourceRoot, "defusingBomb", false)
 		stopAnimationWithWalking()
 		g_player.canChangeSlot = true
@@ -143,13 +141,12 @@ end
 
 function onBombDefused(progressName)
 	if progressName == "defusing" then
-		setElementFrozen(localPlayer, false)
-		toggleControl("fire", true)
-		toggleControl("aim_weapon", true)
+		localPlayer.frozen = false
+		updatePlayerControls()
 		stopAnimationWithWalking()
 		g_player.canChangeSlot = true
 
-		triggerServerEvent("defuseBomb", resourceRoot, localPlayer)
+		triggerServerEvent("defuseBomb", localPlayer)
 		removeEventHandler("onProgressBarEnd", resourceRoot, onBombDefused)
 	end
 end
@@ -158,8 +155,11 @@ end
 addEventHandler("onClientPlayerWasted", localPlayer,
 	function()
 		if getCurrentProgressBar() ~= "" then
-			if localPlayer.team == g_team[1] then cancelPlant()
-			elseif localPlayer.team == g_team[2] then cancelDefuse() end
+			if localPlayer.team == g_team[1] then
+				cancelPlant()
+			elseif localPlayer.team == g_team[2] then
+				cancelDefuse()
+			end
 		end
 	end
 )
