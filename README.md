@@ -49,5 +49,5 @@ This repository consist of code and configuration files only. Assets are not inc
 Special thanks to [Ren712](https://community.multitheftauto.com/?p=profile&id=320386) for his [wall shader](https://community.multitheftauto.com/index.php?p=resources&s=details&id=7615).
 
 <p align="center">
-2012 - 2022
+2012 – 2022
 </p>
