@@ -40,7 +40,7 @@ CS:RW
 This game mode is not being actively developed anymore. However, pull requests are welcome. New features should be reported as issue first.
 
 ## Other
-* [Multi Theft Auto forum topic](https://forum.mtasa.com/topic/61129-rel-counter-strike-renderware-gamemode/)
+* [Multi Theft Auto forum topic](https://forum.multitheftauto.com/topic/61129-rel-counter-strike-renderware-gamemode/)
 * [Videos on YouTube](https://www.youtube.com/playlist?list=PLlZJGl2Rc-B-GrX5Vn66DSsKI_K0q28Aj)
 
 
