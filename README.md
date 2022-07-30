@@ -27,7 +27,7 @@ CS:RW
 * ability to drop weapons on the ground
 * server Message of The Day
 * <s>global news</s>
-* new version notification
+* <s>new version notification</s>
 * <s>internal master server list</s>
 * Rock The Vote feature and ability to nominate maps for next vote
 * locale system (by default: english and polish)
