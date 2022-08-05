@@ -1,6 +1,9 @@
--- Wyrzucanie broni z wykorzystaniem fizyki GTA
+-- Weapon drop - server
+
 local weaponCount = 0
 local weapons = {} -- xyzString, slot, weapon, totalAmmo, clipAmmo
+
+-- @todo: set dimensions?
 
 addEvent("dropPhysicWeapon", true)
 addEventHandler("dropPhysicWeapon", root,
@@ -104,7 +107,7 @@ function createGroundWeapon(slot, weapon, x, y, z, rz, int)
 		slot = slot,
 		weapon = weapon,
 		totalAmmo = totalAmmo,
-		clipAmmo = clipAmmo,
+		clipAmmo = totalClip,
 		rotz = rz,
 		int = int
 	}
@@ -184,7 +187,6 @@ end
 addEvent("onPhysicWeaponTaken", true)
 addEventHandler("onPhysicWeaponTaken", root, onPhysicWeaponTaken)
 
--- @todo: some checks could be implemented to avoid h4cks
 addEvent("syncThrowedWeapon", true)
 addEventHandler("syncThrowedWeapon", root,
 	function(uniqueID, xyzString, rotz)
@@ -198,22 +200,25 @@ addEventHandler("syncThrowedWeapon", root,
 		end
 
 		local weapon = weapons[uniqueID]
+		if weapon.dropState ~= 0 then
+			-- Weapon is already synced
+			return
+		end
+
 		if weapon.owner ~= client then
-			outputChatBox("syncThrowedWeapon fail owner")
 			-- Player can't sync this weapon position
 			-- because he isn't owner
 			return
 		end
 
-		if not g_matchSettings.weaponDrop and not (weapon.slot == DEF_BOMB[1] and weapon.weapon == DEF_BOMB[2]) then
+		if not g_match.settings.weaponDrop and not (weapon.slot == DEF_BOMB[1] and weapon.weapon == DEF_BOMB[2]) then
 			-- Weapon drop is disabled in config
-			-- (drop bomb even if weaponDrop is disabled though)
+			-- (but drop bomb even if weapon drop is disabled)
 			return
 		end
 
 		local pos = split(xyzString, ";")
-		if #pos ~= 3 then
-			outputChatBox("syncThrowedWeapon fail pos")
+		if type(pos) ~= "table" or #pos ~= 3 then
 			-- Invalid position (should be "X;Y;Z" string)
 			return
 		end

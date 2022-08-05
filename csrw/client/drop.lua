@@ -1,4 +1,4 @@
--- Weapon drop
+-- Weapon drop - client
 
 -- Same physical property group is used for projectiles and weapon objects
 local DROPPED_OBJECT_PHYSICAL_PROPERTY_GROUP = 122

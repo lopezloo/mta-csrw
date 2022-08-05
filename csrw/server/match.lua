@@ -1,6 +1,9 @@
 g_match = {
 	mode = "cs",
-	rounds = 0, -- liczba wystartowanych rund na obecnej mapie
+
+	-- count of started rounds in this match
+	rounds = 0,
+
 	nextMap = nil,
 
 	bombsites = false,
@@ -9,8 +12,6 @@ g_match = {
 
 	settings = deepcopy(DEFAULT_MATCH_SETTINGS)
 }
-
-output(tostring( g_match.settings.weaponShop ))
 
 function restartMatch(currentMap)
 	outputServerLog("Match was restarted.")

@@ -360,3 +360,9 @@ function outputText(txt, r, g, b, to)
 		outputChatBox(getText(txt, to), to, r, g, b)
 	end
 end
+
+addEventHandler("onPickupHit", root,
+	function(player)
+		cancelEvent()
+	end
+)

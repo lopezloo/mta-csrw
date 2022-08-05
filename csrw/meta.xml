@@ -1,5 +1,5 @@
 <meta>
-	<info type="gamemode" name="CSRW" author="lopezloo" version="1.1.0" edf:definition="edf/csrw.xml" />
+	<info type="gamemode" name="CS:RW" author="lopezloo" version="1.1.0" edf:definition="edf/csrw.xml" />
 	
 	<file src="files/config.xml" />
 	<file src="files/shop.xml" />
@@ -11,8 +11,8 @@
 
 	<script type="shared" src="shared/utils/definitions.lua" />
 	<script type="shared" src="shared/utils/definitions2.lua" />
-	<script type="shared" src="shared/utils/advert.lua" />
 	<script type="shared" src="shared/utils/utils.lua" />
+	<script type="shared" src="shared/utils/advert.lua" />
 
 	<script type="shared" src="shared/config.lua" />
 	<script type="shared" src="shared/language.lua" />
@@ -61,7 +61,9 @@
 	<script type="client" src="client/render/progressbar.lua" />
 	<!--<script type="client" src="client/render/debug.lua" />-->
 
-	<file src="motd.txt" /> <!-- Message of The Day, feel free to edit this -->
+	<!-- Message of The Day, feel free to edit this -->
+	<file src="motd.txt" />
+	
 	<!--<file src="news" />-->
 
 	<!-- CSRW resources -->
@@ -84,10 +86,16 @@
 
 	<!-- ACL requests -->
 	<aclrequest>
-		<right name="function.stopResource" access="true" /> <!-- managing external resources -->
+		<!-- managing external resources -->
+		<right name="function.stopResource" access="true" />
 		<right name="function.startResource" access="true" />
-		<!--<right name="function.fetchRemote" access="true" />--> <!-- master server list, global news -->
-		<right name="function.callRemote" access="true" /> <!-- new version notification -->
+
+		<!-- master server list, global news -->
+		<!--<right name="function.fetchRemote" access="true" />-->
+
+		<!-- new version notification -->
+		<right name="function.callRemote" access="true" />
+
 		<right name="general.ModifyOtherObjects" access="true" />
 	</aclrequest>
 

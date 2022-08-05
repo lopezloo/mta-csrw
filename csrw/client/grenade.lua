@@ -365,6 +365,7 @@ function createSmokeGrenadeParticleEffect(projectile)
 		moveObject(obj, 100*(z - groundZ), x, y, groundZ)
 	end
 	
+	-- Extinguish nearby fire
 	setTimer(
 		function()
 			extinguishFire(x, y, z, 5.0)

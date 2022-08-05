@@ -8,7 +8,7 @@ local specData = {
 local updateColorTimer
 local updateWallEffectTimer
 
-spectator = {} -- funkcje spectatora
+spectator = {}
 
 function spectator.join(temporary)
 	outputDebugString("joining spectators")

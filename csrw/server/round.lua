@@ -142,7 +142,7 @@ function randomizeBomberMan()
 
 	local terrorists = getPlayersInTeam(g_team[1])
 	for _, v in pairs(terrorists) do
-		-- usuwanie nieżywych tt
+		-- remove dead players
 		if getElementData(v, "alive") == false then
 			table.removeElement(terrorists, v)
 		end
@@ -152,7 +152,7 @@ function randomizeBomberMan()
 		return false
 	end
 
-	if DEF_BOMB[1] == -1 then
+	if DEF_BOMB[1] == -1 or DEF_BOMB[2] == -1 then
 		outputChatBox("SERVER: ERROR: There is no weapon with BOMB flag.")
 		return false
 	end
@@ -298,14 +298,14 @@ function onRoundEnd(winTeam, reason)
 	
 	-- kasa za wygranie rundy poprzez zabicie wszystkich członków pozostałej drużyny (jednakowa dla obu drużyn)
 	if reason == 1 then
-		for i, player in pairs( getPlayersInTeam(g_team[winTeam]) ) do
+		for _, player in pairs( getPlayersInTeam(g_team[winTeam]) ) do
 			givePlayerMoneyEx(player, 3250)
 			advert.ok(getText("msg_moneyAward", player) .. 3250, player, true)
 		end
 
 	-- kasa dla TT za wybuch bomby
 	elseif reason == 2 then
-		for i, player in pairs( getPlayersInTeam(g_team[1]) ) do
+		for _, player in pairs( getPlayersInTeam(g_team[1]) ) do
 			local money = 3500
 			-- dodatkowy bonus pieniężny gdy jest conajmniej 1 CT żywy
 			if g_roundData.aliveCT >= 1 then
@@ -317,7 +317,7 @@ function onRoundEnd(winTeam, reason)
 
 	-- kasa dla CT za rozbrojenie bomby lub dla TT za skończenie się czasu na rozbrojenie bomby
 	elseif reason == 3 or reason == 4 then
-		for i, player in pairs( getPlayersInTeam(g_team[winTeam]) ) do
+		for _, player in pairs( getPlayersInTeam(g_team[winTeam]) ) do
 			givePlayerMoneyEx(player, 3250)
 			advert.ok(getText("msg_moneyAward", player) .. 3250, player, true)
 		end
@@ -326,7 +326,7 @@ function onRoundEnd(winTeam, reason)
 
 	-- uwolnienie zakładników
 	elseif reason == 5 then
-		for k, v in pairs( getPlayersInTeam( g_team[winTeam] ) ) do
+		for _, v in pairs( getPlayersInTeam( g_team[winTeam] ) ) do
 			givePlayerMoneyEx(v, 1000)
 			advert.ok(getText("msg_moneyAward", v) .. 1000, v, true)
 		end
@@ -343,12 +343,12 @@ function onRoundEnd(winTeam, reason)
 		local lostTeam = getOppositeTeam(winTeam)
 		if lostTeam then
 			-- zapomoga pieniężna dla przegrańców
-			for k, v in pairs(getPlayersInTeam( g_team[ lostTeam ] )) do
+			for _, v in pairs(getPlayersInTeam( g_team[ lostTeam ] )) do
 				givePlayerMoneyEx(v, 1500)
 			end
 		end
 	else
-		for k, v in pairs(getElementsByType("player")) do
+		for _, v in pairs(getElementsByType("player")) do
 			if getPlayerTeam(v) == g_team[1] or getPlayerTeam(v) == g_team[2] then
 				-- zapomoga dla obu drużyn podczas remisu
 				givePlayerMoneyEx(v, 1500)
@@ -357,7 +357,7 @@ function onRoundEnd(winTeam, reason)
 	end
 
 	local players = getElementsByType("player")
-	for i, player in pairs(players) do
+	for _, player in pairs(players) do
 		if getElementData(player, "alive") then
 			g_player[player].surviveLastRound = true
 			setPlayerChannelByTeam(player)
