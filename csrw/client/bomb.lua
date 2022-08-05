@@ -19,13 +19,10 @@ function plantBomb(key, keyState)
 		if localPlayer.team ~= g_team[1] then return end
 
 		local inBombsite = false
-		for k, v in pairs(getElementsByType("marker")) do
-			if isElementWithinMarker(localPlayer, v) then
-				local id = getElementID(v)
-				if id == "A" or id == "B" or id == "C" then
-					inBombsite = true
-					break
-				end
+		for _, v in pairs(getElementsByType("marker")) do
+			if v:getData("isBombsite") and localPlayer:isWithinMarker(v) and localPlayer.interior == v.interior and localPlayer.dimension == v.dimension then
+				inBombsite = true
+				break
 			end
 		end
 		
@@ -33,11 +30,11 @@ function plantBomb(key, keyState)
 			local currentSlot = getElementData(localPlayer, "currentSlot")
 			if not currentSlot or not g_playerWeaponData.current then return end
 			if g_weapon[currentSlot][g_playerWeaponData.current]["weaponID"] == "-6" then
-
 				if gl_lastPlantTryTime and getTickCount() - gl_lastPlantTryTime < 2000 then
 					-- Rate limit bomb planting
 					return
 				end
+
 				gl_lastPlantTryTime = getTickCount()
 
 				setProgressBar("planting", 0.02)

@@ -58,13 +58,23 @@ function respawnHostages()
 	end
 end
 
+-- @todo: refactor this into event
 addEventHandler("onElementDataChange", root,
 	function(data, oldValue)
 		if data == "carryBy" and source.type == "ped" then
 			local player = source:getData("carryBy")
 			if player then
-				-- safety check
-				if ((client and player ~= client) or getPlayerTeam(player) ~= g_team[2] or
+				if not isRoundStarted() then
+					source:setData(data, oldValue)
+					return
+				end
+
+				if player.health == 0 or player.team ~= g_team[2] then
+					source:setData(data, oldValue)
+					return
+				end
+
+				if ((client and player ~= client) or
 					not isElementInRangeOfPoint(player, source.position.x, source.position.y, source.position.z, 5)) then
 					source:setData(data, oldValue)
 					return
@@ -113,7 +123,7 @@ addEventHandler("onPlayerWasted", root,
 )
 
 function onHostageDelivered(element, matchingDimensions)
-	if g_roundData.state ~= "started" then
+	if not isRoundStarted() then
 		return
 	end
 
@@ -142,7 +152,7 @@ addEventHandler("dropHostage", root,
 	function()
 		if not client or client ~= source then return end
 
-		if g_roundData.state ~= "started" then
+		if not isRoundStarted() then
 			return
 		end
 

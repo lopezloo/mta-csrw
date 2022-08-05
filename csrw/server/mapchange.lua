@@ -156,6 +156,7 @@ function onMapStart(startedMap)
 			local marker = createMarker(getElementData(v, "posX"), getElementData(v, "posY"), getElementData(v, "posZ"), "cylinder", getElementData(v, "size"), 255, 255, 255, 0, nil)
 			marker.interior = v:getData("interior") or 0
 			marker.id = bombsiteLetters[k]
+			marker:setData("isBombsite", true)
 		end
 		
 		if #bombsites > 0 then

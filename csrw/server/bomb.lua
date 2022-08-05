@@ -7,6 +7,7 @@ local gl_bombBeepTimer
 local BOMB_BEEP_SOUND_DISTANCE = 70
 local BOMB_EXPLOSION_SOUND_DISTANCE = 120
 
+-- Player is sending request to plant bomb
 function onBombPlanted()
 	if not client or client ~= source then
 		return
@@ -17,7 +18,45 @@ function onBombPlanted()
 		return
 	end
 
+	if not isRoundStarted() then
+		return
+	end
+
 	if DEF_BOMB[1] == -1 or DEF_BOMB[2] == -1 then
+		-- Bomb weapon isn't defined
+		return
+	end
+
+	if not g_match.bombsites then
+		-- Bomb defusals are disabled
+		return
+	end
+
+	if client.health == 0 or client.team ~= g_team[1] then
+		return
+	end
+
+	local currentSlot = client:getData("currentSlot")
+	if not currentSlot or currentSlot ~= DEF_BOMB[1] then
+		-- Player current weapon isn't bomb
+		return
+	end
+
+	if g_playerWeaponData[client][ DEF_BOMB[1] ].weapon ~= DEF_BOMB[2] then
+		-- Player doesn't have bomb
+		return
+	end
+
+	local inBombsite = false
+	for _, v in pairs(getElementsByType("marker")) do
+		if v:getData("isBombsite") and client:isWithinMarker(v) and client.interior == v.interior and client.dimension == v.dimension then
+			inBombsite = true
+			break
+		end
+	end
+
+	if not inBombsite then
+		-- Player is not at bomb site
 		return
 	end
 
@@ -45,6 +84,7 @@ function bombBeep(interval)
 	local x, y, z = getElementPosition(gl_bombObj)
 	local light = createMarker(x, y, z + 0.075, "corona", 0.1, 255, 0, 0)
 	light.interior = gl_bombObj.interior
+	light.dimension = gl_bombObj.dimension
 	setTimer(destroyElement, 50, 1, light)
 	triggerClientEvent("cPlaySound", root, "weapons/c4/c4_beep1.wav", x, y, z, BOMB_BEEP_SOUND_DISTANCE)
 
@@ -62,7 +102,7 @@ function onBombExploded()
 	end
 
 	local x, y, z = getElementPosition(gl_bombObj)
-	createExplosion(x, y, z, 6)
+	createExplosion(x, y, z, EXPLOSION_BOAT)
 	triggerClientEvent("cPlaySound", root, "weapons/c4/c4_explode1.wav", x, y, z, BOMB_EXPLOSION_SOUND_DISTANCE)
 
 	if countPlayersInTeam(g_team[2]) > 0 then
@@ -87,12 +127,32 @@ function destroyBomb()
 	g_roundData.bomb = false
 end
 
+-- Player is sending request to defuse bomb
 function onBombDefused()
 	if not client or client ~= source then
 		return
 	end
 
 	if not g_roundData.bomb then
+		-- Bomb isn't planted
+		return
+	end
+
+	if not isRoundStarted() then
+		return
+	end
+
+	if client.health == 0 or client.team ~= g_team[2] then
+		return
+	end
+
+	if client.interior ~= gl_bombObj.interior or client.dimension ~= gl_bombObj.dimension then
+		return
+	end
+
+	local dist = getDistanceBetweenPoints3D(client.position, gl_bombObj.position)
+	if dist >= 5 then
+		-- Player is too far away from bomb
 		return
 	end
 
