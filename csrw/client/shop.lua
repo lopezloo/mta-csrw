@@ -32,7 +32,18 @@ function showShop()
 	end
 
 	if not g_matchSettings.weaponShop then
-		outputChatBox("shop disabledddd")
+		return
+	end
+
+	if g_player.aiming or g_player.reloading then
+		return
+	end
+
+	if getPedTask(localPlayer, "secondary", TASK_SECONDARY_ATTACK) then
+		return
+	end
+
+	if getPedTask(localPlayer, "primary", TASK_PRIMARY) then
 		return
 	end
 
@@ -287,6 +298,18 @@ function shop_buyWeapon(button, state) -- onClientGUIClick; wybranie broni i pr√
 end
 
 function buyWeapon(weaponCategory, weaponPos)
+	if g_player.aiming or g_player.reloading then
+		return
+	end
+
+	if getPedTask(localPlayer, "secondary", TASK_SECONDARY_ATTACK) then
+		return
+	end
+
+	if getPedTask(localPlayer, "primary", TASK_PRIMARY) then
+		return
+	end
+
 	local tid = getTeamID(localPlayer.team)
 	local shopWeapon = shop[tid][weaponCategory][weaponPos]
 	local slot = shopWeapon["slot"]
