@@ -26,9 +26,6 @@ CS:RW
 * spectator mode with free camera mode and "wallhacking" (CS:GO alike) teammates and weapons laying on ground
 * ability to drop weapons on the ground
 * server Message of The Day
-* <s>global news</s>
-* <s>new version notification</s>
-* <s>internal master server list</s>
 * Rock The Vote feature and ability to nominate maps for next vote
 * locale system (by default: english and polish)
 * configurable
